@@ -1,0 +1,278 @@
+.invite {
+  min-height: 100vh;
+  padding-bottom: 4rem;
+}
+
+.invite__layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  gap: 2rem;
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .invite__layout {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .invite__content {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    padding: 2rem 1.5rem;
+  }
+
+  .invite__contentInner {
+    overflow-y: visible;
+  }
+
+  .invite__imageWrap {
+    height: 75vh;
+    min-height: 420px;
+  }
+}
+
+.invite__content {
+  display: flex;
+  flex-direction: column;
+  height: 90vh;
+  min-height: 560px;
+  max-height: 90vh;
+  padding: 1.75rem 1.5rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.invite__imageWrap {
+  position: relative;
+  width: 100%;
+  height: 90vh;
+  min-height: 560px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.invite__image {
+  object-fit: contain;
+  object-position: center;
+}
+
+.invite__imagePlaceholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+.invite__imagePlaceholder code {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+
+.invite__contentInner {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.invite__titleWrap {
+  margin-bottom: 1rem;
+  text-align: left;
+  flex-shrink: 0;
+}
+
+.invite__title {
+  font-size: clamp(1.75rem, 4.5vw, 2.5rem);
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+
+.invite__subtitle {
+  font-size: 0.8rem;
+  font-weight: 300;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.invite__details {
+  padding: 0 0 1.25rem;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.invite__copy {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.invite__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.invite__rsvp {
+  padding: 1.25rem 0 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.invite__rsvpTitle {
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.required {
+  color: var(--accent);
+}
+
+.rsvpForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.rsvpForm__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.rsvpForm__input {
+  width: 100%;
+  padding: 0.55rem 0.85rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.rsvpForm__input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.rsvpForm__input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.rsvpForm__textarea {
+  resize: vertical;
+  min-height: 56px;
+}
+
+.rsvpForm__radioGroup {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.rsvpForm__radio {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.rsvpForm__radio input {
+  accent-color: var(--accent);
+  width: 18px;
+  height: 18px;
+}
+
+.rsvpForm__status {
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.rsvpForm__statusSuccess {
+  color: var(--success);
+}
+
+.rsvpForm__statusError {
+  color: var(--error);
+}
+
+.rsvpForm__submit {
+  margin-top: 0.35rem;
+  padding: 0.7rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.rsvpForm__submit:hover:not(:disabled) {
+  background: #a68b3d;
+}
+
+.rsvpForm__submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.invite__footer {
+  padding: 1rem 0 0;
+  text-align: left;
+  margin-top: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+
+.invite__footer .rsvpForm__submit {
+  margin-top: 1rem;
+}
+
+.invite__export a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.invite__export a:hover {
+  text-decoration: underline;
+}
