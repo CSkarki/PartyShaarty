@@ -99,7 +99,7 @@ export default function InvitePage() {
               With love and gratitude, please join us for a special occasion.
               </p>
               <div className={styles.invite__meta}>
-                <span>Date & time — Feb/21/2026, 5:30 PM</span>
+                <span>Date & time — Feb-21-2026, 5:30 PM</span>
                 <span>Location — 25930 lennox hale dr, Aldie, VA 20105</span>
               </div>
             </section>
