@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 import XLSX from "xlsx";
-import { requireHost } from "../../../../lib/auth";
+import { requireHost } from "../../../lib/auth";
 
 const RSVPS_FILE = join(process.cwd(), "data", "rsvps.json");
 
