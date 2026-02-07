@@ -1,4 +1,4 @@
-import XLSX from "xlsx";
+import * as XLSX from "xlsx";
 import { requireHost } from "../../../lib/auth";
 import { listRsvps } from "../../../lib/rsvp-store";
 
