@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import styles from "./page.module.css";
 
 export default function GalleryPage() {
+  return (
+    <Suspense fallback={<main className={styles.gallery}><p className={styles.loading}>Loading...</p></main>}>
+      <GalleryContent />
+    </Suspense>
+  );
+}
+
+function GalleryContent() {
+  const searchParams = useSearchParams();
+  const albumParam = searchParams.get("album"); // ?album=<albumId> deep link
+
   const [verified, setVerified] = useState(null); // null = checking, true/false
   const [step, setStep] = useState("email"); // "email" | "code"
   const [email, setEmail] = useState("");
@@ -19,6 +31,7 @@ export default function GalleryPage() {
   const [photos, setPhotos] = useState([]);
   const [loadingPhotos, setLoadingPhotos] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(null);
+  const [deepLinkHandled, setDeepLinkHandled] = useState(false);
 
   const opts = { credentials: "include" };
 
@@ -33,7 +46,18 @@ export default function GalleryPage() {
         setVerified(false);
         return [];
       })
-      .then((data) => setAlbums(Array.isArray(data) ? data : []))
+      .then((data) => {
+        const albumList = Array.isArray(data) ? data : [];
+        setAlbums(albumList);
+        // Auto-open album from ?album= deep link
+        if (albumParam && albumList.length > 0) {
+          const target = albumList.find((a) => a.id === albumParam);
+          if (target && !deepLinkHandled) {
+            setDeepLinkHandled(true);
+            openAlbum(target);
+          }
+        }
+      })
       .catch(() => setVerified(false));
   }, []);
 
@@ -136,7 +160,16 @@ export default function GalleryPage() {
       const res = await fetch("/api/gallery/albums/guest", opts);
       if (res.ok) {
         const data = await res.json();
-        setAlbums(Array.isArray(data) ? data : []);
+        const albumList = Array.isArray(data) ? data : [];
+        setAlbums(albumList);
+        // Auto-open album from ?album= deep link after OTP verification
+        if (albumParam && !deepLinkHandled) {
+          const target = albumList.find((a) => a.id === albumParam);
+          if (target) {
+            setDeepLinkHandled(true);
+            openAlbum(target);
+          }
+        }
       }
     } catch {}
     setLoadingAlbums(false);

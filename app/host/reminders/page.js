@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import styles from "./page.module.css";
 
 export default function RemindersPage() {
@@ -16,6 +16,9 @@ export default function RemindersPage() {
   const [sending, setSending] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [albums, setAlbums] = useState([]);
+  const [selectedAlbumId, setSelectedAlbumId] = useState("");
+  const textareaRef = useRef(null);
 
   const opts = { credentials: "include" };
 
@@ -32,6 +35,10 @@ export default function RemindersPage() {
       .then((r) => {
         if (r.ok) {
           setLoggedIn(true);
+          fetch("/api/gallery/albums", opts)
+            .then((res) => (res.ok ? res.json() : []))
+            .then((data) => setAlbums(Array.isArray(data) ? data : []))
+            .catch(() => {});
           return fetch("/api/rsvp/list", opts).then((res) => res.json());
         }
         setLoggedIn(false);
@@ -62,6 +69,25 @@ export default function RemindersPage() {
 
   function deselectAll() {
     setSelected(new Set());
+  }
+
+  function insertAlbumLink() {
+    if (!selectedAlbumId) return;
+    const album = albums.find((a) => a.id === selectedAlbumId);
+    if (!album) return;
+    const link = `${window.location.origin}/gallery?album=${album.id}`;
+    const label = `View "${album.name}" photos: ${link}`;
+    const ta = textareaRef.current;
+    if (ta) {
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const before = message.slice(0, start);
+      const after = message.slice(end);
+      setMessage(before + label + after);
+    } else {
+      setMessage((prev) => prev + (prev ? "\n\n" : "") + label);
+    }
+    setSelectedAlbumId("");
   }
 
   async function handleSend(e) {
@@ -218,11 +244,35 @@ export default function RemindersPage() {
 
             <label className={styles.label}>Message</label>
             <textarea
+              ref={textareaRef}
               className={styles.textarea}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Write your reminder message here..."
             />
+
+            {albums.length > 0 && (
+              <div className={styles.albumLinkRow}>
+                <select
+                  className={styles.albumSelect}
+                  value={selectedAlbumId}
+                  onChange={(e) => setSelectedAlbumId(e.target.value)}
+                >
+                  <option value="">Insert album link...</option>
+                  {albums.map((a) => (
+                    <option key={a.id} value={a.id}>{a.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className={styles.albumInsertBtn}
+                  onClick={insertAlbumLink}
+                  disabled={!selectedAlbumId}
+                >
+                  Insert Link
+                </button>
+              </div>
+            )}
 
             {feedback && (
               <p className={styles[feedback.type]}>{feedback.text}</p>

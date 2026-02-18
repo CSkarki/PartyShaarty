@@ -1,6 +1,13 @@
 import { requireHost } from "../../../../lib/auth";
 import { sendEmail } from "../../../../lib/mailer";
 
+function linkify(text) {
+  return text.replace(
+    /(https?:\/\/[^\s<]+)/g,
+    (url) => `<a href="${url}" style="color:#c4a45a;">${url}</a>`
+  );
+}
+
 export async function POST(request) {
   const auth = requireHost(request);
   if (!auth.ok) {
@@ -28,7 +35,7 @@ export async function POST(request) {
         subject: subject.trim(),
         html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;">
           <p>Hi ${firstName},</p>
-          <p>${message.trim().replace(/\n/g, "<br>")}</p>
+          <p>${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
         </div>`,
       });
       results.push({ email, status: "sent" });
