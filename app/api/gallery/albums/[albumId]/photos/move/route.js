@@ -1,14 +1,14 @@
-import { requireHost } from "../../../../../../../lib/auth";
+import { createSupabaseServerClient, requireHostProfile } from "../../../../../../../lib/supabase-server";
 import { getAlbum } from "../../../../../../../lib/gallery-store";
-import {
-  copyPhotoBetweenAlbums,
-  movePhotoBetweenAlbums,
-} from "../../../../../../../lib/supabase";
+import { copyPhotoBetweenAlbums, movePhotoBetweenAlbums } from "../../../../../../../lib/supabase";
 
 export async function POST(request, { params }) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
   const { albumId } = params;
@@ -19,29 +19,24 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const sourceAlbum = await getAlbum(albumId);
-    if (!sourceAlbum) {
-      return Response.json({ error: "Source album not found" }, { status: 404 });
-    }
+    const sourceAlbum = await getAlbum(albumId, profile.id);
+    if (!sourceAlbum) return Response.json({ error: "Source album not found" }, { status: 404 });
 
-    // Validate sourcePath belongs to source album
-    if (!sourcePath.startsWith(`${sourceAlbum.slug}/`)) {
+    // Validate path belongs to this host's album
+    if (!sourcePath.startsWith(`${profile.id}/${sourceAlbum.slug}/`)) {
       return Response.json({ error: "Invalid source path" }, { status: 400 });
     }
 
-    const targetAlbum = await getAlbum(targetAlbumId);
-    if (!targetAlbum) {
-      return Response.json({ error: "Target album not found" }, { status: 404 });
-    }
+    const targetAlbum = await getAlbum(targetAlbumId, profile.id);
+    if (!targetAlbum) return Response.json({ error: "Target album not found" }, { status: 404 });
 
-    // Extract filename from source path
     const filename = sourcePath.split("/").pop();
-    const newPath = `${targetAlbum.slug}/${filename}`;
+    const newPath = `${profile.id}/${targetAlbum.slug}/${filename}`;
 
     if (copy) {
-      await copyPhotoBetweenAlbums(sourcePath, targetAlbum.slug, filename);
+      await copyPhotoBetweenAlbums(sourcePath, profile.id, targetAlbum.slug, filename);
     } else {
-      await movePhotoBetweenAlbums(sourcePath, targetAlbum.slug, filename);
+      await movePhotoBetweenAlbums(sourcePath, profile.id, targetAlbum.slug, filename);
     }
 
     return Response.json({ ok: true, newPath });

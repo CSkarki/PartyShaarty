@@ -1,14 +1,18 @@
 import * as XLSX from "xlsx";
-import { requireHost } from "../../../lib/auth";
+import { createSupabaseServerClient, requireHostProfile } from "../../../lib/supabase-server";
 import { listRsvps } from "../../../lib/rsvp-store";
 
-export async function GET(request) {
-  const result = requireHost(request);
-  if (!result.ok) {
+export async function GET() {
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
     return new Response("Unauthorized", { status: 401 });
   }
+
   try {
-    const arr = await listRsvps();
+    const arr = await listRsvps(profile.id);
     const head = ["Timestamp", "Name", "Email", "Attending", "Message"];
     const data = [head, ...arr.map((r) => [r.timestamp, r.name, r.email, r.attending, r.message || ""])];
 

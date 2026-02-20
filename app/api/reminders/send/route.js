@@ -1,5 +1,6 @@
-import { requireHost } from "../../../../lib/auth";
+import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { sendEmail } from "../../../../lib/mailer";
+import { sendWhatsApp } from "../../../../lib/messenger";
 
 function linkify(text) {
   return text.replace(
@@ -9,44 +10,68 @@ function linkify(text) {
 }
 
 export async function POST(request) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let user, profile;
+  try {
+    ({ user, profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
-  const { recipients, subject, message } = await request.json();
+  const { recipients, subject, message, channel = "email" } = await request.json();
 
   if (!Array.isArray(recipients) || recipients.length === 0) {
     return Response.json({ error: "No recipients selected" }, { status: 400 });
   }
-  if (!subject || !subject.trim()) {
-    return Response.json({ error: "Subject is required" }, { status: 400 });
-  }
   if (!message || !message.trim()) {
     return Response.json({ error: "Message is required" }, { status: 400 });
   }
+  if (channel === "email" && (!subject || !subject.trim())) {
+    return Response.json({ error: "Subject is required for email" }, { status: 400 });
+  }
+  if (!["email", "whatsapp"].includes(channel)) {
+    return Response.json({ error: "Invalid channel" }, { status: 400 });
+  }
 
   const results = [];
-  for (const { name, email } of recipients) {
+
+  for (const { name, email, phone } of recipients) {
     const firstName = (name || "").split(" ")[0] || "Guest";
-    try {
-      await sendEmail({
-        to: email,
-        subject: subject.trim(),
-        html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;">
-          <p>Hi ${firstName},</p>
-          <p>${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
-        </div>`,
-      });
-      results.push({ email, status: "sent" });
-    } catch (err) {
-      console.error(`Failed to send to ${email}:`, err.message);
-      results.push({ email, status: "failed", error: err.message });
+
+    if (channel === "email") {
+      try {
+        await sendEmail({
+          to: email,
+          subject: subject.trim(),
+          replyTo: user.email,
+          html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;">
+            <p>Hi ${firstName},</p>
+            <p>${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
+          </div>`,
+        });
+        results.push({ email, status: "sent" });
+      } catch (err) {
+        console.error(`Failed to send email to ${email}:`, err.message);
+        results.push({ email, status: "failed", error: err.message });
+      }
+    } else if (channel === "whatsapp") {
+      if (!phone) {
+        results.push({ email, status: "skipped", error: "No phone number" });
+        continue;
+      }
+      try {
+        await sendWhatsApp({ to: phone, body: `Hi ${firstName}, ${message.trim()}` });
+        results.push({ email, phone, status: "sent" });
+      } catch (err) {
+        console.error(`Failed to send WhatsApp to ${phone}:`, err.message);
+        results.push({ email, phone, status: "failed", error: err.message });
+      }
     }
   }
 
   const sent = results.filter((r) => r.status === "sent").length;
   const failed = results.filter((r) => r.status === "failed").length;
+  const skipped = results.filter((r) => r.status === "skipped").length;
 
-  return Response.json({ sent, failed, results });
+  return Response.json({ sent, failed, skipped, results });
 }

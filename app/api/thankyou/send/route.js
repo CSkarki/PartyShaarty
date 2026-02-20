@@ -1,5 +1,6 @@
-import { requireHost } from "../../../../lib/auth";
+import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { sendEmail } from "../../../../lib/mailer";
+import { sendWhatsApp } from "../../../../lib/messenger";
 
 function linkify(text) {
   return text.replace(
@@ -9,25 +10,31 @@ function linkify(text) {
 }
 
 export async function POST(request) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let user, profile;
+  try {
+    ({ user, profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
-  const { recipients, subject, message, imageUrls, uploadedImages } =
+  const { recipients, subject, message, imageUrls, uploadedImages, channel = "email" } =
     await request.json();
 
   if (!Array.isArray(recipients) || recipients.length === 0) {
     return Response.json({ error: "No recipients selected" }, { status: 400 });
   }
-  if (!subject || !subject.trim()) {
-    return Response.json({ error: "Subject is required" }, { status: 400 });
-  }
   if (!message || !message.trim()) {
     return Response.json({ error: "Message is required" }, { status: 400 });
   }
+  if (channel === "email" && (!subject || !subject.trim())) {
+    return Response.json({ error: "Subject is required for email" }, { status: 400 });
+  }
+  if (!["email", "whatsapp"].includes(channel)) {
+    return Response.json({ error: "Invalid channel" }, { status: 400 });
+  }
 
-  // URL-based images
+  // Build image HTML (email only)
   const urls = Array.isArray(imageUrls) ? imageUrls : [];
   const urlImagesHtml = urls
     .map(
@@ -36,7 +43,6 @@ export async function POST(request) {
     )
     .join("");
 
-  // File-uploaded images → Nodemailer attachments with CID
   const uploads = Array.isArray(uploadedImages) ? uploadedImages : [];
   const attachments = uploads.map((img, i) => {
     const base64 = img.dataUrl.replace(/^data:image\/\w+;base64,/, "");
@@ -54,35 +60,52 @@ export async function POST(request) {
         `<img src="cid:${att.cid}" alt="Party photo" style="max-width:100%;height:auto;border-radius:8px;margin-bottom:12px;display:block;" />`
     )
     .join("");
-
   const allImagesHtml =
     urlImagesHtml || uploadImagesHtml
       ? `<div style="margin:24px 0;">${urlImagesHtml}${uploadImagesHtml}</div>`
       : "";
 
   const results = [];
-  for (const { name, email } of recipients) {
+
+  for (const { name, email, phone } of recipients) {
     const firstName = (name || "").split(" ")[0] || "Guest";
-    try {
-      await sendEmail({
-        to: email,
-        subject: subject.trim(),
-        html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px;">
-          <p style="font-size:16px;">Hi ${firstName},</p>
-          <p style="font-size:16px;">${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
-          ${allImagesHtml}
-        </div>`,
-        attachments: attachments.length > 0 ? attachments : undefined,
-      });
-      results.push({ email, status: "sent" });
-    } catch (err) {
-      console.error(`Failed to send to ${email}:`, err.message);
-      results.push({ email, status: "failed", error: err.message });
+
+    if (channel === "email") {
+      try {
+        await sendEmail({
+          to: email,
+          subject: subject.trim(),
+          replyTo: user.email,
+          html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px;">
+            <p style="font-size:16px;">Hi ${firstName},</p>
+            <p style="font-size:16px;">${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
+            ${allImagesHtml}
+          </div>`,
+          attachments: attachments.length > 0 ? attachments : undefined,
+        });
+        results.push({ email, status: "sent" });
+      } catch (err) {
+        console.error(`Failed to send email to ${email}:`, err.message);
+        results.push({ email, status: "failed", error: err.message });
+      }
+    } else if (channel === "whatsapp") {
+      if (!phone) {
+        results.push({ email, status: "skipped", error: "No phone number" });
+        continue;
+      }
+      try {
+        await sendWhatsApp({ to: phone, body: `Hi ${firstName}, ${message.trim()}` });
+        results.push({ email, phone, status: "sent" });
+      } catch (err) {
+        console.error(`Failed to send WhatsApp to ${phone}:`, err.message);
+        results.push({ email, phone, status: "failed", error: err.message });
+      }
     }
   }
 
   const sent = results.filter((r) => r.status === "sent").length;
   const failed = results.filter((r) => r.status === "failed").length;
+  const skipped = results.filter((r) => r.status === "skipped").length;
 
-  return Response.json({ sent, failed, results });
+  return Response.json({ sent, failed, skipped, results });
 }

@@ -1,11 +1,7 @@
-import { getClearCookieHeader } from "../../../../lib/auth";
+import { createSupabaseServerClient } from "../../../../lib/supabase-server";
 
 export async function POST() {
-  return new Response(JSON.stringify({ ok: true }), {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json",
-      "Set-Cookie": getClearCookieHeader(),
-    },
-  });
+  const supabase = createSupabaseServerClient();
+  await supabase.auth.signOut();
+  return Response.json({ ok: true });
 }

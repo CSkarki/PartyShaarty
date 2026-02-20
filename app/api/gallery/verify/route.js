@@ -1,103 +1,115 @@
-import pg from "pg";
 import { createGuestSession } from "../../../../lib/guest-auth";
 import { sendEmail } from "../../../../lib/mailer";
-import { createHmac } from "crypto";
-
-const { Client } = pg;
-
-// In-memory OTP store: { email -> { code, expiresAt, attempts } }
-// In production, use Redis or a database table. This works for single-instance deploys.
-const otpStore = new Map();
+import { createSupabaseAdminClient } from "../../../../lib/supabase-server";
+import { createHash, randomFillSync } from "crypto";
 
 const OTP_EXPIRY_MS = 10 * 60 * 1000; // 10 minutes
 const MAX_ATTEMPTS = 5;
 
 function generateOTP() {
-  // Cryptographically random 6-digit code
   const bytes = Buffer.alloc(4);
-  require("crypto").randomFillSync(bytes);
-  const num = bytes.readUInt32BE(0) % 1000000;
-  return String(num).padStart(6, "0");
+  randomFillSync(bytes);
+  return String(bytes.readUInt32BE(0) % 1000000).padStart(6, "0");
 }
 
-function dbConfig(url) {
-  try {
-    const u = new URL(url);
-    return {
-      host: u.hostname,
-      port: u.port || 5432,
-      user: u.username ? decodeURIComponent(u.username) : undefined,
-      password: u.password ? decodeURIComponent(u.password) : undefined,
-      database: u.pathname?.slice(1) || undefined,
-      ssl: { rejectUnauthorized: false },
-    };
-  } catch {
-    return { connectionString: url, ssl: { rejectUnauthorized: false } };
-  }
+function hashOTP(code) {
+  return createHash("sha256").update(String(code)).digest("hex");
 }
 
-/** Step 1: POST { email } → sends OTP */
-/** Step 2: POST { email, code } → verifies OTP and sets session */
+/**
+ * POST { email, hostSlug }           → send OTP
+ * POST { email, hostSlug, code }     → verify OTP, issue guest session cookie
+ */
 export async function POST(request) {
-  const body = await request.json();
-  const { email, code } = body;
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const { email, code, hostSlug } = body;
 
   if (!email || typeof email !== "string" || !email.trim()) {
     return Response.json({ error: "Email is required" }, { status: 400 });
   }
-
-  const trimmed = email.trim().toLowerCase();
-  const dbUrl = process.env.DATABASE_URL;
-
-  if (!dbUrl) {
-    return Response.json({ error: "Database not configured" }, { status: 500 });
+  if (!hostSlug || typeof hostSlug !== "string") {
+    return Response.json({ error: "Host not specified" }, { status: 400 });
   }
 
-  // Check email exists in RSVP list
-  const client = new Client(dbConfig(dbUrl));
-  try {
-    await client.connect();
-    const res = await client.query(
-      "SELECT email FROM invite_rsvps WHERE LOWER(email) = $1 AND LOWER(attending) = 'yes' LIMIT 1",
-      [trimmed]
+  const trimmedEmail = email.trim().toLowerCase();
+  const admin = createSupabaseAdminClient();
+
+  // Resolve host profile from slug
+  const { data: hostProfile } = await admin
+    .from("host_profiles")
+    .select("id")
+    .eq("slug", hostSlug)
+    .single();
+
+  if (!hostProfile) {
+    return Response.json({ error: "Event not found" }, { status: 404 });
+  }
+
+  const hostId = hostProfile.id;
+
+  // Check email exists in this host's RSVP list with attending = yes
+  const { data: rsvp } = await admin
+    .from("invite_rsvps")
+    .select("email")
+    .eq("host_id", hostId)
+    .ilike("email", trimmedEmail)
+    .ilike("attending", "yes")
+    .single();
+
+  if (!rsvp) {
+    return Response.json(
+      { error: "Email not found. Only guests who RSVP'd Yes can view photos." },
+      { status: 403 }
     );
-    if (!res.rows.length) {
-      return Response.json(
-        { error: "Email not found. Only guests who RSVP'd Yes can view photos." },
-        { status: 403 }
-      );
-    }
-  } finally {
-    await client.end();
   }
 
-  // Step 2: Verify OTP code
+  // ---- Step 2: Verify OTP ----
   if (code) {
-    const stored = otpStore.get(trimmed);
-    if (!stored) {
+    const { data: otpRecord } = await admin
+      .from("otp_codes")
+      .select("*")
+      .eq("host_id", hostId)
+      .ilike("email", trimmedEmail)
+      .single();
+
+    if (!otpRecord) {
       return Response.json({ error: "No code sent. Request a new one." }, { status: 400 });
     }
-    if (Date.now() > stored.expiresAt) {
-      otpStore.delete(trimmed);
+
+    if (new Date(otpRecord.expires_at) < new Date()) {
+      await admin.from("otp_codes").delete().eq("id", otpRecord.id);
       return Response.json({ error: "Code expired. Request a new one." }, { status: 400 });
     }
-    if (stored.attempts >= MAX_ATTEMPTS) {
-      otpStore.delete(trimmed);
+
+    if (otpRecord.attempts >= MAX_ATTEMPTS) {
+      await admin.from("otp_codes").delete().eq("id", otpRecord.id);
       return Response.json({ error: "Too many attempts. Request a new code." }, { status: 429 });
     }
 
-    stored.attempts++;
+    const submittedHash = hashOTP(String(code).trim());
+    if (submittedHash !== otpRecord.code_hash) {
+      await admin
+        .from("otp_codes")
+        .update({ attempts: otpRecord.attempts + 1 })
+        .eq("id", otpRecord.id);
 
-    if (String(code).trim() !== stored.code) {
+      const remaining = MAX_ATTEMPTS - otpRecord.attempts - 1;
       return Response.json(
-        { error: `Invalid code. ${MAX_ATTEMPTS - stored.attempts} attempts remaining.` },
+        { error: `Invalid code. ${remaining} attempt${remaining !== 1 ? "s" : ""} remaining.` },
         { status: 400 }
       );
     }
 
-    // OTP valid — clean up and issue session
-    otpStore.delete(trimmed);
-    const session = createGuestSession(trimmed);
+    // Valid — delete OTP and issue guest session
+    await admin.from("otp_codes").delete().eq("id", otpRecord.id);
+
+    const session = createGuestSession(trimmedEmail, hostSlug);
     return new Response(JSON.stringify({ ok: true, verified: true }), {
       status: 200,
       headers: {
@@ -107,17 +119,34 @@ export async function POST(request) {
     });
   }
 
-  // Step 1: Generate and send OTP
+  // ---- Step 1: Generate and send OTP ----
   const otp = generateOTP();
-  otpStore.set(trimmed, {
-    code: otp,
-    expiresAt: Date.now() + OTP_EXPIRY_MS,
+  const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS).toISOString();
+
+  // Delete any existing OTP for this host+email, then insert fresh one.
+  // (Avoids ON CONFLICT against the functional LOWER(email) index.)
+  await admin
+    .from("otp_codes")
+    .delete()
+    .eq("host_id", hostId)
+    .ilike("email", trimmedEmail);
+
+  const { error: insertErr } = await admin.from("otp_codes").insert({
+    host_id: hostId,
+    email: trimmedEmail,
+    code_hash: hashOTP(otp),
+    expires_at: expiresAt,
     attempts: 0,
   });
 
+  if (insertErr) {
+    console.error("OTP insert error:", insertErr.message);
+    return Response.json({ error: "Failed to generate code." }, { status: 500 });
+  }
+
   try {
     await sendEmail({
-      to: trimmed,
+      to: trimmedEmail,
       subject: "Your Gallery Access Code",
       html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:400px;margin:0 auto;padding:20px;text-align:center;">
         <h2 style="margin-bottom:8px;">Gallery Access Code</h2>
@@ -128,7 +157,8 @@ export async function POST(request) {
     });
   } catch (err) {
     console.error("Failed to send OTP:", err.message);
-    otpStore.delete(trimmed);
+    // Clean up the OTP we just inserted
+    await admin.from("otp_codes").delete().eq("host_id", hostId).ilike("email", trimmedEmail);
     return Response.json({ error: "Failed to send verification code." }, { status: 500 });
   }
 

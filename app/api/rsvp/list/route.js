@@ -1,13 +1,17 @@
-import { requireHost } from "../../../../lib/auth";
+import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { listRsvps } from "../../../../lib/rsvp-store";
 
-export async function GET(request) {
-  const result = requireHost(request);
-  if (!result.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export async function GET() {
+  const supabase = createSupabaseServerClient();
+  let profile;
   try {
-    const rows = await listRsvps();
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
+  }
+
+  try {
+    const rows = await listRsvps(profile.id);
     return Response.json(rows);
   } catch (err) {
     console.error("RSVP list error:", err.message);

@@ -1,25 +1,18 @@
-import { requireHost } from "../../../../../../lib/auth";
-import {
-  getAlbum,
-  listAlbumShares,
-  shareAlbumWithEmails,
-  revokeAlbumShare,
-} from "../../../../../../lib/gallery-store";
+import { createSupabaseServerClient, requireHostProfile } from "../../../../../../lib/supabase-server";
+import { listAlbumShares, shareAlbumWithEmails, revokeAlbumShare } from "../../../../../../lib/gallery-store";
 
 export async function GET(request, { params }) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
   const { albumId } = params;
-
   try {
-    const album = await getAlbum(albumId);
-    if (!album) {
-      return Response.json({ error: "Album not found" }, { status: 404 });
-    }
-    const shares = await listAlbumShares(albumId);
+    const shares = await listAlbumShares(albumId, profile.id);
     return Response.json(shares);
   } catch (err) {
     console.error("List shares error:", err.message);
@@ -28,9 +21,12 @@ export async function GET(request, { params }) {
 }
 
 export async function POST(request, { params }) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
   const { albumId } = params;
@@ -41,11 +37,7 @@ export async function POST(request, { params }) {
   }
 
   try {
-    const album = await getAlbum(albumId);
-    if (!album) {
-      return Response.json({ error: "Album not found" }, { status: 404 });
-    }
-    await shareAlbumWithEmails(albumId, emails);
+    await shareAlbumWithEmails(albumId, emails, profile.id);
     return Response.json({ ok: true, added: emails.length });
   } catch (err) {
     console.error("Share album error:", err.message);
@@ -54,9 +46,12 @@ export async function POST(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
   const { albumId } = params;
@@ -67,7 +62,7 @@ export async function DELETE(request, { params }) {
   }
 
   try {
-    await revokeAlbumShare(albumId, email);
+    await revokeAlbumShare(albumId, email, profile.id);
     return Response.json({ ok: true });
   } catch (err) {
     console.error("Revoke share error:", err.message);

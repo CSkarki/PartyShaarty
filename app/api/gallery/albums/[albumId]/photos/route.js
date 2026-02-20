@@ -1,44 +1,61 @@
-import { requireHost } from "../../../../../../lib/auth";
+import { createSupabaseServerClient, requireHostProfile, createSupabaseAdminClient } from "../../../../../../lib/supabase-server";
 import { requireGuest } from "../../../../../../lib/guest-auth";
-import {
-  getAlbum,
-  listAlbumsForEmail,
-} from "../../../../../../lib/gallery-store";
-import {
-  listPhotosInAlbum,
-  getSignedUrlsForPaths,
-  uploadPhotoToAlbum,
-  deletePhotoByPath,
-} from "../../../../../../lib/supabase";
+import { getAlbum, listAlbumsForEmail } from "../../../../../../lib/gallery-store";
+import { listPhotosInAlbum, getSignedUrlsForPaths, uploadPhotoToAlbum, deletePhotoByPath } from "../../../../../../lib/supabase";
 
 export async function GET(request, { params }) {
-  const guest = requireGuest(request);
-  const host = requireHost(request);
+  const { albumId } = params;
+  const { searchParams } = new URL(request.url);
+  const hostSlug = searchParams.get("hostSlug");
 
-  if (!guest.ok && !host.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  // Try guest auth first
+  const guest = requireGuest(request, hostSlug || undefined);
+
+  if (guest.ok) {
+    // Guest access: resolve host from cookie's hostSlug
+    const slug = hostSlug || guest.hostSlug;
+    if (!slug) return Response.json({ error: "Host not specified" }, { status: 400 });
+
+    const admin = createSupabaseAdminClient();
+    const { data: hostProfile } = await admin
+      .from("host_profiles")
+      .select("id")
+      .eq("slug", slug)
+      .single();
+
+    if (!hostProfile) return Response.json({ error: "Event not found" }, { status: 404 });
+
+    const album = await getAlbum(albumId, hostProfile.id);
+    if (!album) return Response.json({ error: "Album not found" }, { status: 404 });
+
+    // Verify album is shared with this guest
+    const allowed = await listAlbumsForEmail(guest.email, hostProfile.id);
+    if (!allowed.find((a) => a.id === albumId)) {
+      return Response.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    return servePhotos(hostProfile.id, album);
   }
 
-  const { albumId } = params;
-
+  // Try host auth
+  const supabase = createSupabaseServerClient();
+  let profile;
   try {
-    const album = await getAlbum(albumId);
-    if (!album) {
-      return Response.json({ error: "Album not found" }, { status: 404 });
-    }
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
+  }
 
-    // Guest access check: verify album is shared with this guest
-    if (guest.ok && !host.ok) {
-      const allowed = await listAlbumsForEmail(guest.email);
-      if (!allowed.find((a) => a.id === albumId)) {
-        return Response.json({ error: "Forbidden" }, { status: 403 });
-      }
-    }
+  const album = await getAlbum(albumId, profile.id);
+  if (!album) return Response.json({ error: "Album not found" }, { status: 404 });
 
-    const files = await listPhotosInAlbum(album.slug);
-    if (!files.length) {
-      return Response.json([]);
-    }
+  return servePhotos(profile.id, album);
+}
+
+async function servePhotos(hostProfileId, album) {
+  try {
+    const files = await listPhotosInAlbum(hostProfileId, album.slug);
+    if (!files.length) return Response.json([]);
 
     const paths = files.map((f) => f.path);
     const signed = await getSignedUrlsForPaths(paths);
@@ -59,25 +76,22 @@ export async function GET(request, { params }) {
 }
 
 export async function POST(request, { params }) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
   const { albumId } = params;
+  const album = await getAlbum(albumId, profile.id);
+  if (!album) return Response.json({ error: "Album not found" }, { status: 404 });
 
   try {
-    const album = await getAlbum(albumId);
-    if (!album) {
-      return Response.json({ error: "Album not found" }, { status: 404 });
-    }
-
     const formData = await request.formData();
     const files = formData.getAll("photos");
-
-    if (!files.length) {
-      return Response.json({ error: "No files uploaded" }, { status: 400 });
-    }
+    if (!files.length) return Response.json({ error: "No files uploaded" }, { status: 400 });
 
     const results = [];
     for (const file of files) {
@@ -88,13 +102,11 @@ export async function POST(request, { params }) {
       }
 
       const ext = file.name.split(".").pop() || "jpg";
-      const timestamp = Date.now();
-      const rand = Math.random().toString(36).slice(2, 8);
-      const filename = `${timestamp}-${rand}.${ext}`;
-
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
       const buffer = Buffer.from(await file.arrayBuffer());
-      await uploadPhotoToAlbum(buffer, album.slug, filename, file.type);
-      results.push({ name: filename, path: `${album.slug}/${filename}`, originalName: file.name, status: "uploaded" });
+
+      await uploadPhotoToAlbum(buffer, profile.id, album.slug, filename, file.type);
+      results.push({ name: filename, path: `${profile.id}/${album.slug}/${filename}`, originalName: file.name, status: "uploaded" });
     }
 
     const uploaded = results.filter((r) => r.status === "uploaded").length;
@@ -106,29 +118,29 @@ export async function POST(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const auth = requireHost(request);
-  if (!auth.ok) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+  const supabase = createSupabaseServerClient();
+  let profile;
+  try {
+    ({ profile } = await requireHostProfile(supabase));
+  } catch (res) {
+    return res;
   }
 
   const { albumId } = params;
   const { path } = await request.json();
-
   if (!path || typeof path !== "string") {
     return Response.json({ error: "Photo path is required" }, { status: 400 });
   }
 
+  const album = await getAlbum(albumId, profile.id);
+  if (!album) return Response.json({ error: "Album not found" }, { status: 404 });
+
+  // Validate path belongs to this host's album
+  if (!path.startsWith(`${profile.id}/${album.slug}/`)) {
+    return Response.json({ error: "Invalid path" }, { status: 400 });
+  }
+
   try {
-    const album = await getAlbum(albumId);
-    if (!album) {
-      return Response.json({ error: "Album not found" }, { status: 404 });
-    }
-
-    // Validate path belongs to this album
-    if (!path.startsWith(`${album.slug}/`)) {
-      return Response.json({ error: "Invalid path" }, { status: 400 });
-    }
-
     await deletePhotoByPath(path);
     return Response.json({ ok: true });
   } catch (err) {
