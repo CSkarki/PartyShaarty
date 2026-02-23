@@ -50,7 +50,7 @@ export async function middleware(request) {
   // Protect host API routes — return 401 if not authenticated
   const isProtectedApi =
     pathname.startsWith("/api/rsvp/list") ||
-    pathname.startsWith("/api/gallery/albums") ||
+    (pathname.startsWith("/api/gallery/albums") && !pathname.startsWith("/api/gallery/albums/guest")) ||
     pathname.startsWith("/api/reminders") ||
     pathname.startsWith("/api/thankyou") ||
     pathname.startsWith("/api/export") ||
@@ -74,7 +74,8 @@ export const config = {
     "/auth/login",
     "/auth/register",
     "/api/rsvp/list/:path*",
-    "/api/gallery/albums/:path*",
+    "/api/gallery/albums",
+    "/api/gallery/albums/host/:path*",
     "/api/reminders/:path*",
     "/api/thankyou/:path*",
     "/api/export/:path*",
