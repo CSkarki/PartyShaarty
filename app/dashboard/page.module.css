@@ -1,97 +1,911 @@
-.host {
+/* ─── Loading ─────────────────────────────────────────── */
+.loadingScreen {
   min-height: 100vh;
-  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.loadingSpinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Page ────────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
   background: var(--bg);
   color: var(--text);
 }
 
-.loading {
-  text-align: center;
-  color: var(--text-muted);
-  margin-top: 4rem;
-}
-
-.header {
+/* ─── Nav ─────────────────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
+  padding: 0 2rem;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.navBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navLogo {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.navName {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.navViewInvite {
+  padding: 0.4rem 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+  transition: border-color 0.15s;
+}
+
+.navViewInvite:hover {
+  border-color: var(--accent);
+}
+
+.navLogout {
+  padding: 0.4rem 0.875rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.navLogout:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* ─── Main Content ────────────────────────────────────── */
+.main {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ─── Welcome Banner ──────────────────────────────────── */
+.welcomeBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  flex-wrap: wrap;
+}
+
+.welcomeTitle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0 0 0.3rem;
+  line-height: 1.1;
+}
+
+.welcomeSub {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.countdown {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.countdownToday {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.countdownPast {
+  color: var(--text-muted);
+}
+
+.noEventLink {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.noEventLink:hover {
+  text-decoration: underline;
+}
+
+/* Invite Share Box */
+.inviteShareBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+}
+
+.inviteShareLabel {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+}
+
+.inviteShareRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.375rem 0.375rem 0.375rem 0.75rem;
+}
+
+.inviteShareLink {
+  font-size: 0.82rem;
+  color: var(--accent);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px;
+}
+
+.copyBtn {
+  flex-shrink: 0;
+  padding: 0.3rem 0.75rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  font-family: inherit;
+}
+
+.copyBtn:hover {
+  opacity: 0.88;
+}
+
+/* ─── Stats Row ───────────────────────────────────────── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 1rem;
-  margin-bottom: 2rem;
 }
 
-.title {
-  font-size: 1.75rem;
+.statCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
-.actions {
+.statNumber {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text);
+}
+
+.statCardGreen .statNumber { color: #16a34a; }
+.statCardRed .statNumber   { color: #dc2626; }
+.statCardAccent .statNumber { color: var(--accent); }
+
+.statLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ─── Mid Row: Setup + Actions ────────────────────────── */
+.midRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/* Shared card styles */
+.setupCard,
+.actionsCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.cardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.cardTitle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 0.15rem;
+}
+
+.cardSub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 1.25rem;
+}
+
+/* Setup Progress */
+.setupProgress {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+  flex-shrink: 0;
+}
+
+.setupProgressText {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.setupProgressBar {
+  width: 64px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.setupProgressFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+
+/* Checklist */
+.checkList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.checkItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  transition: border-color 0.15s;
+}
+
+.checkDone {
+  background: rgba(22, 163, 74, 0.04);
+  border-color: rgba(22, 163, 74, 0.2);
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+}
+
+.checkIconDone {
+  background: #16a34a;
+  border-color: #16a34a;
+  color: white;
+}
+
+.checkBody {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkLabel {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.checkDesc {
+  display: block;
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+.checkAction {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid rgba(184, 149, 74, 0.3);
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.checkAction:hover {
+  border-color: var(--accent);
+}
+
+.setupComplete {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(184, 149, 74, 0.07);
+  border: 1px solid rgba(184, 149, 74, 0.2);
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Action Grid */
+.actionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.actionItem {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: inherit;
+  background: var(--bg);
+  transition: border-color 0.15s, background 0.15s;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.actionItem:hover {
+  border-color: var(--accent);
+  background: rgba(184, 149, 74, 0.04);
+}
+
+.actionItemActive {
+  border-color: var(--accent);
+  background: rgba(184, 149, 74, 0.06);
+}
+
+.actionIcon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--accent);
+}
+
+.actionLabel {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.actionDesc {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ─── Import Panel ────────────────────────────────────── */
+.importPanel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+.importHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.importTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.importClose {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem 0.375rem;
+  border-radius: 4px;
+  line-height: 1;
+  transition: color 0.15s;
+}
+
+.importClose:hover {
+  color: var(--text);
+}
+
+.importNote {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+}
+
+.importActions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   align-items: center;
 }
 
-.download {
-  padding: 0.5rem 1rem;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--accent);
-  text-decoration: none;
-  font-size: 0.9rem;
-}
-
-.download:hover {
-  border-color: var(--accent);
-}
-
-.logout {
-  padding: 0.5rem 1rem;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.logout:hover {
-  border-color: var(--text-muted);
+.fileInput {
+  font-size: 0.85rem;
   color: var(--text);
 }
 
+.importResult {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.resultError   { color: var(--error); margin: 0; }
+.resultSuccess { color: var(--success); margin: 0; }
+
+.resultErrors {
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+  color: var(--text-muted);
+}
+
+/* ─── Buttons ─────────────────────────────────────────── */
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.25rem;
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.btnOutline:hover {
+  border-color: var(--accent);
+}
+
+.btnOutlineSmall {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.875rem;
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.btnOutlineSmall:hover {
+  border-color: var(--accent);
+}
+
+/* ─── RSVP Section ────────────────────────────────────── */
+.rsvpSection {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.rsvpHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.rsvpTitle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  display: inline;
+}
+
+.rsvpCount {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-left: 0.5rem;
+}
+
+.rsvpControls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Filter Tabs */
+.filterTabs {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.filterTab {
+  padding: 0.35rem 0.875rem;
+  font-size: 0.82rem;
+  background: none;
+  border: none;
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.filterTab:last-child {
+  border-right: none;
+}
+
+.filterTabActive {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ─── Table ───────────────────────────────────────────── */
 .tableWrap {
   overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.table th,
-.table td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
 }
 
 .table th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 0.875rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
 }
 
 .table tr:last-child td {
   border-bottom: none;
 }
 
-.empty {
-  color: var(--text-muted);
+.table tbody tr:hover td {
+  background: rgba(0, 0, 0, 0.012);
+}
+
+.tdName  { font-weight: 500; }
+.tdEmail { color: var(--text-muted); font-size: 0.845rem; }
+.tdMsg   { color: var(--text-muted); font-size: 0.845rem; max-width: 240px; }
+.tdDate  { color: var(--text-muted); font-size: 0.82rem; white-space: nowrap; }
+.noMsg   { opacity: 0.35; }
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.625rem;
+  border-radius: 20px;
+  font-size: 0.775rem;
+  font-weight: 500;
+}
+
+.badgeYes {
+  background: rgba(22, 163, 74, 0.1);
+  color: #16a34a;
+}
+
+.badgeNo {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+}
+
+/* ─── Empty State ─────────────────────────────────────── */
+.emptyState {
+  padding: 3.5rem 2rem;
   text-align: center;
-  padding: 2rem;
+}
+
+.emptyTitle {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem;
+}
+
+.emptyText {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ─── Events Grid ─────────────────────────────────────── */
+.eventsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.eventCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color 0.15s;
+}
+
+.eventCard:hover {
+  border-color: var(--accent);
+}
+
+.eventCardTop {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.eventCardName {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text);
+}
+
+.eventCardDate {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.eventCardMeta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.eventCardLink {
+  font-size: 0.8rem;
+  overflow: hidden;
+}
+
+.eventCardActions {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+}
+
+/* Create Event Form */
+.createForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.createFormActions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.createInput {
+  width: 100%;
+  padding: 0.5rem 0.875rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text);
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.createInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 960px) {
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .midRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .main {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .nav {
+    padding: 0 1rem;
+  }
+
+  .welcomeBanner {
+    padding: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .inviteShareLink {
+    max-width: 160px;
+  }
+
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .actionGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rsvpHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rsvpControls {
+    width: 100%;
+  }
+
+  .filterTabs {
+    flex: 1;
+  }
+
+  .filterTab {
+    flex: 1;
+    text-align: center;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem 1rem;
+  }
 }

@@ -17,8 +17,9 @@ function hashOTP(code) {
 }
 
 /**
- * POST { email, hostSlug }           → send OTP
- * POST { email, hostSlug, code }     → verify OTP, issue guest session cookie
+ * POST { email, eventSlug }           → send OTP
+ * POST { email, eventSlug, code }     → verify OTP, issue guest session cookie
+ * Also accepts hostSlug for legacy backward compat.
  */
 export async function POST(request) {
   let body;
@@ -28,36 +29,36 @@ export async function POST(request) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { email, code, hostSlug } = body;
+  const { email, code } = body;
+  // Accept eventSlug (new) or hostSlug (legacy)
+  const eventSlug = body.eventSlug || body.hostSlug;
 
   if (!email || typeof email !== "string" || !email.trim()) {
     return Response.json({ error: "Email is required" }, { status: 400 });
   }
-  if (!hostSlug || typeof hostSlug !== "string") {
-    return Response.json({ error: "Host not specified" }, { status: 400 });
+  if (!eventSlug || typeof eventSlug !== "string") {
+    return Response.json({ error: "Event not specified" }, { status: 400 });
   }
 
   const trimmedEmail = email.trim().toLowerCase();
   const admin = createSupabaseAdminClient();
 
-  // Resolve host profile from slug
-  const { data: hostProfile } = await admin
-    .from("host_profiles")
-    .select("id")
-    .eq("slug", hostSlug)
+  // Resolve event from slug
+  const { data: event } = await admin
+    .from("events")
+    .select("id, host_id")
+    .eq("slug", eventSlug)
     .single();
 
-  if (!hostProfile) {
+  if (!event) {
     return Response.json({ error: "Event not found" }, { status: 404 });
   }
 
-  const hostId = hostProfile.id;
-
-  // Check email exists in this host's RSVP list with attending = yes
+  // Check email exists in this event's RSVP list with attending = yes
   const { data: rsvp } = await admin
     .from("invite_rsvps")
     .select("email")
-    .eq("host_id", hostId)
+    .eq("event_id", event.id)
     .ilike("email", trimmedEmail)
     .ilike("attending", "yes")
     .single();
@@ -74,7 +75,7 @@ export async function POST(request) {
     const { data: otpRecord } = await admin
       .from("otp_codes")
       .select("*")
-      .eq("host_id", hostId)
+      .eq("event_id", event.id)
       .ilike("email", trimmedEmail)
       .single();
 
@@ -109,7 +110,7 @@ export async function POST(request) {
     // Valid — delete OTP and issue guest session
     await admin.from("otp_codes").delete().eq("id", otpRecord.id);
 
-    const session = createGuestSession(trimmedEmail, hostSlug);
+    const session = createGuestSession(trimmedEmail, eventSlug);
     return new Response(JSON.stringify({ ok: true, verified: true }), {
       status: 200,
       headers: {
@@ -123,16 +124,16 @@ export async function POST(request) {
   const otp = generateOTP();
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MS).toISOString();
 
-  // Delete any existing OTP for this host+email, then insert fresh one.
-  // (Avoids ON CONFLICT against the functional LOWER(email) index.)
+  // Delete any existing OTP for this event+email, then insert fresh one.
   await admin
     .from("otp_codes")
     .delete()
-    .eq("host_id", hostId)
+    .eq("event_id", event.id)
     .ilike("email", trimmedEmail);
 
   const { error: insertErr } = await admin.from("otp_codes").insert({
-    host_id: hostId,
+    host_id: event.host_id,
+    event_id: event.id,
     email: trimmedEmail,
     code_hash: hashOTP(otp),
     expires_at: expiresAt,
@@ -158,7 +159,7 @@ export async function POST(request) {
   } catch (err) {
     console.error("Failed to send OTP:", err.message);
     // Clean up the OTP we just inserted
-    await admin.from("otp_codes").delete().eq("host_id", hostId).ilike("email", trimmedEmail);
+    await admin.from("otp_codes").delete().eq("event_id", event.id).ilike("email", trimmedEmail);
     return Response.json({ error: "Failed to send verification code." }, { status: 500 });
   }
 

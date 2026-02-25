@@ -13,7 +13,7 @@ export default function GalleryPage() {
 }
 
 function GalleryContent() {
-  const { hostSlug } = useParams();
+  const { eventSlug } = useParams();
   const searchParams = useSearchParams();
   const albumParam = searchParams.get("album");
 
@@ -35,9 +35,9 @@ function GalleryContent() {
 
   const opts = { credentials: "include" };
 
-  // Check if already verified (existing cookie for this host)
+  // Check if already verified (existing cookie for this event)
   useEffect(() => {
-    fetch(`/api/gallery/albums/guest?hostSlug=${encodeURIComponent(hostSlug)}`, opts)
+    fetch(`/api/gallery/albums/guest?eventSlug=${encodeURIComponent(eventSlug)}`, opts)
       .then((r) => {
         if (r.ok) {
           setVerified(true);
@@ -67,7 +67,7 @@ function GalleryContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: email.trim(), hostSlug }),
+        body: JSON.stringify({ email: email.trim(), eventSlug }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Verification failed."); return; }
@@ -89,7 +89,7 @@ function GalleryContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: email.trim(), code: code.trim(), hostSlug }),
+        body: JSON.stringify({ email: email.trim(), code: code.trim(), eventSlug }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Invalid code."); return; }
@@ -108,7 +108,7 @@ function GalleryContent() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: email.trim(), hostSlug }),
+        body: JSON.stringify({ email: email.trim(), eventSlug }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || "Failed to resend code."); return; }
@@ -123,7 +123,7 @@ function GalleryContent() {
   async function loadAlbums() {
     setLoadingAlbums(true);
     try {
-      const res = await fetch(`/api/gallery/albums/guest?hostSlug=${encodeURIComponent(hostSlug)}`, opts);
+      const res = await fetch(`/api/gallery/albums/guest?eventSlug=${encodeURIComponent(eventSlug)}`, opts);
       if (res.ok) {
         const data = await res.json();
         const albumList = Array.isArray(data) ? data : [];
@@ -143,7 +143,7 @@ function GalleryContent() {
     setLoadingPhotos(true);
     try {
       const res = await fetch(
-        `/api/gallery/albums/${album.id}/photos?hostSlug=${encodeURIComponent(hostSlug)}`,
+        `/api/gallery/albums/${album.id}/photos?eventSlug=${encodeURIComponent(eventSlug)}`,
         opts
       );
       if (res.ok) { const data = await res.json(); setPhotos(Array.isArray(data) ? data : []); }
@@ -248,7 +248,7 @@ function GalleryContent() {
             <span className={styles.breadcrumbSep}>/</span>
             <h1 className={styles.title}>{selectedAlbum.name}</h1>
           </div>
-          <a href={`/${hostSlug}/invite`} className={styles.backLink}>Back to Invite</a>
+          <a href={`/${eventSlug}/invite`} className={styles.backLink}>Back to Invite</a>
         </div>
         {loadingPhotos ? (
           <p className={styles.loading}>Loading photos...</p>
@@ -283,7 +283,7 @@ function GalleryContent() {
     <main className={styles.gallery}>
       <div className={styles.header}>
         <h1 className={styles.title}>Event Gallery</h1>
-        <a href={`/${hostSlug}/invite`} className={styles.backLink}>Back to Invite</a>
+        <a href={`/${eventSlug}/invite`} className={styles.backLink}>Back to Invite</a>
       </div>
       {loadingAlbums ? (
         <p className={styles.loading}>Loading albums...</p>

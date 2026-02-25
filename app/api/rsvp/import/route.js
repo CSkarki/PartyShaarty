@@ -1,22 +1,32 @@
 import * as XLSX from "xlsx";
 import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { addRsvp } from "../../../../lib/rsvp-store";
+import { getEvent } from "../../../../lib/event-store";
 
 export async function POST(request) {
   const supabase = createSupabaseServerClient();
   let profile;
   try { ({ profile } = await requireHostProfile(supabase)); } catch (res) { return res; }
 
-  let file;
+  let file, eventId;
   try {
     const formData = await request.formData();
     file = formData.get("file");
+    eventId = formData.get("eventId") || null;
   } catch {
     return Response.json({ error: "Invalid form data" }, { status: 400 });
   }
 
   if (!file || !(file instanceof File) || file.size === 0)
     return Response.json({ error: "No file uploaded" }, { status: 400 });
+
+  // Verify event ownership if eventId provided
+  let resolvedEventId = null;
+  if (eventId) {
+    const event = await getEvent(eventId, profile.id);
+    if (!event) return Response.json({ error: "Event not found" }, { status: 404 });
+    resolvedEventId = event.id;
+  }
 
   let rows;
   try {
@@ -80,7 +90,8 @@ export async function POST(request) {
     try {
       await addRsvp(
         { name, email, phone: phone || null, attending: norm, message: message || "" },
-        profile.id
+        profile.id,
+        resolvedEventId
       );
       imported++;
     } catch (err) {

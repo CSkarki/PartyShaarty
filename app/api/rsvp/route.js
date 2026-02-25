@@ -9,31 +9,34 @@ export async function POST(request) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { name, email, phone, attending, message, hostSlug } = body;
+  // Accept eventSlug (new) or hostSlug (legacy) for backward compat
+  const { name, email, phone, attending, message, eventSlug, hostSlug } = body;
+  const slug = eventSlug || hostSlug;
+
   if (!name || typeof name !== "string" || !email || typeof email !== "string" || !attending) {
     return Response.json(
       { error: "Name, email, and attending are required" },
       { status: 400 }
     );
   }
-  if (!hostSlug) {
-    return Response.json({ error: "Host not specified" }, { status: 400 });
+  if (!slug) {
+    return Response.json({ error: "Event not specified" }, { status: 400 });
   }
 
-  // Resolve host_id from slug
+  // Resolve event from slug
   const admin = createSupabaseAdminClient();
-  const { data: profile } = await admin
-    .from("host_profiles")
-    .select("id")
-    .eq("slug", hostSlug)
+  const { data: event } = await admin
+    .from("events")
+    .select("id, host_id")
+    .eq("slug", slug)
     .single();
 
-  if (!profile) {
+  if (!event) {
     return Response.json({ error: "Event not found" }, { status: 404 });
   }
 
   try {
-    await addRsvp({ name, email, phone, attending, message }, profile.id);
+    await addRsvp({ name, email, phone, attending, message }, event.host_id, event.id);
     return Response.json({ ok: true });
   } catch (err) {
     console.error("RSVP API error:", err.message);

@@ -1,7 +1,8 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
-import { createAlbum, listAlbums } from "../../../../lib/gallery-store";
+import { createAlbum, listAlbums, createAlbumForEvent, listAlbumsByEvent } from "../../../../lib/gallery-store";
+import { getEvent } from "../../../../lib/event-store";
 
-export async function GET() {
+export async function GET(request) {
   const supabase = createSupabaseServerClient();
   let profile;
   try {
@@ -10,7 +11,16 @@ export async function GET() {
     return res;
   }
 
+  const { searchParams } = new URL(request.url);
+  const eventId = searchParams.get("eventId");
+
   try {
+    if (eventId) {
+      const event = await getEvent(eventId, profile.id);
+      if (!event) return Response.json({ error: "Event not found" }, { status: 404 });
+      const albums = await listAlbumsByEvent(eventId);
+      return Response.json(albums);
+    }
     const albums = await listAlbums(profile.id);
     return Response.json(albums);
   } catch (err) {
@@ -28,7 +38,9 @@ export async function POST(request) {
     return res;
   }
 
-  const { name } = await request.json();
+  const body = await request.json();
+  const { name, eventId } = body;
+
   if (!name || typeof name !== "string" || !name.trim()) {
     return Response.json({ error: "Album name is required" }, { status: 400 });
   }
@@ -37,6 +49,12 @@ export async function POST(request) {
   }
 
   try {
+    if (eventId) {
+      const event = await getEvent(eventId, profile.id);
+      if (!event) return Response.json({ error: "Event not found" }, { status: 404 });
+      const album = await createAlbumForEvent(name, eventId, profile.id);
+      return Response.json(album, { status: 201 });
+    }
     const album = await createAlbum(name, profile.id);
     return Response.json(album, { status: 201 });
   } catch (err) {

@@ -1,5 +1,5 @@
-import { createSupabaseServerClient, requireHostProfile, createSupabaseAdminClient } from "../../../../lib/supabase-server";
-import { uploadCoverImage } from "../../../../lib/supabase";
+import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
+import { uploadCoverImage, getCoverImageUrl } from "../../../../lib/supabase";
 
 export async function GET() {
   const supabase = createSupabaseServerClient();
@@ -9,7 +9,14 @@ export async function GET() {
   } catch (res) {
     return res;
   }
-  return Response.json(profile);
+
+  // Include a fresh signed URL so the dashboard can preview the cover image
+  let event_image_url = null;
+  if (profile.event_image_path) {
+    event_image_url = await getCoverImageUrl(profile.event_image_path);
+  }
+
+  return Response.json({ ...profile, event_image_url });
 }
 
 export async function PATCH(request) {
@@ -33,13 +40,21 @@ export async function PATCH(request) {
       event_message: formData.get("event_message"),
     };
 
-    // Handle cover image upload
+    // Handle cover image upload.
+    // Next.js App Router may return a Blob instead of a File from formData(),
+    // so avoid instanceof File — just check it has a size.
     const coverFile = formData.get("cover_image");
-    if (coverFile && coverFile instanceof File && coverFile.size > 0) {
-      const ext = coverFile.name.split(".").pop() || "jpg";
+    console.log("[PATCH] coverFile:", coverFile ? `size=${coverFile.size} type=${coverFile.type}` : "null/missing");
+    if (coverFile && typeof coverFile.arrayBuffer === "function" && coverFile.size > 0) {
+      const rawName = typeof coverFile.name === "string" ? coverFile.name : "photo.jpg";
+      const ext = rawName.includes(".") ? rawName.split(".").pop().toLowerCase() : "jpg";
+      const mimeType = coverFile.type || "image/jpeg";
       const buffer = Buffer.from(await coverFile.arrayBuffer());
-      const imagePath = await uploadCoverImage(buffer, profile.id, ext, coverFile.type);
+      const imagePath = await uploadCoverImage(buffer, profile.id, ext, mimeType);
+      console.log("[PATCH] uploaded imagePath:", imagePath);
       fields.event_image_path = imagePath;
+    } else {
+      console.log("[PATCH] skipping upload — no valid cover file");
     }
   } else {
     fields = await request.json();
@@ -60,15 +75,24 @@ export async function PATCH(request) {
 
   updates.updated_at = new Date().toISOString();
 
-  const admin = createSupabaseAdminClient();
-  const { error } = await admin
+  console.log("[PATCH] updates:", JSON.stringify(updates));
+
+  const { data: updatedRows, error } = await supabase
     .from("host_profiles")
     .update(updates)
-    .eq("id", profile.id);
+    .eq("id", profile.id)
+    .select();
+
+  console.log("[PATCH] result rows:", updatedRows?.length, "| BBBBdb event_image_path:", updatedRows?.[0]?.event_image_path, "| error:", error?.message ?? "none");
 
   if (error) {
     console.error("Profile update error:", error.message);
     return Response.json({ error: "Failed to update profile" }, { status: 500 });
+  }
+
+  if (!updatedRows?.length) {
+    console.error("[PATCH] UPDATE affected 0 rows — RLS or filter issue");
+    return Response.json({ error: "Update failed: no rows matched. Check RLS policy." }, { status: 500 });
   }
 
   return Response.json({ ok: true });

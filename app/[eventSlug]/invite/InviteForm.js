@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
 import styles from "./invite.module.css";
 
-export default function InviteForm({ profile, hostSlug, coverUrl }) {
+export default function InviteForm({ profile, eventSlug, coverUrl }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -43,7 +42,7 @@ export default function InviteForm({ profile, hostSlug, coverUrl }) {
           phone: phone.trim() || undefined,
           attending,
           message: message.trim() || "",
-          hostSlug,
+          eventSlug,
         }),
         signal: controller.signal,
       });
@@ -77,13 +76,11 @@ export default function InviteForm({ profile, hostSlug, coverUrl }) {
       <div className={styles.invite__layout}>
         <div className={styles.invite__imageWrap}>
           {hasImage ? (
-            <Image
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
               src={coverUrl}
               alt="Event invitation"
-              fill
               className={styles.invite__image}
-              sizes="50vw"
-              priority
               onError={() => setImageError(true)}
             />
           ) : (
@@ -204,7 +201,7 @@ export default function InviteForm({ profile, hostSlug, coverUrl }) {
                     {loading ? "Sending…" : "Send RSVP"}
                   </button>
                   <p className={styles.invite__export}>
-                    <a href={`/${hostSlug}/gallery`}>View Event Photos</a>
+                    <a href={`/${eventSlug}/gallery`}>View Event Photos</a>
                   </p>
                 </footer>
               </form>
