@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { createSupabaseBrowserClient } from "../../lib/supabase-browser";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
@@ -11,6 +11,10 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   const [configMissing, setConfigMissing] = useState(false);
+  const [importFile, setImportFile] = useState(null);
+  const [importing, setImporting] = useState(false);
+  const [importResult, setImportResult] = useState(null);
+  const importFileRef = useRef(null);
 
   const opts = { credentials: "include" };
 
@@ -44,6 +48,30 @@ export default function DashboardPage() {
     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
     router.push("/auth/login");
     router.refresh();
+  }
+
+  async function handleImport() {
+    if (!importFile) return;
+    setImporting(true);
+    setImportResult(null);
+    const fd = new FormData();
+    fd.append("file", importFile);
+    try {
+      const res = await fetch("/api/rsvp/import", { method: "POST", credentials: "include", body: fd });
+      const data = await res.json();
+      if (!res.ok) { setImportResult({ error: data.error || "Import failed" }); return; }
+      setImportResult(data);
+      if (data.imported > 0) {
+        const r = await fetch("/api/rsvp/list", opts);
+        if (r.ok) { const d = await r.json(); setRsvps(Array.isArray(d) ? d : []); }
+      }
+    } catch {
+      setImportResult({ error: "Network error during import" });
+    } finally {
+      setImporting(false);
+      setImportFile(null);
+      if (importFileRef.current) importFileRef.current.value = "";
+    }
   }
 
   if (loading) {
@@ -91,6 +119,50 @@ export default function DashboardPage() {
           </a>
         </div>
       )}
+
+      <div style={{ marginBottom: "1.5rem", padding: "1rem", background: "var(--surface)", border: "1px solid var(--border)", borderRadius: "8px" }}>
+        <h2 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: "0.5rem" }}>Import RSVPs from CSV</h2>
+        <p style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginBottom: "0.75rem" }}>
+          Columns marked <strong>*</strong> are required. <em>Attending</em> must be &quot;Yes&quot; or &quot;No&quot;.
+        </p>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", alignItems: "center" }}>
+          <a href="/api/rsvp/template" download="rsvp-template.csv" className={styles.download}>
+            Download Template
+          </a>
+          <input
+            ref={importFileRef}
+            type="file"
+            accept=".csv"
+            onChange={(e) => { setImportFile(e.target.files?.[0] || null); setImportResult(null); }}
+            style={{ fontSize: "0.875rem" }}
+          />
+          <button
+            type="button"
+            onClick={handleImport}
+            disabled={!importFile || importing}
+            className={styles.download}
+            style={{ opacity: !importFile || importing ? 0.5 : 1, cursor: !importFile || importing ? "not-allowed" : "pointer" }}
+          >
+            {importing ? "Importing…" : "Import"}
+          </button>
+        </div>
+        {importResult && (
+          <div style={{ marginTop: "0.75rem", fontSize: "0.875rem" }}>
+            {importResult.error ? (
+              <p style={{ color: "#e55" }}>{importResult.error}</p>
+            ) : (
+              <>
+                <p style={{ color: "var(--accent)" }}>{importResult.imported} imported, {importResult.skipped} skipped.</p>
+                {importResult.errors?.length > 0 && (
+                  <ul style={{ marginTop: "0.5rem", paddingLeft: "1.25rem", color: "var(--text-muted)" }}>
+                    {importResult.errors.map((e, i) => <li key={i}>Row {e.row}: {e.reason}</li>)}
+                  </ul>
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className={styles.tableWrap}>
         {rsvps.length === 0 ? (
