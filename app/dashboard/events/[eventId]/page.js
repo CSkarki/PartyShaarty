@@ -115,7 +115,7 @@ export default function EventDashboardPage() {
       <header className={styles.nav}>
         <div className={styles.navBrand}>
           <span className={styles.navLogo}>✦</span>
-          <span className={styles.navName}>PartyShaarty</span>
+          <span className={styles.navName}>Utsavé</span>
         </div>
         <div className={styles.navRight}>
           <a href="/dashboard" className={styles.navViewInvite}>← All Events</a>

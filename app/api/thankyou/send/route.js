@@ -1,13 +1,7 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { sendEmail } from "../../../../lib/mailer";
 import { sendWhatsApp } from "../../../../lib/messenger";
-
-function linkify(text) {
-  return text.replace(
-    /(https?:\/\/[^\s<]+)/g,
-    (url) => `<a href="${url}" style="color:#c4a45a;">${url}</a>`
-  );
-}
+import { escapeHtml, formatMessageHtml } from "../../../../lib/html-utils";
 
 export async function POST(request) {
   const supabase = createSupabaseServerClient();
@@ -34,13 +28,14 @@ export async function POST(request) {
     return Response.json({ error: "Invalid channel" }, { status: 400 });
   }
 
-  // Build image HTML (email only)
+  // Build image HTML (email only) — only allow http/https URLs to prevent injection
   const urls = Array.isArray(imageUrls) ? imageUrls : [];
   const urlImagesHtml = urls
-    .map(
-      (url) =>
-        `<img src="${url}" alt="Party photo" style="max-width:100%;height:auto;border-radius:8px;margin-bottom:12px;display:block;" />`
-    )
+    .filter((url) => typeof url === "string" && /^https?:\/\//i.test(url))
+    .map((url) => {
+      const safeUrl = escapeHtml(url);
+      return `<img src="${safeUrl}" alt="Party photo" style="max-width:100%;height:auto;border-radius:8px;margin-bottom:12px;display:block;" />`;
+    })
     .join("");
 
   const uploads = Array.isArray(uploadedImages) ? uploadedImages : [];
@@ -68,7 +63,7 @@ export async function POST(request) {
   const results = [];
 
   for (const { name, email, phone } of recipients) {
-    const firstName = (name || "").split(" ")[0] || "Guest";
+    const firstName = escapeHtml((name || "").split(" ")[0] || "Guest");
 
     if (channel === "email") {
       try {
@@ -78,7 +73,7 @@ export async function POST(request) {
           replyTo: user.email,
           html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;padding:20px;">
             <p style="font-size:16px;">Hi ${firstName},</p>
-            <p style="font-size:16px;">${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
+            <p style="font-size:16px;">${formatMessageHtml(message)}</p>
             ${allImagesHtml}
           </div>`,
           attachments: attachments.length > 0 ? attachments : undefined,

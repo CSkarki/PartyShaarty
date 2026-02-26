@@ -1,5 +1,6 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { uploadCoverImage, getCoverImageUrl } from "../../../../lib/supabase";
+import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../../../../lib/upload-utils";
 
 export async function GET() {
   const supabase = createSupabaseServerClient();
@@ -46,10 +47,24 @@ export async function PATCH(request) {
     const coverFile = formData.get("cover_image");
     console.log("[PATCH] coverFile:", coverFile ? `size=${coverFile.size} type=${coverFile.type}` : "null/missing");
     if (coverFile && typeof coverFile.arrayBuffer === "function" && coverFile.size > 0) {
-      const rawName = typeof coverFile.name === "string" ? coverFile.name : "photo.jpg";
-      const ext = rawName.includes(".") ? rawName.split(".").pop().toLowerCase() : "jpg";
-      const mimeType = coverFile.type || "image/jpeg";
-      const buffer = Buffer.from(await coverFile.arrayBuffer());
+      // Fix 1: check declared size before allocating buffer
+      const sizeCheck = validateFileSize(coverFile);
+      if (!sizeCheck.ok) {
+        return Response.json({ error: sizeCheck.error }, { status: sizeCheck.status });
+      }
+
+      const rawBuffer = Buffer.from(await coverFile.arrayBuffer());
+
+      // Fix 5: validate actual image bytes via sharp
+      const imageCheck = await validateImageBuffer(rawBuffer);
+      if (!imageCheck.ok) {
+        return Response.json({ error: imageCheck.error }, { status: imageCheck.status });
+      }
+
+      // Strip EXIF and re-encode; derive ext/mimeType from real format
+      const buffer = await stripExifAndReencode(rawBuffer, imageCheck.metadata.format);
+      const ext = imageCheck.metadata.format === "jpeg" ? "jpg" : imageCheck.metadata.format;
+      const mimeType = `image/${imageCheck.metadata.format}`;
       const imagePath = await uploadCoverImage(buffer, profile.id, ext, mimeType);
       console.log("[PATCH] uploaded imagePath:", imagePath);
       fields.event_image_path = imagePath;

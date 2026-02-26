@@ -2,6 +2,7 @@ import { createSupabaseServerClient, requireHostProfile, createSupabaseAdminClie
 import { requireGuest } from "../../../../../../lib/guest-auth";
 import { getAlbum, listAlbumsForEmail } from "../../../../../../lib/gallery-store";
 import { listPhotosInAlbum, getSignedUrlsForPaths, uploadPhotoToAlbum, deletePhotoByPath } from "../../../../../../lib/supabase";
+import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../../../../../../lib/upload-utils";
 
 export async function GET(request, { params }) {
   const { albumId } = params;
@@ -96,16 +97,36 @@ export async function POST(request, { params }) {
     const results = [];
     for (const file of files) {
       if (!(file instanceof File)) continue;
+
+      // Fix 1: check declared size before allocating buffer
+      const sizeCheck = validateFileSize(file);
+      if (!sizeCheck.ok) {
+        results.push({ name: file.name, status: "skipped", error: sizeCheck.error });
+        continue;
+      }
+
+      // Quick MIME pre-screen (client-supplied, but catches obvious non-images early)
       if (!file.type.startsWith("image/")) {
         results.push({ name: file.name, status: "skipped", error: "Not an image" });
         continue;
       }
 
-      const ext = file.name.split(".").pop() || "jpg";
-      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const buffer = Buffer.from(await file.arrayBuffer());
+      const rawBuffer = Buffer.from(await file.arrayBuffer());
 
-      await uploadPhotoToAlbum(buffer, profile.id, album.slug, filename, file.type);
+      // Fix 5: validate actual image bytes via sharp (catches spoofed extensions/MIME)
+      const imageCheck = await validateImageBuffer(rawBuffer);
+      if (!imageCheck.ok) {
+        results.push({ name: file.name, status: "skipped", error: imageCheck.error });
+        continue;
+      }
+
+      // Strip EXIF (GPS, device info) and re-encode
+      const buffer = await stripExifAndReencode(rawBuffer, imageCheck.metadata.format);
+      const ext = imageCheck.metadata.format === "jpeg" ? "jpg" : imageCheck.metadata.format;
+      const contentType = `image/${imageCheck.metadata.format}`;
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+
+      await uploadPhotoToAlbum(buffer, profile.id, album.slug, filename, contentType);
       results.push({ name: filename, path: `${profile.id}/${album.slug}/${filename}`, originalName: file.name, status: "uploaded" });
     }
 

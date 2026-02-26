@@ -34,6 +34,9 @@ Thumbs.db
 supabase/.branches
 supabase/.temp
 
+# Downloaded celebration assets (regenerate with: npm run fetch-assets)
+public/assets/
+
 # Misc
 *.tsbuildinfo
 .turbo

@@ -53,7 +53,7 @@ export default function RegisterPage() {
     <main className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <span className={styles.logoText}>PartyShaarty</span>
+          <span className={styles.logoText}>Utsavé</span>
         </div>
 
         <h1 className={styles.title}>Create your account</h1>

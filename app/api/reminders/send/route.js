@@ -1,13 +1,7 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
 import { sendEmail } from "../../../../lib/mailer";
 import { sendWhatsApp } from "../../../../lib/messenger";
-
-function linkify(text) {
-  return text.replace(
-    /(https?:\/\/[^\s<]+)/g,
-    (url) => `<a href="${url}" style="color:#c4a45a;">${url}</a>`
-  );
-}
+import { escapeHtml, formatMessageHtml } from "../../../../lib/html-utils";
 
 export async function POST(request) {
   const supabase = createSupabaseServerClient();
@@ -36,7 +30,7 @@ export async function POST(request) {
   const results = [];
 
   for (const { name, email, phone } of recipients) {
-    const firstName = (name || "").split(" ")[0] || "Guest";
+    const firstName = escapeHtml((name || "").split(" ")[0] || "Guest");
 
     if (channel === "email") {
       try {
@@ -46,7 +40,7 @@ export async function POST(request) {
           replyTo: user.email,
           html: `<div style="font-family:sans-serif;line-height:1.6;color:#333;max-width:600px;margin:0 auto;">
             <p>Hi ${firstName},</p>
-            <p>${linkify(message.trim()).replace(/\n/g, "<br>")}</p>
+            <p>${formatMessageHtml(message)}</p>
           </div>`,
         });
         results.push({ email, status: "sent" });

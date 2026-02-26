@@ -1,9 +1,9 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "PartyShaarty — Your Personal Event RSVP & Gallery",
+  title: "Utsavé — Every Celebration, Elevated",
   description:
-    "Create your own event invite page, collect RSVPs, share photos, and send thank-you emails — all in one place.",
+    "The end-to-end celebration platform for the Indian diaspora. Invites, RSVPs, photo galleries, WhatsApp reminders — for every function in your family's life.",
 };
 
 export default function RootLayout({ children }) {

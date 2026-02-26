@@ -22,9 +22,9 @@
 }
 
 .logoText {
-  font-family: "Cormorant Garamond", serif;
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
   font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 400;
   color: var(--accent);
   letter-spacing: 0.03em;
 }

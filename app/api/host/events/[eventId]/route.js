@@ -1,6 +1,7 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../../lib/supabase-server";
 import { getEvent, updateEvent, deleteEvent } from "../../../../../lib/event-store";
 import { uploadEventCoverImage, getCoverImageUrl, getSignedUrlsForPaths } from "../../../../../lib/supabase";
+import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../../../../../lib/upload-utils";
 import { listAlbumsByEvent } from "../../../../../lib/gallery-store";
 import { listPhotosInAlbum, deletePhotoByPath } from "../../../../../lib/supabase";
 
@@ -52,10 +53,24 @@ export async function PATCH(request, { params }) {
 
     const coverFile = formData.get("cover_image");
     if (coverFile && typeof coverFile.arrayBuffer === "function" && coverFile.size > 0) {
-      const rawName = typeof coverFile.name === "string" ? coverFile.name : "photo.jpg";
-      const ext = rawName.includes(".") ? rawName.split(".").pop().toLowerCase() : "jpg";
-      const mimeType = coverFile.type || "image/jpeg";
-      const buffer = Buffer.from(await coverFile.arrayBuffer());
+      // Fix 1: check declared size before allocating buffer
+      const sizeCheck = validateFileSize(coverFile);
+      if (!sizeCheck.ok) {
+        return Response.json({ error: sizeCheck.error }, { status: sizeCheck.status });
+      }
+
+      const rawBuffer = Buffer.from(await coverFile.arrayBuffer());
+
+      // Fix 5: validate actual image bytes via sharp
+      const imageCheck = await validateImageBuffer(rawBuffer);
+      if (!imageCheck.ok) {
+        return Response.json({ error: imageCheck.error }, { status: imageCheck.status });
+      }
+
+      // Strip EXIF and re-encode; derive ext/mimeType from real format
+      const buffer = await stripExifAndReencode(rawBuffer, imageCheck.metadata.format);
+      const ext = imageCheck.metadata.format === "jpeg" ? "jpg" : imageCheck.metadata.format;
+      const mimeType = `image/${imageCheck.metadata.format}`;
       const imagePath = await uploadEventCoverImage(buffer, eventId, ext, mimeType);
       fields.event_image_path = imagePath;
     }

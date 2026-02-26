@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
+import { checkRateLimit } from "./lib/rate-limit";
 
 export async function middleware(request) {
   let response = NextResponse.next({
@@ -62,6 +63,38 @@ export async function middleware(request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Rate limiting for public endpoints
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+
+  if (pathname === "/api/rsvp" && request.method === "POST") {
+    const { limited, retryAfter } = await checkRateLimit("rsvp", ip);
+    if (limited) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please wait before submitting again." }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", "Retry-After": String(retryAfter) },
+        }
+      );
+    }
+  }
+
+  if (pathname === "/api/gallery/verify" && request.method === "POST") {
+    const { limited, retryAfter } = await checkRateLimit("galleryVerify", ip);
+    if (limited) {
+      return new Response(
+        JSON.stringify({ error: "Too many verification attempts. Please wait." }),
+        {
+          status: 429,
+          headers: { "Content-Type": "application/json", "Retry-After": String(retryAfter) },
+        }
+      );
+    }
+  }
+
   // Redirect authenticated users away from auth pages
   if (session && (pathname === "/auth/login" || pathname === "/auth/register")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
@@ -75,9 +108,11 @@ export const config = {
     "/dashboard/:path*",
     "/auth/login",
     "/auth/register",
+    "/api/rsvp",               // public RSVP submit — rate limited
     "/api/rsvp/list/:path*",
     "/api/rsvp/import",
     "/api/rsvp/template",
+    "/api/gallery/verify",     // gallery OTP — rate limited
     "/api/gallery/albums",
     "/api/gallery/albums/host/:path*",
     "/api/reminders/:path*",

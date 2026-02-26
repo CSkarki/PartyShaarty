@@ -35,13 +35,13 @@ export async function POST(request) {
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const { event_name, event_date, event_location, event_message } = body;
+  const { event_name, event_date, event_location, event_message, event_type } = body;
   if (!event_name || !String(event_name).trim()) {
     return Response.json({ error: "event_name is required" }, { status: 400 });
   }
 
   try {
-    const event = await createEvent({ event_name, event_date, event_location, event_message }, profile.id);
+    const event = await createEvent({ event_name, event_date, event_location, event_message, event_type }, profile.id);
     return Response.json(event, { status: 201 });
   } catch (err) {
     console.error("Create event error:", err.message);

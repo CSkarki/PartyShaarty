@@ -2,7 +2,7 @@ import { createSupabaseServerClient } from "../../lib/supabase-server";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Dashboard — PartyShaarty",
+  title: "Dashboard — Utsavé",
 };
 
 export default async function DashboardLayout({ children }) {

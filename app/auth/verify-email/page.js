@@ -5,7 +5,7 @@ export default function VerifyEmailPage() {
     <main className={styles.page}>
       <div className={styles.card}>
         <div className={styles.logo}>
-          <span className={styles.logoText}>PartyShaarty</span>
+          <span className={styles.logoText}>Utsavé</span>
         </div>
 
         <div className={styles.icon}>✉️</div>
@@ -16,7 +16,7 @@ export default function VerifyEmailPage() {
         </p>
 
         <ul className={styles.list}>
-          <li>Open the email from PartyShaarty</li>
+          <li>Open the email from Utsavé</li>
           <li>Click the confirmation link</li>
           <li>You&apos;ll be taken to your dashboard</li>
         </ul>

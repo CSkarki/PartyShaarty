@@ -846,6 +846,246 @@
   border-color: var(--accent);
 }
 
+/* ─── Nav name — DM Serif Display ────────────────────── */
+.navName {
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-size: 1.3rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.02em;
+}
+
+/* ─── Create Panel (replaces importPanel for create flow) */
+.createPanel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+}
+
+/* ─── Create Step Header (back btn + title) ──────────── */
+.createStepHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+
+.backBtn:hover {
+  opacity: 0.75;
+}
+
+/* ─── Type Selector Grid ─────────────────────────────── */
+.typeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.typeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: center;
+  transition: border-color 0.15s, transform 0.15s, background 0.15s;
+}
+
+.typeCard:hover {
+  border-color: var(--accent);
+  background: rgba(201, 148, 26, 0.04);
+  transform: translateY(-1px);
+}
+
+.typeCardSpecial {
+  border-color: var(--accent);
+  background: rgba(201, 148, 26, 0.06);
+  grid-column: span 2;
+  flex-direction: row;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+.typeCardSpecial:hover {
+  background: rgba(201, 148, 26, 0.1);
+}
+
+.typeCardIcon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.typeCardLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.typeCardDetail {
+  font-size: 0.72rem;
+  color: var(--accent);
+  font-weight: 500;
+}
+
+/* ─── Wedding Suite Builder ──────────────────────────── */
+.suiteRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.suiteRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.suiteCheck {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.suiteNameInput {
+  flex: 1;
+  min-width: 0;
+}
+
+.suiteDateInput {
+  flex: 0 0 160px;
+}
+
+.suiteRow :disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ─── Event Card — Title Row with type icon ──────────── */
+.eventCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.eventTypeChip {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+/* ─── Group Card (Wedding Suite on dashboard) ────────── */
+.groupCard {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  overflow: hidden;
+  grid-column: 1 / -1;
+  transition: box-shadow 0.15s;
+}
+
+.groupCard:hover {
+  box-shadow: 0 4px 20px rgba(201, 148, 26, 0.12);
+}
+
+.groupCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(201, 148, 26, 0.04);
+}
+
+.groupCardLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.groupCardIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.groupCardName {
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-size: 1.25rem;
+  font-weight: 400;
+  margin: 0 0 0.15rem;
+  color: var(--text);
+}
+
+.groupCardBadge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.03em;
+}
+
+.groupFunctions {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.groupFunctionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.15s;
+}
+
+.groupFunctionRow:hover {
+  background: rgba(201, 148, 26, 0.04);
+}
+
+.groupFunctionName {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.groupFunctionMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.groupFunctionArrow {
+  font-size: 0.875rem;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
 /* ─── Responsive ──────────────────────────────────────── */
 @media (max-width: 960px) {
   .statsRow {
@@ -854,6 +1094,20 @@
 
   .midRow {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .typeGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .typeCardSpecial {
+    grid-column: span 2;
+  }
+
+  .suiteDateInput {
+    flex: 0 0 120px;
   }
 }
 

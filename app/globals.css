@@ -1,13 +1,16 @@
-@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap");
 
 :root {
-  --bg: #f5f3ef;
+  --bg: #faf7f2;
   --surface: #ffffff;
-  --border: #e5e2dc;
+  --border: #e8e4dd;
   --text: #1a1a1a;
   --text-muted: #5c5c5c;
-  --accent: #b8954a;
-  --accent-dim: rgba(184, 149, 74, 0.15);
+  --accent: #c9941a;
+  --accent-hover: #a87a14;
+  --accent-dim: rgba(201, 148, 26, 0.12);
+  --accent-deep: #8b4513;
+  --accent-rose: #d4627a;
   --success: #16a34a;
   --error: #dc2626;
 }
@@ -31,8 +34,12 @@ body {
 }
 
 h1, h2 {
-  font-family: "Cormorant Garamond", serif;
-  font-weight: 600;
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-weight: 400;
+}
+
+h3 {
+  font-family: "Outfit", sans-serif;
 }
 
 button, input, textarea {
