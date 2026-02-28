@@ -12,7 +12,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug }) {
 
   // Fetch photos client-side via the existing slideshow API (proven working)
   useEffect(() => {
-    fetch(`/api/slideshow/${eventSlug}`)
+    fetch(`/api/slideshow/${eventSlug}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data.photos)) setPhotos(data.photos);
