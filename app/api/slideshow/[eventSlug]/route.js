@@ -2,6 +2,9 @@ import { createSupabaseAdminClient } from "../../../../lib/supabase-server";
 import { listAlbumsByEvent } from "../../../../lib/gallery-store";
 import { listPhotosInAlbum, getSignedUrlsForPaths } from "../../../../lib/supabase";
 
+// Always fetch fresh — photo uploads must appear immediately
+export const dynamic = "force-dynamic";
+
 export async function GET(request, { params }) {
   const { eventSlug } = params;
 
