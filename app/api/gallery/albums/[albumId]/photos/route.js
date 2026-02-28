@@ -7,35 +7,47 @@ import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../
 export async function GET(request, { params }) {
   const { albumId } = params;
   const { searchParams } = new URL(request.url);
-  const hostSlug = searchParams.get("hostSlug");
+  // Accept new eventSlug param (multi-event) and legacy hostSlug for backward compat
+  const eventSlugParam = searchParams.get("eventSlug");
+  const hostSlugParam = searchParams.get("hostSlug");
+  const slugParam = eventSlugParam || hostSlugParam;
 
-  // Try guest auth first
-  const guest = requireGuest(request, hostSlug || undefined);
+  // Try guest auth first (validate cookie matches this event)
+  const guest = requireGuest(request, slugParam || undefined);
 
   if (guest.ok) {
-    // Guest access: resolve host from cookie's hostSlug
-    const slug = hostSlug || guest.hostSlug;
+    const slug = slugParam || guest.eventSlug;
     if (!slug) return Response.json({ error: "Host not specified" }, { status: 400 });
 
     const admin = createSupabaseAdminClient();
-    const { data: hostProfile } = await admin
-      .from("host_profiles")
-      .select("id")
-      .eq("slug", slug)
-      .single();
 
-    if (!hostProfile) return Response.json({ error: "Event not found" }, { status: 404 });
+    // Resolve host_id: try event slug via RPC first, then fall back to host profile slug
+    let hostProfileId;
+    const { data: eventRows } = await admin.rpc("get_event_by_slug", { p_slug: slug });
+    if (eventRows?.length) {
+      hostProfileId = eventRows[0].host_id;
+    } else {
+      // Legacy: host slug lookup
+      const { data: hp } = await admin
+        .from("host_profiles")
+        .select("id")
+        .eq("slug", slug)
+        .single();
+      hostProfileId = hp?.id;
+    }
 
-    const album = await getAlbum(albumId, hostProfile.id);
+    if (!hostProfileId) return Response.json({ error: "Event not found" }, { status: 404 });
+
+    const album = await getAlbum(albumId, hostProfileId);
     if (!album) return Response.json({ error: "Album not found" }, { status: 404 });
 
     // Verify album is shared with this guest
-    const allowed = await listAlbumsForEmail(guest.email, hostProfile.id);
+    const allowed = await listAlbumsForEmail(guest.email, hostProfileId);
     if (!allowed.find((a) => a.id === albumId)) {
       return Response.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    return servePhotos(hostProfile.id, album);
+    return servePhotos(hostProfileId, album);
   }
 
   // Try host auth

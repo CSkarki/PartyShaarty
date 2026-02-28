@@ -297,3 +297,88 @@
 .lightboxNext {
   right: 1rem;
 }
+
+/* ─── Guest Upload Panel ────────────────────────────── */
+.uploadPanel {
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.uploadPanelHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  margin-bottom: 1.25rem;
+}
+
+.uploadPanelIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.uploadPanelTitle {
+  font-family: "Cormorant Garamond", serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 0.2rem;
+  color: var(--text);
+}
+
+.uploadPanelSub {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.uploadRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.uploadInput {
+  font-size: 0.85rem;
+  color: var(--text);
+  flex: 1;
+  min-width: 0;
+}
+
+.uploadBtn {
+  flex-shrink: 0;
+  padding: 0.5rem 1.25rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: opacity 0.15s;
+}
+
+.uploadBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.uploadBtn:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
+.uploadSuccess {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--success, #16a34a);
+}
+
+.uploadError {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--error, #dc2626);
+}

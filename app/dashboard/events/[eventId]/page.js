@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import QRCode from "qrcode";
 import styles from "../../page.module.css";
 
 export default function EventDashboardPage() {
@@ -15,6 +16,8 @@ export default function EventDashboardPage() {
   const [importing, setImporting] = useState(false);
   const [importResult, setImportResult] = useState(null);
   const [showImport, setShowImport] = useState(false);
+  const [showQr, setShowQr] = useState(false);
+  const [qrDataUrl, setQrDataUrl] = useState("");
   const [rsvpFilter, setRsvpFilter] = useState("all");
   const [copied, setCopied] = useState(false);
   const importFileRef = useRef(null);
@@ -75,6 +78,24 @@ export default function EventDashboardPage() {
     await navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  }
+
+  async function toggleQr() {
+    if (showQr) { setShowQr(false); return; }
+    if (!qrDataUrl && event?.slug) {
+      const url = `${window.location.origin}/${event.slug}/invite`;
+      const dataUrl = await QRCode.toDataURL(url, { width: 240, margin: 2, color: { dark: "#2a1f00", light: "#faf7f2" } });
+      setQrDataUrl(dataUrl);
+    }
+    setShowQr(true);
+  }
+
+  function downloadQr() {
+    if (!qrDataUrl) return;
+    const a = document.createElement("a");
+    a.href = qrDataUrl;
+    a.download = `${event?.slug || "invite"}-qr.png`;
+    a.click();
   }
 
   if (loading) {
@@ -305,6 +326,31 @@ export default function EventDashboardPage() {
                   <span className={styles.actionDesc}>Bulk add RSVPs</span>
                 </div>
               </button>
+              <button
+                type="button"
+                onClick={toggleQr}
+                className={`${styles.actionItem} ${showQr ? styles.actionItemActive : ""}`}
+              >
+                <span className={styles.actionIcon}>◫</span>
+                <div>
+                  <span className={styles.actionLabel}>QR Code</span>
+                  <span className={styles.actionDesc}>Print for table cards</span>
+                </div>
+              </button>
+              {event?.slug && (
+                <a
+                  href={`/${event.slug}/slideshow`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.actionItem}
+                >
+                  <span className={styles.actionIcon}>▶</span>
+                  <div>
+                    <span className={styles.actionLabel}>Live Slideshow</span>
+                    <span className={styles.actionDesc}>For projector or TV</span>
+                  </div>
+                </a>
+              )}
             </div>
           </div>
         </section>
@@ -363,6 +409,31 @@ export default function EventDashboardPage() {
                 )}
               </div>
             )}
+          </section>
+        )}
+
+        {/* QR Code Panel */}
+        {showQr && (
+          <section className={styles.importPanel}>
+            <div className={styles.importHeader}>
+              <h3 className={styles.importTitle}>QR Code — {event?.event_name}</h3>
+              <button type="button" onClick={() => setShowQr(false)} className={styles.importClose}>✕</button>
+            </div>
+            <p className={styles.importNote}>
+              Guests scan this QR code to open your invite page and RSVP instantly — no typing needed.
+            </p>
+            <div className={styles.qrContent}>
+              {qrDataUrl && <img src={qrDataUrl} alt="Invite QR code" className={styles.qrImage} />}
+              <div className={styles.qrActions}>
+                <button type="button" onClick={downloadQr} className={styles.btnPrimary}>
+                  Download PNG
+                </button>
+                <a href={inviteUrl} target="_blank" rel="noreferrer" className={styles.btnOutline}>
+                  Preview invite ↗
+                </a>
+              </div>
+              <p className={styles.qrUrl}>{inviteUrl}</p>
+            </div>
           </section>
         )}
 

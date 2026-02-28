@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, Suspense } from "react";
+import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useParams } from "next/navigation";
 import styles from "./page.module.css";
 
@@ -298,6 +298,80 @@ function GalleryContent() {
           ))}
         </div>
       )}
+      <GuestUploadPanel eventSlug={eventSlug} />
     </main>
+  );
+}
+
+function GuestUploadPanel({ eventSlug }) {
+  const fileInputRef = useRef(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const [result, setResult] = useState(null);
+  const MAX = 5;
+
+  function handleFileChange(e) {
+    const files = Array.from(e.target.files || []).slice(0, MAX);
+    setSelectedFiles(files);
+    setResult(null);
+  }
+
+  async function handleUpload() {
+    if (!selectedFiles.length) return;
+    setUploading(true);
+    setResult(null);
+    const fd = new FormData();
+    selectedFiles.forEach((f) => fd.append("photos", f));
+    try {
+      const res = await fetch("/api/gallery/guest-upload", {
+        method: "POST",
+        credentials: "include",
+        body: fd,
+      });
+      const data = await res.json();
+      if (!res.ok) { setResult({ error: data.error || "Upload failed" }); return; }
+      setResult({ uploaded: data.uploaded });
+      setSelectedFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch {
+      setResult({ error: "Network error. Try again." });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div className={styles.uploadPanel}>
+      <div className={styles.uploadPanelHeader}>
+        <span className={styles.uploadPanelIcon}>📸</span>
+        <div>
+          <h3 className={styles.uploadPanelTitle}>Share Your Photos</h3>
+          <p className={styles.uploadPanelSub}>Upload photos you took at this event (up to {MAX} at a time)</p>
+        </div>
+      </div>
+      <div className={styles.uploadRow}>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleFileChange}
+          className={styles.uploadInput}
+        />
+        <button
+          type="button"
+          onClick={handleUpload}
+          disabled={!selectedFiles.length || uploading}
+          className={styles.uploadBtn}
+        >
+          {uploading ? "Uploading…" : `Upload ${selectedFiles.length ? `${selectedFiles.length} photo${selectedFiles.length > 1 ? "s" : ""}` : "photos"}`}
+        </button>
+      </div>
+      {result && (
+        result.error
+          ? <p className={styles.uploadError}>{result.error}</p>
+          : <p className={styles.uploadSuccess}>✓ {result.uploaded} photo{result.uploaded !== 1 ? "s" : ""} shared — thank you!</p>
+      )}
+    </div>
   );
 }

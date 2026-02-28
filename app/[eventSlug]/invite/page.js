@@ -33,11 +33,27 @@ export default async function InvitePage({ params }) {
   // Resolve cover image signed URL if set
   const coverUrl = await getCoverImageUrl(event.event_image_path);
 
+  // Check if this is part of a Wedding Suite — fetch all sibling functions
+  let groupEvents = null;
+  const { data: extraFields } = await admin
+    .from("events")
+    .select("event_group_id, event_type")
+    .eq("slug", eventSlug)
+    .single();
+
+  if (extraFields?.event_group_id && extraFields?.event_type === "wedding_function") {
+    const { data: groupData } = await admin.rpc("get_group_events_by_event_slug", { p_slug: eventSlug });
+    if (groupData?.length > 1) {
+      groupEvents = groupData;
+    }
+  }
+
   return (
     <InviteForm
       profile={event}
       eventSlug={eventSlug}
       coverUrl={coverUrl}
+      groupEvents={groupEvents}
     />
   );
 }

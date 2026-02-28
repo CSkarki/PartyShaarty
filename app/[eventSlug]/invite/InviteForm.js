@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import styles from "./invite.module.css";
 
-export default function InviteForm({ profile, eventSlug, coverUrl }) {
+export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -14,14 +14,67 @@ export default function InviteForm({ profile, eventSlug, coverUrl }) {
   const [imageError, setImageError] = useState(false);
   const statusRef = useRef(null);
 
+  // Per-function responses for Wedding Suite: { [eventSlug]: "Yes" | "No" | "" }
+  const [fnResponses, setFnResponses] = useState(() =>
+    groupEvents ? Object.fromEntries(groupEvents.map((g) => [g.event_slug, ""])) : {}
+  );
+
   useEffect(() => {
     if (status && statusRef.current) {
       statusRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [status]);
 
+  function setFnResponse(slug, value) {
+    setFnResponses((prev) => ({ ...prev, [slug]: value }));
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
+
+    if (groupEvents) {
+      // Wedding Suite — per-function RSVP
+      if (!name.trim() || !email.trim()) {
+        setStatus({ type: "error", text: "Please fill in your name and email." });
+        return;
+      }
+      const responses = groupEvents.map((g) => ({
+        slug: g.event_slug,
+        attending: fnResponses[g.event_slug] || "No",
+      }));
+      setLoading(true);
+      setStatus(null);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      try {
+        const res = await fetch("/api/rsvp/suite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            responses,
+            name: name.trim(),
+            email: email.trim(),
+            phone: phone.trim() || undefined,
+            message: message.trim() || "",
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeoutId);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `RSVP failed (${res.status})`);
+        setStatus({ type: "success", text: "Thank you! Your RSVPs have been recorded." });
+        setName(""); setEmail(""); setPhone(""); setMessage("");
+        setFnResponses(Object.fromEntries(groupEvents.map((g) => [g.event_slug, ""])));
+      } catch (err) {
+        clearTimeout(timeoutId);
+        setStatus({ type: "error", text: err.name === "AbortError" ? "Request timed out. Try again." : err.message || "Network error." });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Standard single-event RSVP
     if (!name.trim() || !email.trim() || !attending) {
       setStatus({ type: "error", text: "Please fill name, email, and RSVP." });
       return;
@@ -146,31 +199,71 @@ export default function InviteForm({ profile, eventSlug, coverUrl }) {
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="+1 555 000 0000"
                 />
-                <label className={styles.rsvpForm__label}>
-                  Will you attend? <span className={styles.required}>*</span>
-                </label>
-                <div className={styles.rsvpForm__radioGroup}>
-                  <label className={styles.rsvpForm__radio}>
-                    <input
-                      type="radio"
-                      name="attending"
-                      value="Yes"
-                      checked={attending === "Yes"}
-                      onChange={(e) => setAttending(e.target.value)}
-                    />
-                    <span>Yes</span>
-                  </label>
-                  <label className={styles.rsvpForm__radio}>
-                    <input
-                      type="radio"
-                      name="attending"
-                      value="No"
-                      checked={attending === "No"}
-                      onChange={(e) => setAttending(e.target.value)}
-                    />
-                    <span>No</span>
-                  </label>
-                </div>
+
+                {groupEvents ? (
+                  /* ── Per-function toggle section (Wedding Suite) ── */
+                  <div className={styles.fnSection}>
+                    <label className={styles.rsvpForm__label}>
+                      Which functions will you attend? <span className={styles.required}>*</span>
+                    </label>
+                    <div className={styles.fnGrid}>
+                      {groupEvents.map((g) => (
+                        <div key={g.event_slug} className={styles.fnRow}>
+                          <div className={styles.fnInfo}>
+                            <span className={styles.fnName}>{g.event_name}</span>
+                            {g.event_date && <span className={styles.fnDate}>{g.event_date}</span>}
+                          </div>
+                          <div className={styles.fnToggle}>
+                            <button
+                              type="button"
+                              onClick={() => setFnResponse(g.event_slug, "Yes")}
+                              className={`${styles.fnBtn} ${fnResponses[g.event_slug] === "Yes" ? styles.fnBtnYes : ""}`}
+                            >
+                              Attending
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setFnResponse(g.event_slug, "No")}
+                              className={`${styles.fnBtn} ${fnResponses[g.event_slug] === "No" ? styles.fnBtnNo : ""}`}
+                            >
+                              Can&apos;t make it
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  /* ── Standard Yes/No radio ── */
+                  <>
+                    <label className={styles.rsvpForm__label}>
+                      Will you attend? <span className={styles.required}>*</span>
+                    </label>
+                    <div className={styles.rsvpForm__radioGroup}>
+                      <label className={styles.rsvpForm__radio}>
+                        <input
+                          type="radio"
+                          name="attending"
+                          value="Yes"
+                          checked={attending === "Yes"}
+                          onChange={(e) => setAttending(e.target.value)}
+                        />
+                        <span>Yes</span>
+                      </label>
+                      <label className={styles.rsvpForm__radio}>
+                        <input
+                          type="radio"
+                          name="attending"
+                          value="No"
+                          checked={attending === "No"}
+                          onChange={(e) => setAttending(e.target.value)}
+                        />
+                        <span>No</span>
+                      </label>
+                    </div>
+                  </>
+                )}
+
                 <label className={styles.rsvpForm__label}>Message (optional)</label>
                 <textarea
                   className={`${styles.rsvpForm__input} ${styles.rsvpForm__textarea}`}
