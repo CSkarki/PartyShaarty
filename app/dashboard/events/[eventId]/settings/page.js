@@ -75,9 +75,17 @@ export default function EventSettingsPage() {
     loadEvent().catch(() => {}).finally(() => setLoading(false));
   }, [eventId]);
 
+  const MAX_COVER_MB = 4;
+  const MAX_COVER_BYTES = MAX_COVER_MB * 1024 * 1024;
+
   function handleFileChange(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > MAX_COVER_BYTES) {
+      setStatus({ type: "error", text: `Image is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Please use an image under ${MAX_COVER_MB} MB.` });
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
     setCoverFile(file);
     const reader = new FileReader();
     reader.onload = (ev) => setCoverPreview(ev.target.result);
@@ -110,6 +118,11 @@ export default function EventSettingsPage() {
     try {
       const res = await fetch(photo.file);
       const blob = await res.blob();
+      if (blob.size > MAX_COVER_BYTES) {
+        setStatus({ type: "error", text: `Library image is too large (${(blob.size / 1024 / 1024).toFixed(1)} MB). Please upload your own image under ${MAX_COVER_MB} MB.` });
+        setShowLibrary(false);
+        return;
+      }
       const filename = photo.file.split("/").pop();
       const file = new File([blob], filename, { type: blob.type || "image/jpeg" });
       setCoverFile(file);
@@ -138,6 +151,13 @@ export default function EventSettingsPage() {
     setSaving(true);
     setStatus(null);
 
+    // Client-side guard: re-check size in case state slipped through
+    if (coverFile && coverFile.size > MAX_COVER_BYTES) {
+      setStatus({ type: "error", text: `Image is too large (${(coverFile.size / 1024 / 1024).toFixed(1)} MB). Please use an image under ${MAX_COVER_MB} MB.` });
+      setSaving(false);
+      return;
+    }
+
     const formData = new FormData();
     formData.append("event_name", eventName);
     formData.append("event_date", eventDate);
@@ -151,8 +171,13 @@ export default function EventSettingsPage() {
         credentials: "include",
         body: formData,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Save failed");
+      // Safely parse JSON — non-JSON responses (e.g. 413 from infrastructure) won't crash
+      let data = {};
+      try { data = await res.json(); } catch {}
+      if (!res.ok) {
+        const msg = data.error || (res.status === 413 ? `Image too large for upload. Please use an image under ${MAX_COVER_MB} MB.` : "Save failed");
+        throw new Error(msg);
+      }
       setStatus({ type: "success", text: "Event settings saved!" });
       setCoverFile(null);
       setCoverPreview(null);
