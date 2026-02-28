@@ -1,7 +1,7 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../../lib/supabase-server";
 import { getEvent, updateEvent, deleteEvent, launchEvent, requestDeletion } from "../../../../../lib/event-store";
 import { sendEmail } from "../../../../../lib/mailer";
-import { uploadEventCoverImage, getCoverImageUrl, getSignedUrlsForPaths } from "../../../../../lib/supabase";
+import { uploadEventCoverImage } from "../../../../../lib/supabase";
 import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../../../../../lib/upload-utils";
 import { listAlbumsByEvent } from "../../../../../lib/gallery-store";
 import { listPhotosInAlbum, deletePhotoByPath } from "../../../../../lib/supabase";
@@ -19,10 +19,9 @@ export async function GET(request, { params }) {
   const event = await getEvent(eventId, profile.id);
   if (!event) return Response.json({ error: "Event not found" }, { status: 404 });
 
-  let event_image_url = null;
-  if (event.event_image_path) {
-    event_image_url = await getCoverImageUrl(event.event_image_path);
-  }
+  const event_image_url = event.event_image_path
+    ? `/api/image?p=${encodeURIComponent(event.event_image_path)}`
+    : null;
 
   return Response.json({ ...event, event_image_url });
 }

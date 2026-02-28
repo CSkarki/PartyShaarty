@@ -1,7 +1,7 @@
 import { createSupabaseServerClient, requireHostProfile, createSupabaseAdminClient } from "../../../../../../lib/supabase-server";
 import { requireGuest } from "../../../../../../lib/guest-auth";
 import { getAlbum, listAlbumsForEmail } from "../../../../../../lib/gallery-store";
-import { listPhotosInAlbum, getSignedUrlsForPaths, uploadPhotoToAlbum, deletePhotoByPath } from "../../../../../../lib/supabase";
+import { listPhotosInAlbum, uploadPhotoToAlbum, deletePhotoByPath } from "../../../../../../lib/supabase";
 import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../../../../../../lib/upload-utils";
 
 export async function GET(request, { params }) {
@@ -70,13 +70,10 @@ async function servePhotos(hostProfileId, album) {
     const files = await listPhotosInAlbum(hostProfileId, album.slug);
     if (!files.length) return Response.json([]);
 
-    const paths = files.map((f) => f.path);
-    const signed = await getSignedUrlsForPaths(paths);
-
-    const photos = files.map((f, i) => ({
+    const photos = files.map((f) => ({
       name: f.name,
       path: f.path,
-      url: signed[i]?.signedUrl || "",
+      url: `/api/image?p=${encodeURIComponent(f.path)}`,
       size: f.metadata?.size || 0,
       createdAt: f.created_at || "",
     }));

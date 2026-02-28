@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseAdminClient } from "../../../lib/supabase-server";
-import { getCoverImageUrl, listPhotosInAlbum, getSignedUrlsForPaths } from "../../../lib/supabase";
+import { listPhotosInAlbum } from "../../../lib/supabase";
 import { listAlbumsByEvent } from "../../../lib/gallery-store";
 import MemoryPage from "./MemoryPage";
 
@@ -61,30 +61,23 @@ export default async function MemoryPageRoute({ params }) {
     redirect(`/${eventSlug}/invite`);
   }
 
-  // Fetch cover image signed URL server-side
-  const coverUrl = await getCoverImageUrl(event.event_image_path);
+  // Cover and photos via image proxy (same-origin, no CORS)
+  const coverUrl = event.event_image_path
+    ? `/api/image?p=${encodeURIComponent(event.event_image_path)}`
+    : null;
 
-  // Fetch photos server-side — signed URLs are fresh on every request
-  // (same pattern as /api/slideshow route, avoids client-side caching issues)
   let photos = [];
   try {
     const albums = await listAlbumsByEvent(event.id);
-    const allPhotos = [];
     for (const album of albums) {
       const files = await listPhotosInAlbum(event.host_id, album.slug);
       for (const f of files) {
-        allPhotos.push({ path: f.path, albumName: album.name, albumId: album.id });
+        photos.push({
+          url: `/api/image?p=${encodeURIComponent(f.path)}`,
+          albumName: album.name,
+          albumId: album.id,
+        });
       }
-    }
-    if (allPhotos.length) {
-      const signed = await getSignedUrlsForPaths(allPhotos.map((p) => p.path));
-      photos = allPhotos
-        .map((p, i) => ({
-          url: signed[i]?.signedUrl || "",
-          albumName: p.albumName,
-          albumId: p.albumId,
-        }))
-        .filter((p) => p.url);
     }
   } catch (err) {
     console.error("[memory/page] photo fetch error:", err.message);

@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseAdminClient } from "../../../lib/supabase-server";
-import { getCoverImageUrl } from "../../../lib/supabase";
 import InviteForm from "./InviteForm";
 
 // Always render fresh — host can update event details and cover image at any time
@@ -42,8 +41,9 @@ export default async function InvitePage({ params }) {
     }
   }
 
-  // Resolve cover image signed URL if set
-  const coverUrl = await getCoverImageUrl(event.event_image_path);
+  const coverUrl = event.event_image_path
+    ? `/api/image?p=${encodeURIComponent(event.event_image_path)}`
+    : null;
 
   // Check if this is part of a Wedding Suite — fetch all sibling functions
   let groupEvents = null;

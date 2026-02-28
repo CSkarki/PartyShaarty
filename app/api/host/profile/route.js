@@ -1,5 +1,5 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../lib/supabase-server";
-import { uploadCoverImage, getCoverImageUrl } from "../../../../lib/supabase";
+import { uploadCoverImage } from "../../../../lib/supabase";
 import { validateFileSize, validateImageBuffer, stripExifAndReencode } from "../../../../lib/upload-utils";
 
 export async function GET() {
@@ -11,11 +11,9 @@ export async function GET() {
     return res;
   }
 
-  // Include a fresh signed URL so the dashboard can preview the cover image
-  let event_image_url = null;
-  if (profile.event_image_path) {
-    event_image_url = await getCoverImageUrl(profile.event_image_path);
-  }
+  const event_image_url = profile.event_image_path
+    ? `/api/image?p=${encodeURIComponent(profile.event_image_path)}`
+    : null;
 
   return Response.json({ ...profile, event_image_url });
 }

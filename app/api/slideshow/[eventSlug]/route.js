@@ -1,6 +1,6 @@
 import { createSupabaseAdminClient } from "../../../../lib/supabase-server";
 import { listAlbumsByEvent } from "../../../../lib/gallery-store";
-import { listPhotosInAlbum, getSignedUrlsForPaths } from "../../../../lib/supabase";
+import { listPhotosInAlbum } from "../../../../lib/supabase";
 
 // Signed URLs expire — never cache this response at any layer
 export const dynamic = "force-dynamic";
@@ -37,14 +37,11 @@ export async function GET(request, { params }) {
       return Response.json({ eventName: ev.event_name, eventDate: ev.event_date, photos: [] }, { headers: NO_CACHE });
     }
 
-    const paths = allPhotos.map((p) => p.path);
-    const signed = await getSignedUrlsForPaths(paths);
-
-    const photos = allPhotos.map((p, i) => ({
-      url: signed[i]?.signedUrl || "",
+    const photos = allPhotos.map((p) => ({
+      url: `/api/image?p=${encodeURIComponent(p.path)}`,
       albumName: p.albumName,
       albumId: p.albumId,
-    })).filter((p) => p.url);
+    }));
 
     return Response.json({
       eventName: ev.event_name,
