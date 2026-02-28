@@ -269,35 +269,7 @@ export default function LandingTemplate({ theme }) {
         </div>
       </section>
 
-      {/* ── Pricing ── */}
-      <section className={styles.pricing} id="pricing">
-        <h2 className={styles.sectionTitle}>Simple, honest pricing</h2>
-        <p className={styles.sectionSub}>
-          Pay once per celebration — no monthly fees, no surprises.
-        </p>
-        <div className={styles.pricingGrid}>
-          {PLANS.map((plan) => (
-            <div key={plan.name} className={`${styles.pricingCard}${plan.highlight ? ` ${styles.pricingCardHighlight}` : ""}`}>
-              {plan.highlight && <div className={styles.pricingBadge}>Most popular</div>}
-              <div className={styles.pricingName}>{plan.name}</div>
-              <div className={styles.pricingPrice}>
-                {plan.price}<span className={styles.pricingPeriod}> / {plan.period}</span>
-              </div>
-              <p className={styles.pricingDesc}>{plan.desc}</p>
-              <ul className={styles.pricingFeatures}>
-                {plan.features.map((f) => (
-                  <li key={f} className={f.includes("coming soon") ? styles.pricingFeatureSoon : styles.pricingFeature}>
-                    {f.includes("coming soon") ? f : `✓ ${f}`}
-                  </li>
-                ))}
-              </ul>
-              <Link href={plan.href} className={plan.highlight ? styles.btnPrimary : styles.btnSecondary}>
-                {plan.cta}
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* ── Pricing ── hidden for now */}
 
       {/* ── CTA Banner ── */}
       <section className={styles.ctaBanner}>

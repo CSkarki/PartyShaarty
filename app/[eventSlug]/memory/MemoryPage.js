@@ -228,7 +228,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug }) {
                   onClick={() => setLightboxIdx(idx)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={photo.url} alt={photo.albumName} loading="lazy" />
+                  <img src={photo.url} alt={photo.albumName} />
                   <div className={styles.masonryOverlay}>{photo.albumName}</div>
                 </div>
               ))}
