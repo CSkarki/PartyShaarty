@@ -28,12 +28,39 @@ const DEFAULT_WEDDING_FUNCTIONS = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function EventCard({ event, getDaysUntil }) {
+function EventCard({ event, getDaysUntil, onDeleted }) {
   const typeOpt = EVENT_TYPE_OPTIONS.find((t) => t.value === event.event_type)
     || EVENT_TYPE_OPTIONS.find((t) => t.value === "other");
   const daysUntil = getDaysUntil(event.event_date);
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const inviteUrl = `${origin}/${event.slug}/invite`;
+  const isLive = event.status === "active";
+
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!deleteConfirm) { setDeleteConfirm(true); return; }
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/host/events/${event.id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (res.ok) {
+        onDeleted(event.id);
+      } else {
+        const data = await res.json();
+        alert(data.error || "Delete failed");
+        setDeleting(false);
+        setDeleteConfirm(false);
+      }
+    } catch {
+      alert("Network error. Please try again.");
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  }
 
   return (
     <div className={styles.eventCard}>
@@ -41,6 +68,10 @@ function EventCard({ event, getDaysUntil }) {
         <div className={styles.eventCardTitleRow}>
           <span className={styles.eventTypeChip}>{typeOpt.icon}</span>
           <h2 className={styles.eventCardName}>{event.event_name || "Untitled"}</h2>
+          {isLive
+            ? <span className={styles.statusLive}>● Live</span>
+            : <span className={styles.statusDraft}>Draft</span>
+          }
         </div>
         {event.event_date && <span className={styles.eventCardDate}>{event.event_date}</span>}
         {daysUntil !== null && (
@@ -67,6 +98,37 @@ function EventCard({ event, getDaysUntil }) {
         <a href={`/${event.slug}/invite`} target="_blank" rel="noreferrer" className={styles.btnOutlineSmall}>
           View Invite ↗
         </a>
+        {!isLive && (
+          deleteConfirm ? (
+            <>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className={`${styles.btnDanger} ${styles.btnDangerSolid}`}
+                style={{ fontSize: "0.8rem", padding: "0.35rem 0.7rem" }}
+              >
+                {deleting ? "…" : "Confirm?"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDeleteConfirm(false)}
+                className={styles.btnOutlineSmall}
+              >
+                Cancel
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={handleDelete}
+              className={styles.btnDanger}
+              style={{ fontSize: "0.8rem", padding: "0.35rem 0.7rem" }}
+            >
+              Delete
+            </button>
+          )
+        )}
       </div>
     </div>
   );
@@ -158,7 +220,7 @@ export default function DashboardPage() {
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    router.push("/auth/login");
+    router.push("/");
     router.refresh();
   }
 
@@ -317,10 +379,10 @@ export default function DashboardPage() {
   return (
     <div className={styles.page}>
       <header className={styles.nav}>
-        <div className={styles.navBrand}>
+        <a href="/" className={styles.navBrand}>
           <span className={styles.navLogo}>✦</span>
           <span className={styles.navName}>Utsavé</span>
-        </div>
+        </a>
         <div className={styles.navRight}>
           <button type="button" onClick={handleLogout} className={styles.navLogout}>
             Log out
@@ -532,7 +594,12 @@ export default function DashboardPage() {
               item.kind === "group" ? (
                 <GroupCard key={item.data.id} group={item.data} getDaysUntil={getDaysUntil} />
               ) : (
-                <EventCard key={item.data.id} event={item.data} getDaysUntil={getDaysUntil} />
+                <EventCard
+                  key={item.data.id}
+                  event={item.data}
+                  getDaysUntil={getDaysUntil}
+                  onDeleted={(id) => setEvents((prev) => prev.filter((e) => e.id !== id))}
+                />
               )
             )}
           </div>

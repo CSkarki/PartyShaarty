@@ -48,6 +48,23 @@ export async function middleware(request) {
     }
   }
 
+  // Protect /admin/* pages — redirect to login if not authenticated
+  // (Super admin email check happens inside each page/API handler)
+  if (pathname.startsWith("/admin")) {
+    if (!session) {
+      const loginUrl = new URL("/auth/login", request.url);
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // Protect admin API routes — return 401 if not authenticated (email check is inside handlers)
+  if (pathname.startsWith("/api/admin")) {
+    if (!session) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   // Protect host API routes — return 401 if not authenticated
   const isProtectedApi =
     pathname.startsWith("/api/rsvp/list") ||
@@ -106,6 +123,7 @@ export async function middleware(request) {
 export const config = {
   matcher: [
     "/dashboard/:path*",
+    "/admin/:path*",           // super admin — session check in middleware, email check in handlers
     "/auth/login",
     "/auth/register",
     "/api/rsvp",               // public RSVP submit — rate limited
@@ -119,5 +137,6 @@ export const config = {
     "/api/thankyou/:path*",
     "/api/export/:path*",
     "/api/host/:path*",
+    "/api/admin/:path*",       // admin API — session check in middleware, email check in handlers
   ],
 };

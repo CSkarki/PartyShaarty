@@ -22,29 +22,41 @@ export default function EventDashboardPage() {
   const [copied, setCopied] = useState(false);
   const importFileRef = useRef(null);
 
+  // Lifecycle state
+  const [launching, setLaunching] = useState(false);
+  const [launchConfirm, setLaunchConfirm] = useState(false);
+  const [launchError, setLaunchError] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const [showDeleteRequest, setShowDeleteRequest] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [requestingDeletion, setRequestingDeletion] = useState(false);
+  const [deletionRequestSent, setDeletionRequestSent] = useState(false);
+
   const opts = { credentials: "include" };
 
-  useEffect(() => {
-    async function load() {
-      const [evRes, rsvpRes] = await Promise.all([
-        fetch(`/api/host/events/${eventId}`, opts),
-        fetch(`/api/rsvp/list?eventId=${eventId}`, opts),
-      ]);
-      if (!evRes.ok) { router.push("/dashboard"); return; }
-      const ev = await evRes.json();
-      setEvent(ev);
-      if (rsvpRes.ok) {
-        const data = await rsvpRes.json();
-        setRsvps(Array.isArray(data) ? data : []);
-      }
-      setLoading(false);
+  async function loadEvent() {
+    const [evRes, rsvpRes] = await Promise.all([
+      fetch(`/api/host/events/${eventId}`, opts),
+      fetch(`/api/rsvp/list?eventId=${eventId}`, opts),
+    ]);
+    if (!evRes.ok) { router.push("/dashboard"); return; }
+    const ev = await evRes.json();
+    setEvent(ev);
+    if (rsvpRes.ok) {
+      const data = await rsvpRes.json();
+      setRsvps(Array.isArray(data) ? data : []);
     }
-    load();
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    loadEvent();
   }, [eventId]);
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
-    router.push("/auth/login");
+    router.push("/");
     router.refresh();
   }
 
@@ -98,6 +110,73 @@ export default function EventDashboardPage() {
     a.click();
   }
 
+  async function handleLaunch() {
+    if (!launchConfirm) { setLaunchConfirm(true); return; }
+    setLaunching(true);
+    setLaunchError(null);
+    try {
+      const res = await fetch(`/api/host/events/${eventId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "launch" }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Launch failed");
+      setLaunchConfirm(false);
+      await loadEvent();
+    } catch (err) {
+      setLaunchError(err.message);
+    } finally {
+      setLaunching(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!deleteConfirm) { setDeleteConfirm(true); return; }
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/host/events/${eventId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error || "Delete failed");
+        setDeleting(false);
+        setDeleteConfirm(false);
+        return;
+      }
+      router.push("/dashboard");
+    } catch {
+      alert("Network error. Please try again.");
+      setDeleting(false);
+      setDeleteConfirm(false);
+    }
+  }
+
+  async function handleRequestDeletion(e) {
+    e.preventDefault();
+    setRequestingDeletion(true);
+    try {
+      const res = await fetch(`/api/host/events/${eventId}`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "request_deletion", reason: deleteReason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+      setDeletionRequestSent(true);
+      setShowDeleteRequest(false);
+      await loadEvent();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setRequestingDeletion(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className={styles.loadingScreen}>
@@ -116,8 +195,10 @@ export default function EventDashboardPage() {
   const hasEventDetails = !!(event?.event_name && event?.event_date);
   const hasCoverPhoto = !!event?.event_image_path;
   const hasRsvps = totalRsvps > 0;
-  const setupComplete = hasEventDetails && hasCoverPhoto && hasRsvps;
   const setupSteps = [hasEventDetails, hasCoverPhoto, hasRsvps].filter(Boolean).length;
+
+  const isLive = event?.status === "active";
+  const isDraft = !isLive;
 
   function getDaysUntil(dateStr) {
     if (!dateStr) return null;
@@ -134,10 +215,10 @@ export default function EventDashboardPage() {
   return (
     <div className={styles.page}>
       <header className={styles.nav}>
-        <div className={styles.navBrand}>
+        <a href="/" className={styles.navBrand}>
           <span className={styles.navLogo}>✦</span>
           <span className={styles.navName}>Utsavé</span>
-        </div>
+        </a>
         <div className={styles.navRight}>
           <a href="/dashboard" className={styles.navViewInvite}>← All Events</a>
           {event?.slug && (
@@ -153,9 +234,15 @@ export default function EventDashboardPage() {
         {/* Welcome Banner */}
         <section className={styles.welcomeBanner}>
           <div className={styles.welcomeText}>
-            <h1 className={styles.welcomeTitle}>
-              {event?.event_name || "Untitled Event"}
-            </h1>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", flexWrap: "wrap" }}>
+              <h1 className={styles.welcomeTitle}>
+                {event?.event_name || "Untitled Event"}
+              </h1>
+              {isDraft
+                ? <span className={styles.statusDraft}>Draft</span>
+                : <span className={styles.statusLive}>● Live</span>
+              }
+            </div>
             <p className={styles.welcomeSub}>
               {event?.event_date ? (
                 <>
@@ -177,19 +264,53 @@ export default function EventDashboardPage() {
               )}
             </p>
           </div>
-          {event?.slug && (
-            <div className={styles.inviteShareBox}>
-              <span className={styles.inviteShareLabel}>Invite link</span>
-              <div className={styles.inviteShareRow}>
-                <a href={inviteUrl} target="_blank" rel="noreferrer" className={styles.inviteShareLink}>
-                  {inviteUrl.replace("https://", "")}
-                </a>
-                <button type="button" onClick={copyInviteLink} className={styles.copyBtn}>
-                  {copied ? "Copied!" : "Copy"}
-                </button>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "0.75rem" }}>
+            {event?.slug && (
+              <div className={styles.inviteShareBox}>
+                <span className={styles.inviteShareLabel}>Invite link</span>
+                <div className={styles.inviteShareRow}>
+                  <a href={inviteUrl} target="_blank" rel="noreferrer" className={styles.inviteShareLink}>
+                    {inviteUrl.replace("https://", "")}
+                  </a>
+                  <button type="button" onClick={copyInviteLink} className={styles.copyBtn}>
+                    {copied ? "Copied!" : "Copy"}
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+            {/* Launch button */}
+            {isDraft && (
+              <div style={{ textAlign: "right" }}>
+                {launchConfirm ? (
+                  <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                    <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>Confirm launch?</span>
+                    <button
+                      type="button"
+                      onClick={handleLaunch}
+                      disabled={launching}
+                      className={styles.btnLaunch}
+                    >
+                      {launching ? "Launching…" : "Yes, Go Live →"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLaunchConfirm(false)}
+                      className={styles.btnOutlineSmall}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" onClick={handleLaunch} className={styles.btnLaunch}>
+                    🚀 Launch Event
+                  </button>
+                )}
+                {launchError && (
+                  <p style={{ fontSize: "0.8rem", color: "var(--error)", marginTop: "0.35rem" }}>{launchError}</p>
+                )}
+              </div>
+            )}
+          </div>
         </section>
 
         {/* Stats Row */}
@@ -218,14 +339,18 @@ export default function EventDashboardPage() {
             <div className={styles.cardTitleRow}>
               <div>
                 <h2 className={styles.cardTitle}>Event Setup</h2>
-                <p className={styles.cardSub}>Complete these steps to go live</p>
+                <p className={styles.cardSub}>
+                  {isLive ? "Your event is live" : "Complete these steps to go live"}
+                </p>
               </div>
-              <div className={styles.setupProgress}>
-                <span className={styles.setupProgressText}>{setupSteps}/3</span>
-                <div className={styles.setupProgressBar}>
-                  <div className={styles.setupProgressFill} style={{ width: `${(setupSteps / 3) * 100}%` }} />
+              {isDraft && (
+                <div className={styles.setupProgress}>
+                  <span className={styles.setupProgressText}>{setupSteps}/3</span>
+                  <div className={styles.setupProgressBar}>
+                    <div className={styles.setupProgressFill} style={{ width: `${(setupSteps / 3) * 100}%` }} />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
 
             <ul className={styles.checkList}>
@@ -237,7 +362,7 @@ export default function EventDashboardPage() {
                   <span className={styles.checkLabel}>Add event details</span>
                   <span className={styles.checkDesc}>Name, date, location &amp; message</span>
                 </div>
-                {!hasEventDetails && (
+                {!hasEventDetails && isDraft && (
                   <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Set up →</a>
                 )}
               </li>
@@ -249,7 +374,7 @@ export default function EventDashboardPage() {
                   <span className={styles.checkLabel}>Upload a cover photo</span>
                   <span className={styles.checkDesc}>Make your invite page beautiful</span>
                 </div>
-                {!hasCoverPhoto && (
+                {!hasCoverPhoto && isDraft && (
                   <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Upload →</a>
                 )}
               </li>
@@ -261,7 +386,7 @@ export default function EventDashboardPage() {
                   <span className={styles.checkLabel}>Share &amp; collect RSVPs</span>
                   <span className={styles.checkDesc}>Send your invite link to guests</span>
                 </div>
-                {!hasRsvps && event?.slug && (
+                {!hasRsvps && event?.slug && isDraft && (
                   <button type="button" onClick={copyInviteLink} className={styles.checkAction}>
                     {copied ? "Copied!" : "Copy link →"}
                   </button>
@@ -269,9 +394,9 @@ export default function EventDashboardPage() {
               </li>
             </ul>
 
-            {setupComplete && (
+            {isLive && (
               <div className={styles.setupComplete}>
-                ✦ Your event is all set — enjoy the party!
+                ✦ Event is live — guests can now RSVP!
               </div>
             )}
           </div>
@@ -284,7 +409,7 @@ export default function EventDashboardPage() {
                 <span className={styles.actionIcon}>⚙</span>
                 <div>
                   <span className={styles.actionLabel}>Event Settings</span>
-                  <span className={styles.actionDesc}>Details &amp; cover photo</span>
+                  <span className={styles.actionDesc}>{isLive ? "View details (locked)" : "Details & cover photo"}</span>
                 </div>
               </a>
               <a href={`/dashboard/events/${eventId}/gallery`} className={styles.actionItem}>
@@ -436,6 +561,100 @@ export default function EventDashboardPage() {
             </div>
           </section>
         )}
+
+        {/* ── Danger Zone ── */}
+        <section className={styles.dangerZone}>
+          <h3 className={styles.dangerZoneTitle}>
+            {isDraft ? "Delete Event" : "Request Deletion"}
+          </h3>
+          {isDraft ? (
+            <>
+              <p className={styles.dangerZoneDesc}>
+                This will permanently delete the event, all RSVPs, and any uploaded photos. This cannot be undone.
+              </p>
+              {deleteConfirm ? (
+                <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                  <span style={{ fontSize: "0.85rem", color: "var(--error)", fontWeight: 500 }}>
+                    Are you sure? This is permanent.
+                  </span>
+                  <button
+                    type="button"
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className={`${styles.btnDanger} ${styles.btnDangerSolid}`}
+                  >
+                    {deleting ? "Deleting…" : "Yes, Delete"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeleteConfirm(false)}
+                    className={styles.btnOutlineSmall}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button type="button" onClick={handleDelete} className={styles.btnDanger}>
+                  Delete this event
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <p className={styles.dangerZoneDesc}>
+                Live events cannot be self-deleted. Submit a request and our team will review and process it.
+                {event?.deletion_requested && (
+                  <strong style={{ display: "block", marginTop: "0.4rem", color: "var(--error)" }}>
+                    ✓ Deletion request already submitted.
+                  </strong>
+                )}
+              </p>
+              {deletionRequestSent && (
+                <p style={{ color: "#16a34a", fontSize: "0.875rem", fontWeight: 500 }}>
+                  ✓ Deletion request sent. Our team will be in touch.
+                </p>
+              )}
+              {!event?.deletion_requested && !deletionRequestSent && (
+                showDeleteRequest ? (
+                  <form onSubmit={handleRequestDeletion} className={styles.deleteRequestForm}>
+                    <textarea
+                      className={styles.deleteReasonTextarea}
+                      placeholder="Why do you want to delete this event? (optional)"
+                      value={deleteReason}
+                      onChange={(e) => setDeleteReason(e.target.value)}
+                      rows={3}
+                      maxLength={500}
+                    />
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      <button
+                        type="submit"
+                        disabled={requestingDeletion}
+                        className={`${styles.btnDanger} ${styles.btnDangerSolid}`}
+                      >
+                        {requestingDeletion ? "Sending…" : "Send Deletion Request"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowDeleteRequest(false)}
+                        className={styles.btnOutlineSmall}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteRequest(true)}
+                    className={styles.btnDanger}
+                  >
+                    Request event deletion
+                  </button>
+                )
+              )}
+            </>
+          )}
+        </section>
 
         {/* Guest List / RSVPs */}
         <section className={styles.rsvpSection}>

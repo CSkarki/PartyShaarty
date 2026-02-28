@@ -1,0 +1,834 @@
+/* ── Landing page ─────────────────────────────────────────────────────────── */
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Nav ─────────────────────────────────────────────────────────────────── */
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navLogo {
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navLogin {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.navLogin:hover {
+  color: var(--text);
+}
+
+.navCta {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.5rem 1.1rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.navCta:hover {
+  background: var(--accent-hover);
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────────── */
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  padding: 6rem 2rem 5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.heroInner {
+  flex: 1;
+  max-width: 560px;
+}
+
+.heroBadge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: var(--accent-dim);
+  padding: 0.35rem 0.85rem;
+  border-radius: 20px;
+  margin-bottom: 1.25rem;
+}
+
+.heroTitle {
+  font-size: clamp(2.6rem, 6vw, 4.2rem);
+  line-height: 1.08;
+  margin-bottom: 1.35rem;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.heroSub {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: 2rem;
+}
+
+.heroCtas {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ── Hero photo collage ───────────────────────────────────────────────────── */
+
+.heroPhotoStack {
+  flex: 0 0 320px;
+  position: relative;
+  height: 380px;
+}
+
+/* main photo fills most of the box */
+.heroPhotoMain {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.22);
+}
+
+/* top-right floating polaroid — Diwali sparklers */
+.heroPhotoA {
+  position: absolute;
+  width: 136px;
+  height: 112px;
+  top: -10px;
+  right: -14px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 4px solid #fff;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+  transform: rotate(4deg);
+  z-index: 2;
+}
+
+/* bottom-left floating polaroid — Haldi bride */
+.heroPhotoB {
+  position: absolute;
+  width: 118px;
+  height: 98px;
+  bottom: -6px;
+  left: -8px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 4px solid #fff;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.18);
+  transform: rotate(-4.5deg);
+  z-index: 2;
+}
+
+.heroPhotoCover {
+  object-fit: cover;
+}
+
+/* ── Shared buttons ──────────────────────────────────────────────────────── */
+
+.btnPrimary {
+  display: inline-block;
+  padding: 0.8rem 1.75rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.btnPrimary:hover {
+  background: var(--accent-hover);
+}
+
+.btnSecondary {
+  display: inline-block;
+  padding: 0.8rem 1.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btnSecondary:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Shared section layout ───────────────────────────────────────────────── */
+
+.sectionTitle {
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  text-align: center;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.sectionSub {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 1rem;
+  max-width: 520px;
+  margin: 0 auto 2.75rem;
+  line-height: 1.65;
+}
+
+/* ── Event Type Photo Cards ──────────────────────────────────────────────── */
+
+.celebrations {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 3.5rem 2rem;
+}
+
+.celebrationsLabel {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 1.75rem;
+}
+
+.celebGrid {
+  display: flex;
+  gap: 0.85rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.celebCard {
+  position: relative;
+  width: 148px;
+  height: 216px;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: default;
+  flex-shrink: 0;
+  transition: transform 0.25s;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.celebCard:hover {
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.celebPhoto {
+  object-fit: cover;
+  transition: transform 0.45s;
+}
+
+.celebCard:hover .celebPhoto {
+  transform: scale(1.07);
+}
+
+/* dark gradient from bottom so text is legible */
+.celebOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 30%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.celebText {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.8rem 0.85rem 0.9rem;
+  color: #fff;
+}
+
+.celebIcon {
+  display: block;
+  font-size: 1.15rem;
+  margin-bottom: 0.18rem;
+}
+
+.celebName {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.celebDetail {
+  display: block;
+  font-size: 0.67rem;
+  opacity: 0.8;
+  margin-top: 0.2rem;
+  line-height: 1.35;
+}
+
+/* ── Lifecycle: Before / Day-of / After ──────────────────────────────────── */
+
+.lifecycle {
+  padding: 5.5rem 2rem;
+  max-width: 1060px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.lifecycleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.lifecycleCol {
+  padding: 2rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.lifecycleColHighlight {
+  border-color: var(--accent);
+  background: #fffdf8;
+  box-shadow: 0 4px 20px rgba(201, 148, 26, 0.1);
+}
+
+.lifecycleIcon {
+  font-size: 1.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.lifecyclePhase {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.lifecycleTagline {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-weight: 500;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.02em;
+}
+
+.lifecycleList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.lifecycleItem {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  padding-left: 1.1rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.lifecycleItem::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-size: 0.8rem;
+  top: 0.05rem;
+}
+
+.lifecycleItemSoon {
+  font-size: 0.85rem;
+  color: var(--border);
+  padding-left: 1.1rem;
+  position: relative;
+  line-height: 1.4;
+}
+
+.lifecycleItemSoon::before {
+  content: "◦";
+  position: absolute;
+  left: 0;
+  color: var(--border);
+}
+
+/* ── Gallery Glimpse ─────────────────────────────────────────────────────── */
+
+.galleryGlimpse {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 5rem 2rem;
+}
+
+.galleryGlimpseInner {
+  max-width: 940px;
+  margin: 0 auto;
+}
+
+.galleryEyebrow {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.galleryQuote {
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-size: clamp(1.4rem, 3vw, 1.95rem);
+  text-align: center;
+  color: var(--text);
+  max-width: 700px;
+  margin: 0 auto 2.75rem;
+  line-height: 1.45;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.galleryQuote em {
+  color: var(--accent-deep);
+  font-style: italic;
+}
+
+/* Bento mosaic: 3 columns, 2 rows, first item is tall */
+.galleryMosaic {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr 1fr;
+  grid-template-rows: 198px 198px;
+  gap: 0.6rem;
+  border-radius: 22px;
+  overflow: hidden;
+}
+
+.mosaicItem {
+  position: relative;
+  overflow: hidden;
+}
+
+/* first item spans both rows (tall) */
+.mosaicItemTall {
+  grid-row: 1 / 3;
+}
+
+.mosaicPhoto {
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.mosaicItem:hover .mosaicPhoto {
+  transform: scale(1.05);
+}
+
+.mosaicOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 55%, rgba(0, 0, 0, 0.52) 100%);
+}
+
+.mosaicLabel {
+  position: absolute;
+  bottom: 0.7rem;
+  left: 0.85rem;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* ── Features ────────────────────────────────────────────────────────────── */
+
+.features {
+  background: var(--surface);
+  padding: 5.5rem 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.featureGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  padding: 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.featureCard:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.featureIcon {
+  font-size: 1.75rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.featureTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  line-height: 1.35;
+  color: var(--text);
+}
+
+.featureDesc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ── How it works ────────────────────────────────────────────────────────── */
+
+.howItWorks {
+  padding: 5.5rem 2rem;
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.stepNum {
+  flex: 0 0 40px;
+  height: 40px;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.stepLabel {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+}
+
+.stepDesc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ── Pricing ─────────────────────────────────────────────────────────────── */
+
+.pricing {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 5.5rem 2rem;
+}
+
+.pricingGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.pricingCard {
+  position: relative;
+  padding: 2rem 1.75rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.pricingCardHighlight {
+  border-color: var(--accent);
+  background: var(--surface);
+  box-shadow: 0 6px 30px rgba(201, 148, 26, 0.12);
+}
+
+.pricingBadge {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.3rem 0.85rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 20px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+}
+
+.pricingName {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.3rem;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+}
+
+.pricingPrice {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.pricingPeriod {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.pricingDesc {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.pricingFeatures {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-bottom: 1.75rem;
+  flex: 1;
+}
+
+.pricingFeature {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.pricingFeatureSoon {
+  font-size: 0.82rem;
+  color: var(--border);
+  line-height: 1.4;
+}
+
+/* ── CTA Banner ──────────────────────────────────────────────────────────── */
+
+.ctaBanner {
+  background: var(--accent);
+  padding: 5.5rem 2rem;
+  text-align: center;
+}
+
+.ctaTitle {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  color: #fff;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.ctaSub {
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ctaBanner .btnPrimary {
+  background: #fff;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.ctaBanner .btnPrimary:hover {
+  background: #f5edda;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.footer {
+  padding: 1.75rem 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--surface);
+}
+
+.footerLogo {
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--accent);
+}
+
+.footerMuted {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .lifecycleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricingGrid {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+  }
+
+  .galleryMosaic {
+    grid-template-columns: 1.4fr 1fr;
+    grid-template-rows: 180px 180px 180px;
+  }
+
+  /* on smaller screens: tall item spans rows 1-2, items 2-4 stack in col 2,
+     item 5 goes below full-width */
+  .mosaicItemTall {
+    grid-row: 1 / 3;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    flex-direction: column;
+    padding: 4rem 1.25rem 3rem;
+    text-align: center;
+  }
+
+  .heroInner {
+    max-width: 100%;
+  }
+
+  .heroCtas {
+    justify-content: center;
+  }
+
+  .heroPhotoStack {
+    display: none;
+  }
+
+  .nav {
+    padding: 1rem 1.25rem;
+  }
+
+  .celebrations {
+    padding: 3rem 1rem;
+  }
+
+  .celebGrid {
+    gap: 0.6rem;
+  }
+
+  .celebCard {
+    width: calc(50% - 0.6rem);
+    max-width: 180px;
+    height: 196px;
+  }
+
+  .galleryGlimpse {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .galleryMosaic {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: repeat(3, 160px);
+  }
+
+  .mosaicItemTall {
+    grid-row: 1 / 3;
+  }
+
+  .lifecycle {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .features {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .howItWorks {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .pricing {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .ctaBanner {
+    padding: 3.5rem 1.25rem;
+  }
+
+  .footer {
+    flex-direction: column;
+    gap: 0.4rem;
+    text-align: center;
+  }
+}

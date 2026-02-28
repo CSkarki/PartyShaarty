@@ -66,21 +66,47 @@ if (!PEXELS_KEY || PEXELS_KEY === 'your_pexels_api_key_here') {
 // ─── Search queries per category ──────────────────────────────────────────────
 
 const PHOTO_QUERIES = {
-  wedding:  ['Indian wedding ceremony', 'South Asian wedding'],
-  mehndi:   ['mehndi henna ceremony', 'mehndi hands bride'],
-  sangeet:  ['sangeet night dance', 'Indian wedding dance'],
-  diwali:   ['Diwali celebration lights', 'Diwali festival India'],
-  family:   ['Indian family celebration', 'South Asian family party'],
-  birthday: ['Indian birthday party celebration'],
-  puja:     ['Indian puja ceremony', 'Hindu prayer ceremony'],
-  haldi:    ['haldi ceremony turmeric', 'Indian haldi celebration'],
+  // ── Weddings & functions ──────────────────────────────────────────────────
+  wedding:          ['Indian wedding ceremony', 'South Asian wedding'],
+  mehndi:           ['mehndi henna ceremony', 'mehndi hands bride'],
+  sangeet:          ['sangeet night dance', 'Indian wedding dance'],
+  haldi:            ['haldi ceremony turmeric', 'Indian haldi celebration'],
+
+  // ── Milestone anniversaries ───────────────────────────────────────────────
+  anniversary_10:   ['couple anniversary dinner celebration', 'married couple 10 years celebration'],
+  anniversary_25:   ['silver wedding anniversary celebration', 'couple 25th anniversary party'],
+  anniversary_50:   ['golden wedding anniversary celebration', 'couple 50 years married party'],
+
+  // ── Milestone birthdays ───────────────────────────────────────────────────
+  birthday_1st:     ['first birthday baby celebration', 'baby 1st birthday party Indian'],
+  birthday_40th:     ['40th birthday party celebration', 'adult 40th birthday party Indian'],
+  birthday_50th:    ['50th birthday party celebration', 'adult milestone birthday party'],
+
+  // ── Indian & South Asian festivals ───────────────────────────────────────
+  diwali:           ['Diwali celebration lights', 'Diwali festival India'],
+  holi:             ['Holi festival colors celebration', 'Holi powder celebration India'],
+  navratri:         ['Navratri garba dance celebration', 'garba dandiya night'],
+  eid:              ['Eid celebration family', 'Eid ul Fitr party South Asian'],
+  uttarayani:       ['Uttarakhand Makar Sankranti kite festival', 'Uttarayan kite flying festival India'],
+  uttarakhand_fair: ['Uttarakhand Kautik mela fair', 'Indian mountain folk festival fair'],
+
+  // ── General celebrations & social events ─────────────────────────────────
+  puja:             ['Indian puja ceremony', 'Hindu prayer ceremony'],
+  family:           ['Indian family celebration', 'South Asian family party'],
+  marathon:         ['Indian American runners marathon race', 'South Asian community runners 10 miler'],
+  community:        ['Indian American community event', 'South Asian diaspora social gathering'],
+  outdoor_run:      ['marathon finish line celebration', 'community road race runners'],
 }
 
 const VIDEO_QUERIES = {
-  wedding: ['Indian wedding'],
-  diwali:  ['Diwali festival lights'],
-  dance:   ['Indian dance celebration'],
-  family:  ['Indian family gathering'],
+  wedding:          ['Indian wedding'],
+  diwali:           ['Diwali festival lights'],
+  dance:            ['Indian dance celebration'],
+  family:           ['Indian family gathering'],
+  holi:             ['Holi festival colors'],
+  navratri:         ['garba dance celebration'],
+  anniversary:      ['couple anniversary celebration'],
+  marathon:         ['marathon running community'],
 }
 
 // ─── HTTP helpers ─────────────────────────────────────────────────────────────
