@@ -21,8 +21,12 @@ export default function MemoryPage({ event, coverUrl, eventSlug }) {
       .finally(() => setPhotosLoading(false));
   }, [eventSlug]);
 
-  // Unique album names from photos
-  const albums = [...new Set(photos.map((p) => p.albumName))];
+  // Unique albums (name + id) from photos
+  const albumMap = photos.reduce((acc, p) => {
+    if (p.albumName && p.albumId && !acc[p.albumName]) acc[p.albumName] = p.albumId;
+    return acc;
+  }, {});
+  const albums = Object.keys(albumMap);
 
   // Filtered photos based on selected album chip
   const filtered =
@@ -203,15 +207,15 @@ export default function MemoryPage({ event, coverUrl, eventSlug }) {
                   All
                 </button>
                 {albums.map((album) => (
-                  <button
+                  <a
                     key={album}
+                    href={`/${eventSlug}/gallery?album=${albumMap[album]}`}
                     className={`${styles.filterChip} ${
                       activeAlbum === album ? styles.filterChipActive : ""
                     }`}
-                    onClick={() => setActiveAlbum(album)}
                   >
                     {album}
-                  </button>
+                  </a>
                 ))}
               </div>
             )}

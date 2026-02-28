@@ -28,7 +28,7 @@ export async function GET(request, { params }) {
     for (const album of albums) {
       const files = await listPhotosInAlbum(ev.host_id, album.slug);
       for (const f of files) {
-        allPhotos.push({ path: f.path, albumName: album.name });
+        allPhotos.push({ path: f.path, albumName: album.name, albumId: album.id });
       }
     }
 
@@ -42,6 +42,7 @@ export async function GET(request, { params }) {
     const photos = allPhotos.map((p, i) => ({
       url: signed[i]?.signedUrl || "",
       albumName: p.albumName,
+      albumId: p.albumId,
     })).filter((p) => p.url);
 
     return Response.json({
