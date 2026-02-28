@@ -6,7 +6,19 @@ import styles from "./page.module.css";
 
 export default function GalleryPage() {
   return (
-    <Suspense fallback={<main className={styles.gallery}><p className={styles.loading}>Loading...</p></main>}>
+    <Suspense
+      fallback={
+        <div className={styles.page}>
+          <div className={styles.topStrip} />
+          <main className={styles.main}>
+            <div className={styles.loadingWrap}>
+              <p className={styles.loading}>✦ &nbsp; Loading your memories… &nbsp; ✦</p>
+            </div>
+          </main>
+          <div className={styles.bottomStrip} />
+        </div>
+      }
+    >
       <GalleryContent />
     </Suspense>
   );
@@ -55,6 +67,7 @@ function GalleryContent() {
         }
       })
       .catch(() => setVerified(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function handleSendCode(e) {
@@ -141,6 +154,8 @@ function GalleryContent() {
     setSelectedAlbum(album);
     setView("photos");
     setLoadingPhotos(true);
+    setPhotos([]);
+    setLightboxIndex(null);
     try {
       const res = await fetch(
         `/api/gallery/albums/${album.id}/photos?eventSlug=${encodeURIComponent(eventSlug)}`,
@@ -152,7 +167,10 @@ function GalleryContent() {
   }
 
   function goBackToAlbums() {
-    setView("albums"); setSelectedAlbum(null); setPhotos([]); setLightboxIndex(null);
+    setView("albums");
+    setSelectedAlbum(null);
+    setPhotos([]);
+    setLightboxIndex(null);
   }
 
   const handleKeyDown = useCallback(
@@ -170,15 +188,22 @@ function GalleryContent() {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  if (verified === null) {
-    return <main className={styles.gallery}><p className={styles.loading}>Loading...</p></main>;
-  }
+  // ── Render content based on state ─────────────────────
+  let content;
 
-  if (!verified) {
-    return (
-      <main className={styles.gallery}>
-        <div className={styles.verifyCard}>
+  if (verified === null) {
+    content = (
+      <div className={styles.loadingWrap}>
+        <p className={styles.loading}>✦ &nbsp; Loading your memories… &nbsp; ✦</p>
+      </div>
+    );
+  } else if (!verified) {
+    content = (
+      <div className={styles.verifyCard}>
+        <div className={styles.verifyCardTop}>
           <h1 className={styles.verifyTitle}>Event Gallery</h1>
+        </div>
+        <div className={styles.verifyBody}>
           {step === "email" ? (
             <>
               <p className={styles.verifySubtitle}>
@@ -195,7 +220,7 @@ function GalleryContent() {
                 />
                 {error && <p className={styles.error}>{error}</p>}
                 <button type="submit" className={styles.submitBtn} disabled={submitting}>
-                  {submitting ? "Sending code..." : "Send Verification Code"}
+                  {submitting ? "Sending code…" : "Send Verification Code"}
                 </button>
               </form>
             </>
@@ -221,7 +246,7 @@ function GalleryContent() {
                   className={styles.submitBtn}
                   disabled={submitting || code.length < 6}
                 >
-                  {submitting ? "Verifying..." : "Verify & View Photos"}
+                  {submitting ? "Verifying…" : "Unlock & View Photos"}
                 </button>
                 <div className={styles.resendRow}>
                   <button type="button" className={styles.resendBtn} onClick={handleResend} disabled={submitting}>
@@ -235,71 +260,134 @@ function GalleryContent() {
             </>
           )}
         </div>
-      </main>
+      </div>
     );
-  }
-
-  if (view === "photos" && selectedAlbum) {
-    return (
-      <main className={styles.gallery}>
-        <div className={styles.header}>
+  } else if (view === "photos" && selectedAlbum) {
+    content = (
+      <>
+        <div className={styles.breadcrumbBar}>
           <div className={styles.albumBreadcrumb}>
             <button className={styles.albumBackBtn} onClick={goBackToAlbums}>Albums</button>
-            <span className={styles.breadcrumbSep}>/</span>
-            <h1 className={styles.title}>{selectedAlbum.name}</h1>
+            <span className={styles.breadcrumbSep}>›</span>
+            <span className={styles.breadcrumbAlbum}>{selectedAlbum.name}</span>
           </div>
-          <a href={`/${eventSlug}/invite`} className={styles.backLink}>Back to Invite</a>
+          {photos.length > 0 && (
+            <span className={styles.photoCount}>
+              {photos.length} {photos.length === 1 ? "photo" : "photos"}
+            </span>
+          )}
         </div>
+
         {loadingPhotos ? (
-          <p className={styles.loading}>Loading photos...</p>
+          <p className={styles.loading}>Loading photos…</p>
         ) : photos.length === 0 ? (
           <p className={styles.empty}>No photos in this album yet.</p>
         ) : (
           <div className={styles.photoGrid}>
             {photos.map((photo, i) => (
               <div key={photo.path} className={styles.photoItem} onClick={() => setLightboxIndex(i)}>
-                <img src={photo.url} alt={photo.name} loading="lazy" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={photo.url} alt={selectedAlbum.name} loading="lazy" />
               </div>
             ))}
           </div>
         )}
-        {lightboxIndex !== null && photos[lightboxIndex] && (
-          <div className={styles.lightbox} onClick={() => setLightboxIndex(null)}>
-            <button className={styles.lightboxClose} onClick={(e) => { e.stopPropagation(); setLightboxIndex(null); }}>✕</button>
-            {lightboxIndex > 0 && (
-              <button className={`${styles.lightboxNav} ${styles.lightboxPrev}`} onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}>&#8249;</button>
-            )}
-            <img src={photos[lightboxIndex].url} alt="Full size" onClick={(e) => e.stopPropagation()} />
-            {lightboxIndex < photos.length - 1 && (
-              <button className={`${styles.lightboxNav} ${styles.lightboxNext}`} onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}>&#8250;</button>
-            )}
+      </>
+    );
+  } else {
+    // Albums grid
+    content = (
+      <>
+        <div className={styles.sectionHeader}>
+          <h1 className={styles.sectionTitle}>Your Photo Albums</h1>
+          <div className={styles.sectionDivider} />
+        </div>
+
+        {loadingAlbums ? (
+          <p className={styles.loading}>Loading albums…</p>
+        ) : albums.length === 0 ? (
+          <p className={styles.empty}>No albums have been shared with you yet.</p>
+        ) : (
+          <div className={styles.albumGrid}>
+            {albums.map((album) => (
+              <div key={album.id} className={styles.albumCard} onClick={() => openAlbum(album)}>
+                <div className={styles.albumCardCover}>
+                  <h3 className={styles.albumCardTitle}>{album.name}</h3>
+                  <p className={styles.albumCardSub}>Photo Album</p>
+                </div>
+                <div className={styles.albumCardBottom}>
+                  <span>📷</span>
+                  <span>Open Album</span>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-      </main>
+
+        <GuestUploadPanel eventSlug={eventSlug} />
+      </>
     );
   }
 
   return (
-    <main className={styles.gallery}>
-      <div className={styles.header}>
-        <h1 className={styles.title}>Event Gallery</h1>
-        <a href={`/${eventSlug}/invite`} className={styles.backLink}>Back to Invite</a>
-      </div>
-      {loadingAlbums ? (
-        <p className={styles.loading}>Loading albums...</p>
-      ) : albums.length === 0 ? (
-        <p className={styles.empty}>No albums have been shared with you yet.</p>
-      ) : (
-        <div className={styles.albumGrid}>
-          {albums.map((album) => (
-            <div key={album.id} className={styles.albumCard} onClick={() => openAlbum(album)}>
-              <h3 className={styles.albumName}>{album.name}</h3>
-            </div>
-          ))}
+    <div className={styles.page}>
+      <div className={styles.topStrip} />
+
+      <nav className={styles.nav}>
+        <a href="/" className={styles.navBrand}>Utsavé</a>
+        <span className={styles.navCenter}>
+          {view === "photos" && selectedAlbum ? selectedAlbum.name : "Event Gallery"}
+        </span>
+        <a href={`/${eventSlug}/invite`} className={styles.navBack}>← Back to Invite</a>
+      </nav>
+
+      <main className={styles.main}>
+        {content}
+      </main>
+
+      <div className={styles.bottomStrip} />
+
+      {/* Lightbox — rendered outside main so it covers everything */}
+      {lightboxIndex !== null && photos[lightboxIndex] && (
+        <div className={styles.lightbox} onClick={() => setLightboxIndex(null)}>
+          <button
+            className={styles.lightboxClose}
+            onClick={(e) => { e.stopPropagation(); setLightboxIndex(null); }}
+          >
+            ✕
+          </button>
+
+          {lightboxIndex > 0 && (
+            <button
+              className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex - 1); }}
+              aria-label="Previous photo"
+            >
+              ‹
+            </button>
+          )}
+
+          <div className={styles.lightboxFrame} onClick={(e) => e.stopPropagation()}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photos[lightboxIndex].url} alt="Full size" />
+          </div>
+
+          {lightboxIndex < photos.length - 1 && (
+            <button
+              className={`${styles.lightboxNav} ${styles.lightboxNext}`}
+              onClick={(e) => { e.stopPropagation(); setLightboxIndex(lightboxIndex + 1); }}
+              aria-label="Next photo"
+            >
+              ›
+            </button>
+          )}
+
+          <div className={styles.lightboxInfo}>
+            {selectedAlbum?.name}&nbsp; · &nbsp;{lightboxIndex + 1} / {photos.length}
+          </div>
         </div>
       )}
-      <GuestUploadPanel eventSlug={eventSlug} />
-    </main>
+    </div>
   );
 }
 
@@ -346,7 +434,9 @@ function GuestUploadPanel({ eventSlug }) {
         <span className={styles.uploadPanelIcon}>📸</span>
         <div>
           <h3 className={styles.uploadPanelTitle}>Share Your Photos</h3>
-          <p className={styles.uploadPanelSub}>Upload photos you took at this event (up to {MAX} at a time)</p>
+          <p className={styles.uploadPanelSub}>
+            Upload photos you took at this event (up to {MAX} at a time)
+          </p>
         </div>
       </div>
       <div className={styles.uploadRow}>
@@ -364,7 +454,9 @@ function GuestUploadPanel({ eventSlug }) {
           disabled={!selectedFiles.length || uploading}
           className={styles.uploadBtn}
         >
-          {uploading ? "Uploading…" : `Upload ${selectedFiles.length ? `${selectedFiles.length} photo${selectedFiles.length > 1 ? "s" : ""}` : "photos"}`}
+          {uploading
+            ? "Uploading…"
+            : `Upload ${selectedFiles.length ? `${selectedFiles.length} photo${selectedFiles.length > 1 ? "s" : ""}` : "photos"}`}
         </button>
       </div>
       {result && (
