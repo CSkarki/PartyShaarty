@@ -6,11 +6,11 @@ import { ALL_EVENT_TYPES } from "./themes/defaults";
 /* ─── Universal data (same across all themes) ──────────────────────────────── */
 
 const GALLERY_PHOTOS = [
-  { src: "/assets/celebrations/photos/sangeet/pexels-30215310.jpg", alt: "Couple dancing at sangeet night", label: "Sangeet", tall: true },
-  { src: "/assets/celebrations/photos/diwali/pexels-7686304.jpg",   alt: "Family celebrating Diwali with sparklers", label: "Diwali" },
-  { src: "/assets/celebrations/photos/mehndi/pexels-27151466.jpg",  alt: "Intricate henna on bride's hands", label: "Mehndi" },
-  { src: "/assets/celebrations/photos/haldi/pexels-30672289.jpg",   alt: "Joyful Indian bride at Haldi ceremony", label: "Haldi" },
-  { src: "/assets/celebrations/photos/puja/pexels-7685983.jpg",     alt: "Mother and daughter at Puja ceremony", label: "Puja" },
+  { src: "https://images.pexels.com/photos/30215310/pexels-photo-30215310.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Couple dancing at sangeet night", label: "Sangeet", tall: true },
+  { src: "https://images.pexels.com/photos/7686304/pexels-photo-7686304.jpeg?auto=compress&cs=tinysrgb&w=800",   alt: "Family celebrating Diwali with sparklers", label: "Diwali" },
+  { src: "https://images.pexels.com/photos/27151466/pexels-photo-27151466.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Intricate henna on bride's hands", label: "Mehndi" },
+  { src: "https://images.pexels.com/photos/30672289/pexels-photo-30672289.jpeg?auto=compress&cs=tinysrgb&w=800", alt: "Joyful Indian bride at Haldi ceremony", label: "Haldi" },
+  { src: "https://images.pexels.com/photos/7685983/pexels-photo-7685983.jpeg?auto=compress&cs=tinysrgb&w=800",   alt: "Mother and daughter at Puja ceremony", label: "Puja" },
 ];
 
 const LIFECYCLE = [
