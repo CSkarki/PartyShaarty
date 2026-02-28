@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { createSupabaseAdminClient } from "../../../lib/supabase-server";
 import { getCoverImageUrl } from "../../../lib/supabase";
 import InviteForm from "./InviteForm";
@@ -29,6 +29,18 @@ export default async function InvitePage({ params }) {
     .single();
 
   if (!event) notFound();
+
+  // If the event is over (48+ hours past event_date), redirect to the memory page
+  if (event.event_date) {
+    const cleaned = event.event_date
+      .replace(/\b(IST|EST|PST|CST|GMT|UTC|[A-Z]{2,4})\b/g, "")
+      .replace(/(\d+)(st|nd|rd|th)\b/g, "$1")
+      .trim();
+    const d = new Date(cleaned) || new Date(event.event_date);
+    if (!isNaN(d.getTime()) && (Date.now() - d.getTime()) / (1000 * 60 * 60) > 48) {
+      redirect(`/${eventSlug}/memory`);
+    }
+  }
 
   // Resolve cover image signed URL if set
   const coverUrl = await getCoverImageUrl(event.event_image_path);

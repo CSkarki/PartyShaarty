@@ -226,6 +226,11 @@ export default function EventDashboardPage() {
               View Invite ↗
             </a>
           )}
+          {event?.slug && (
+            <a href={`/${event.slug}/memory`} target="_blank" rel="noreferrer" className={styles.navViewInvite}>
+              Memories ✦
+            </a>
+          )}
           <button type="button" onClick={handleLogout} className={styles.navLogout}>Log out</button>
         </div>
       </header>
