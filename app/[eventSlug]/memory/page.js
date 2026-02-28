@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { createSupabaseAdminClient } from "../../../lib/supabase-server";
-import { getCoverImageUrl } from "../../../lib/supabase";
+import { getCoverImageUrl, listPhotosInAlbum, getSignedUrlsForPaths } from "../../../lib/supabase";
+import { listAlbumsByEvent } from "../../../lib/gallery-store";
 import MemoryPage from "./MemoryPage";
 
 // Always render fresh — photos and event details may update
@@ -60,16 +61,41 @@ export default async function MemoryPageRoute({ params }) {
     redirect(`/${eventSlug}/invite`);
   }
 
-  // Fetch cover image signed URL (small, safe to embed server-side)
+  // Fetch cover image signed URL server-side
   const coverUrl = await getCoverImageUrl(event.event_image_path);
 
-  // Photos are fetched client-side via /api/slideshow/[eventSlug]
-  // (same proven mechanism used by the slideshow page)
+  // Fetch photos server-side — signed URLs are fresh on every request
+  // (same pattern as /api/slideshow route, avoids client-side caching issues)
+  let photos = [];
+  try {
+    const albums = await listAlbumsByEvent(event.id);
+    const allPhotos = [];
+    for (const album of albums) {
+      const files = await listPhotosInAlbum(event.host_id, album.slug);
+      for (const f of files) {
+        allPhotos.push({ path: f.path, albumName: album.name, albumId: album.id });
+      }
+    }
+    if (allPhotos.length) {
+      const signed = await getSignedUrlsForPaths(allPhotos.map((p) => p.path));
+      photos = allPhotos
+        .map((p, i) => ({
+          url: signed[i]?.signedUrl || "",
+          albumName: p.albumName,
+          albumId: p.albumId,
+        }))
+        .filter((p) => p.url);
+    }
+  } catch (err) {
+    console.error("[memory/page] photo fetch error:", err.message);
+  }
+
   return (
     <MemoryPage
       event={event}
       coverUrl={coverUrl}
       eventSlug={eventSlug}
+      initialPhotos={photos}
     />
   );
 }

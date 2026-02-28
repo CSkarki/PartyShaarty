@@ -3,23 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import styles from "./memory.module.css";
 
-export default function MemoryPage({ event, coverUrl, eventSlug }) {
-  const [photos, setPhotos] = useState([]);
-  const [photosLoading, setPhotosLoading] = useState(true);
+export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }) {
+  const [photos] = useState(initialPhotos || []);
   const [activeAlbum, setActiveAlbum] = useState("all");
   const [lightboxIdx, setLightboxIdx] = useState(null);
   const [coverImgError, setCoverImgError] = useState(false);
-
-  // Fetch photos client-side via the existing slideshow API (proven working)
-  useEffect(() => {
-    fetch(`/api/slideshow/${eventSlug}`, { cache: "no-store" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data.photos)) setPhotos(data.photos);
-      })
-      .catch(() => {})
-      .finally(() => setPhotosLoading(false));
-  }, [eventSlug]);
 
   // Unique albums (name + id) from photos
   const albumMap = photos.reduce((acc, p) => {
@@ -162,10 +150,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug }) {
         {/* ── Photo Memories ───────────────────────── */}
         <h2 className={styles.sectionHeading}>📸 Moments We&apos;ll Treasure</h2>
 
-        {photosLoading ? (
-          /* ── Loading state ── */
-          <p className={styles.sectionSubtitle}>Loading memories…</p>
-        ) : photos.length === 0 ? (
+        {photos.length === 0 ? (
           /* ── Empty state ── */
           <>
             <p className={styles.sectionSubtitle}>
