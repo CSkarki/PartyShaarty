@@ -23,6 +23,7 @@ export default function EventDashboardPage() {
   const importFileRef = useRef(null);
 
   // Lifecycle state
+  const [hasIntake, setHasIntake] = useState(false);
   const [launching, setLaunching] = useState(false);
   const [launchConfirm, setLaunchConfirm] = useState(false);
   const [launchError, setLaunchError] = useState(null);
@@ -36,9 +37,10 @@ export default function EventDashboardPage() {
   const opts = { credentials: "include" };
 
   async function loadEvent() {
-    const [evRes, rsvpRes] = await Promise.all([
+    const [evRes, rsvpRes, intakeRes] = await Promise.all([
       fetch(`/api/host/events/${eventId}`, opts),
       fetch(`/api/rsvp/list?eventId=${eventId}`, opts),
+      fetch(`/api/host/events/${eventId}/intake`, opts),
     ]);
     if (!evRes.ok) { router.push("/dashboard"); return; }
     const ev = await evRes.json();
@@ -46,6 +48,10 @@ export default function EventDashboardPage() {
     if (rsvpRes.ok) {
       const data = await rsvpRes.json();
       setRsvps(Array.isArray(data) ? data : []);
+    }
+    if (intakeRes.ok) {
+      const intakeData = await intakeRes.json();
+      setHasIntake(!!intakeData.intake);
     }
     setLoading(false);
   }
@@ -194,7 +200,9 @@ export default function EventDashboardPage() {
   const hasEventDetails = !!(event?.event_name && event?.event_date);
   const hasCoverPhoto = !!event?.event_image_path;
   const hasRsvps = totalRsvps > 0;
-  const setupSteps = [hasEventDetails, hasCoverPhoto, hasRsvps].filter(Boolean).length;
+  const inviteComplete = hasEventDetails && hasCoverPhoto && hasRsvps;
+  const setupSteps = (inviteComplete ? 1 : 0) + (hasIntake ? 1 : 0);
+  const setupTotal = 2;
 
   const isLive = event?.status === "active";
   const isDraft = !isLive;
@@ -327,53 +335,75 @@ export default function EventDashboardPage() {
                 <p className={styles.cardSub}>Complete these steps to go live</p>
               </div>
               <div className={styles.setupProgress}>
-                <span className={styles.setupProgressText}>{setupSteps}/3</span>
+                <span className={styles.setupProgressText}>{setupSteps}/{setupTotal}</span>
                 <div className={styles.setupProgressBar}>
-                  <div className={styles.setupProgressFill} style={{ width: `${(setupSteps / 3) * 100}%` }} />
+                  <div className={styles.setupProgressFill} style={{ width: `${(setupSteps / setupTotal) * 100}%` }} />
                 </div>
               </div>
             </div>
 
-            <ul className={styles.checkList}>
-              <li className={`${styles.checkItem} ${hasEventDetails ? styles.checkDone : ""}`}>
-                <span className={`${styles.checkIcon} ${hasEventDetails ? styles.checkIconDone : ""}`}>
-                  {hasEventDetails ? "✓" : "1"}
-                </span>
-                <div className={styles.checkBody}>
-                  <span className={styles.checkLabel}>Add event details</span>
-                  <span className={styles.checkDesc}>Name, date, location &amp; message</span>
-                </div>
-                {!hasEventDetails && (
-                  <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Set up →</a>
-                )}
-              </li>
-              <li className={`${styles.checkItem} ${hasCoverPhoto ? styles.checkDone : ""}`}>
-                <span className={`${styles.checkIcon} ${hasCoverPhoto ? styles.checkIconDone : ""}`}>
-                  {hasCoverPhoto ? "✓" : "2"}
-                </span>
-                <div className={styles.checkBody}>
-                  <span className={styles.checkLabel}>Upload a cover photo</span>
-                  <span className={styles.checkDesc}>Make your invite page beautiful</span>
-                </div>
-                {!hasCoverPhoto && (
-                  <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Upload →</a>
-                )}
-              </li>
-              <li className={`${styles.checkItem} ${hasRsvps ? styles.checkDone : ""}`}>
-                <span className={`${styles.checkIcon} ${hasRsvps ? styles.checkIconDone : ""}`}>
-                  {hasRsvps ? "✓" : "3"}
-                </span>
-                <div className={styles.checkBody}>
-                  <span className={styles.checkLabel}>Share &amp; collect RSVPs</span>
-                  <span className={styles.checkDesc}>Send your invite link to guests</span>
-                </div>
-                {!hasRsvps && event?.slug && (
-                  <button type="button" onClick={copyInviteLink} className={styles.checkAction}>
-                    {copied ? "Copied!" : "Copy link →"}
-                  </button>
-                )}
-              </li>
-            </ul>
+            {/* 1. Your Invite — grouped flow */}
+            <div className={styles.setupGroup}>
+              <div className={styles.setupGroupHeader}>
+                <span className={styles.setupGroupTitle}>Your Invite</span>
+                <span className={styles.setupGroupSub}>Details, cover photo &amp; RSVPs</span>
+                {inviteComplete && <span className={styles.setupGroupBadge}>✓ Done</span>}
+              </div>
+              <ul className={styles.checkList}>
+                <li className={`${styles.checkItem} ${hasEventDetails ? styles.checkDone : ""}`}>
+                  <span className={`${styles.checkIcon} ${hasEventDetails ? styles.checkIconDone : ""}`}>
+                    {hasEventDetails ? "✓" : "1"}
+                  </span>
+                  <div className={styles.checkBody}>
+                    <span className={styles.checkLabel}>Add invite details</span>
+                    <span className={styles.checkDesc}>Name, date, location &amp; message</span>
+                  </div>
+                  {!hasEventDetails && (
+                    <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Set up →</a>
+                  )}
+                </li>
+                <li className={`${styles.checkItem} ${hasCoverPhoto ? styles.checkDone : ""}`}>
+                  <span className={`${styles.checkIcon} ${hasCoverPhoto ? styles.checkIconDone : ""}`}>
+                    {hasCoverPhoto ? "✓" : "2"}
+                  </span>
+                  <div className={styles.checkBody}>
+                    <span className={styles.checkLabel}>Upload cover photo</span>
+                    <span className={styles.checkDesc}>Make your invite page beautiful</span>
+                  </div>
+                  {!hasCoverPhoto && (
+                    <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Upload →</a>
+                  )}
+                </li>
+                <li className={`${styles.checkItem} ${hasRsvps ? styles.checkDone : ""}`}>
+                  <span className={`${styles.checkIcon} ${hasRsvps ? styles.checkIconDone : ""}`}>
+                    {hasRsvps ? "✓" : "3"}
+                  </span>
+                  <div className={styles.checkBody}>
+                    <span className={styles.checkLabel}>Share &amp; collect RSVPs</span>
+                    <span className={styles.checkDesc}>Send your invite link to guests</span>
+                  </div>
+                  {!hasRsvps && event?.slug && (
+                    <button type="button" onClick={copyInviteLink} className={styles.checkAction}>
+                      {copied ? "Copied!" : "Copy link →"}
+                    </button>
+                  )}
+                </li>
+              </ul>
+            </div>
+
+            {/* 2. Design your celebration — separate step */}
+            <div className={styles.setupGroup}>
+              <div className={styles.setupGroupHeader}>
+                <span className={styles.setupGroupTitle}>Design your celebration</span>
+                <span className={styles.setupGroupSub}>Tell us your vision &amp; get a recommendation</span>
+                {hasIntake && <span className={styles.setupGroupBadge}>✓ Done</span>}
+              </div>
+              <div className={styles.setupGroupAction}>
+                <a href={`/dashboard/events/${eventId}/intake`} className={styles.checkAction}>
+                  {hasIntake ? "View →" : "Start →"}
+                </a>
+              </div>
+            </div>
           </section>
         )}
 
@@ -382,6 +412,11 @@ export default function EventDashboardPage() {
           <h2 className={styles.cardTitle}>Manage Event</h2>
           <p className={styles.cardSub}>All your tools in one place</p>
           <div className={styles.actionGridLarge}>
+            <a href={`/dashboard/events/${eventId}/intake`} className={styles.actionTileLg}>
+              <span className={styles.actionIconLg}>✦</span>
+              <span className={styles.actionLabelLg}>Design your celebration</span>
+              <span className={styles.actionDescLg}>{hasIntake ? "View recommendation →" : "Start →"}</span>
+            </a>
             <a href={`/dashboard/events/${eventId}/settings`} className={styles.actionTileLg}>
               <span className={styles.actionIconLg}>⚙</span>
               <span className={styles.actionLabelLg}>Event Settings</span>

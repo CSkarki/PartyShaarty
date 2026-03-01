@@ -269,6 +269,66 @@
   padding: 1.5rem;
 }
 
+.setupCard {
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(201, 148, 26, 0.03);
+}
+
+.setupCard .cardTitleRow {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Setup groups (Invite flow vs Design step) */
+.setupGroup {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.setupGroup:last-child {
+  margin-bottom: 0;
+}
+
+.setupGroupHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.setupGroupTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.setupGroupSub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.setupGroupBadge {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #16a34a;
+  background: rgba(22, 163, 74, 0.1);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.setupGroupAction {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
 .cardTitleRow {
   display: flex;
   align-items: flex-start;
@@ -315,9 +375,10 @@
 
 .setupProgressFill {
   height: 100%;
-  background: var(--accent);
+  background: linear-gradient(90deg, #8b4513 0%, #c9941a 40%, #e8b84b 100%);
   border-radius: 2px;
-  transition: width 0.4s ease;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 8px rgba(201, 148, 26, 0.2);
 }
 
 /* Checklist */
@@ -327,7 +388,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
 .checkItem {
@@ -339,6 +400,7 @@
   border-radius: 8px;
   background: var(--bg);
   transition: border-color 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
 }
 
 .checkDone {
@@ -370,6 +432,8 @@
 .checkBody {
   flex: 1;
   min-width: 0;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--border);
 }
 
 .checkLabel {
@@ -377,12 +441,17 @@
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--text);
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  margin-bottom: 0.2rem;
 }
 
 .checkDesc {
   display: block;
   font-size: 0.775rem;
-  color: var(--text-muted);
+  color: var(--accent);
+  font-weight: 500;
+  letter-spacing: 0.02em;
 }
 
 .checkAction {

@@ -34,8 +34,8 @@ export async function middleware(request) {
           },
         },
       });
-      const { data } = await supabase.auth.getSession();
-      session = data?.session ?? null;
+      const { data } = await supabase.auth.getUser();
+      session = data?.user ?? null;
     } catch {
       // Invalid/expired refresh token in cookies — treat as no session, redirect to login
       session = null;

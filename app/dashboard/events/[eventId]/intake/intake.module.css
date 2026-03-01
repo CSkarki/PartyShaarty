@@ -1,0 +1,551 @@
+/* ─── Loading ────────────────────────────────────────────── */
+.loadingScreen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.loadingSpinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Page shell ─────────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* ─── Nav ────────────────────────────────────────────────── */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(201, 148, 26, 0.08);
+}
+
+.navBrand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.navLogo {
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
+.navName {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navBack {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.navBack:hover {
+  color: var(--accent);
+}
+
+/* ─── Main content ───────────────────────────────────────── */
+.main {
+  padding: 3rem 1.5rem 5rem;
+  display: flex;
+  justify-content: center;
+  /* Warm radial ambient glow behind stepper */
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(201, 148, 26, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 50% 100%, rgba(201, 148, 26, 0.06) 0%, transparent 60%),
+    var(--bg);
+}
+
+/* ─── Stepper container ──────────────────────────────────── */
+.stepper {
+  width: 100%;
+  max-width: 640px;
+}
+
+/* ─── Progress ───────────────────────────────────────────── */
+.progressWrap {
+  margin-bottom: 2rem;
+}
+
+.stepNumber {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.progressBar {
+  height: 5px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b4513 0%, #c9941a 35%, #e8b84b 100%);
+  border-radius: 3px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 12px rgba(201, 148, 26, 0.25);
+}
+
+/* ─── Step card ──────────────────────────────────────────── */
+.stepCard {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(201, 148, 26, 0.04);
+}
+
+.stepHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+}
+
+.stepTitle {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.3;
+  margin: 0;
+}
+
+.stepSubtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ─── Step 6: Summary + contact ───────────────────────────── */
+.summaryBlock {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+}
+
+.summaryLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 0.5rem;
+}
+
+.summaryList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.summaryItem {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.summaryItem:last-child {
+  border-bottom: none;
+}
+
+.summaryItemLabel {
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.summaryItemValue {
+  color: var(--text);
+  text-align: right;
+}
+
+.contactFields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.contactLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.required {
+  color: var(--error, #dc2626);
+}
+
+.contactInput {
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.contactInput:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(201, 148, 26, 0.15);
+}
+
+/* ─── Multi-hint ─────────────────────────────────────────── */
+.multiHint {
+  font-size: 0.8rem;
+  color: var(--accent);
+  margin: 0;
+  letter-spacing: 0.03em;
+  font-weight: 500;
+}
+
+/* ─── Sub-group (step 3) ─────────────────────────────────── */
+.subGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.subLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ─── Option grid ────────────────────────────────────────── */
+.optionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.65rem;
+}
+
+@media (min-width: 480px) {
+  .optionGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ─── Option tile ────────────────────────────────────────── */
+.optionTile {
+  position: relative;
+  padding: 0.85rem 0.9rem;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s, box-shadow 0.15s;
+  line-height: 1.35;
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.optionTile:hover:not(:disabled) {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.09);
+}
+
+/* Selected: use the pre-defined --accent-dim variable */
+.optionTileSelected {
+  border-color: var(--accent);
+  background: var(--accent-dim);   /* rgba(201, 148, 26, 0.12) */
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Small checkmark pip in top-right corner */
+.optionTileSelected::after {
+  content: "✓";
+  position: absolute;
+  top: 0.35rem;
+  right: 0.45rem;
+  font-size: 0.65rem;
+  color: var(--accent);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.optionTileDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.15);
+}
+
+/* ─── Nav row ────────────────────────────────────────────── */
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.navRowRight {
+  margin-left: auto;
+}
+
+.btnBack {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  transition: color 0.15s;
+  font-family: inherit;
+}
+
+.btnBack:hover {
+  color: var(--text);
+}
+
+.btnContinue {
+  padding: 0.72rem 1.85rem;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+}
+
+.btnContinue:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(201, 148, 26, 0.35);
+}
+
+.btnContinue:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+/* ─── Save error ─────────────────────────────────────────── */
+.saveError {
+  font-size: 0.85rem;
+  color: var(--error);
+  margin: 0;
+}
+
+/* ─── Recommendation screen ──────────────────────────────── */
+.recommendWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  text-align: center;
+  padding-top: 0.5rem;
+}
+
+.recommendHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.recommendOrnament {
+  font-size: 1.2rem;
+  color: var(--accent);
+  letter-spacing: 0.25em;
+}
+
+.recommendTitle {
+  font-family: "DM Serif Display", Georgia, serif;
+  font-size: 2.2rem;
+  font-weight: 400;
+  background: linear-gradient(135deg, #8b4513 0%, #c9941a 40%, #e8c060 70%, #e8b84b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.recommendSubtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 420px;
+}
+
+/* ─── Recommendation card ────────────────────────────────── */
+.recommendCard {
+  width: 100%;
+  background: var(--surface);
+  /* Left accent strip, subtle box */
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 16px;
+  padding: 0.25rem 1.75rem 0.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  text-align: left;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
+}
+
+.recommendLine {
+  font-size: 0.9375rem;
+  color: var(--text);
+  line-height: 1.7;
+  margin: 0;
+  padding: 1rem 0 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+/* Small accent diamond bullet */
+.recommendLine::before {
+  content: "✦";
+  position: absolute;
+  left: 0;
+  top: 1.1rem;
+  font-size: 0.5rem;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.recommendLine:last-child {
+  border-bottom: none;
+}
+
+/* ─── CTAs ───────────────────────────────────────────────── */
+.ctaRow {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+@media (min-width: 480px) {
+  .ctaRow {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.ctaPrimary {
+  padding: 0.85rem 2rem;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.12s, box-shadow 0.15s;
+  font-family: inherit;
+  letter-spacing: 0.01em;
+  text-align: center;
+  display: inline-block;
+}
+
+.ctaPrimary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 5px 16px rgba(201, 148, 26, 0.35);
+}
+
+.ctaSecondary {
+  padding: 0.85rem 2rem;
+  background: transparent;
+  color: var(--accent);
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, transform 0.12s;
+  font-family: inherit;
+  text-align: center;
+  display: inline-block;
+}
+
+.ctaSecondary:hover {
+  background: var(--accent-dim);
+  transform: translateY(-1px);
+}
+
+.editLink {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+  font-family: inherit;
+  margin-top: -0.5rem;
+}
+
+.editLink:hover {
+  color: var(--text);
+}
