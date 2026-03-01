@@ -38,6 +38,13 @@ function EventCard({ event, getDaysUntil, onDeleted }) {
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    await navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
 
   async function handleDelete() {
     if (!deleteConfirm) { setDeleteConfirm(true); return; }
@@ -63,72 +70,81 @@ function EventCard({ event, getDaysUntil, onDeleted }) {
   }
 
   return (
-    <div className={styles.eventCard}>
-      <div className={styles.eventCardTop}>
-        <div className={styles.eventCardTitleRow}>
-          <span className={styles.eventTypeChip}>{typeOpt.icon}</span>
-          <h2 className={styles.eventCardName}>{event.event_name || "Untitled"}</h2>
-          {isLive
-            ? <span className={styles.statusLive}>● Live</span>
-            : <span className={styles.statusDraft}>Draft</span>
-          }
+    <div className={styles.eventListCard}>
+      <div className={styles.eventListCardMain}>
+        <div className={styles.eventListCardInfo}>
+          <div className={styles.eventListCardTitleRow}>
+            <span className={styles.eventTypeChip}>{typeOpt.icon}</span>
+            <h2 className={styles.eventListCardName}>{event.event_name || "Untitled"}</h2>
+            {isLive
+              ? <span className={styles.statusLive}>● Live</span>
+              : <span className={styles.statusDraft}>Draft</span>
+            }
+            {daysUntil !== null && (
+              <span className={
+                daysUntil > 0 ? styles.countdown :
+                daysUntil === 0 ? styles.countdownToday :
+                styles.countdownPast
+              }>
+                {daysUntil > 0 ? `${daysUntil} days to go` :
+                 daysUntil === 0 ? "Today!" : "Completed"}
+              </span>
+            )}
+          </div>
+          {event.event_date && (
+            <p className={styles.eventListCardDate}>📅 {event.event_date}</p>
+          )}
+          {event.event_location && (
+            <p className={styles.eventListCardMetaLine}>📍 {event.event_location}</p>
+          )}
         </div>
-        {event.event_date && <span className={styles.eventCardDate}>{event.event_date}</span>}
-        {daysUntil !== null && (
-          <span className={
-            daysUntil > 0 ? styles.countdown :
-            daysUntil === 0 ? styles.countdownToday :
-            styles.countdownPast
-          }>
-            {daysUntil > 0 ? `${daysUntil} days to go` :
-             daysUntil === 0 ? "Today!" : "Completed"}
-          </span>
-        )}
-        {event.event_location && (
-          <span className={styles.eventCardMeta}>{event.event_location}</span>
-        )}
+        <div className={styles.eventListCardActions}>
+          <a href={`/dashboard/events/${event.id}`} className={styles.btnPrimary}>Manage →</a>
+          <a href={`/${event.slug}/invite`} target="_blank" rel="noreferrer" className={styles.btnOutlineSmall}>
+            View Invite ↗
+          </a>
+        </div>
       </div>
-      <div className={styles.eventCardLink}>
+      <div className={styles.eventListCardFoot}>
         <a href={inviteUrl} target="_blank" rel="noreferrer" className={styles.inviteShareLink}>
           {inviteUrl.replace(/^https?:\/\//, "")}
         </a>
-      </div>
-      <div className={styles.eventCardActions}>
-        <a href={`/dashboard/events/${event.id}`} className={styles.btnPrimary}>Manage →</a>
-        <a href={`/${event.slug}/invite`} target="_blank" rel="noreferrer" className={styles.btnOutlineSmall}>
-          View Invite ↗
-        </a>
-        {!isLive && (
-          deleteConfirm ? (
-            <>
+        <div className={styles.eventListCardFootRight}>
+          <button type="button" onClick={handleCopy} className={styles.copyBtnSmall}>
+            {copied ? "Copied!" : "Copy link"}
+          </button>
+          {!isLive && (
+            deleteConfirm ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className={`${styles.btnDanger} ${styles.btnDangerSolid}`}
+                  style={{ fontSize: "0.8rem", padding: "0.3rem 0.6rem" }}
+                >
+                  {deleting ? "…" : "Confirm?"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setDeleteConfirm(false)}
+                  className={styles.btnOutlineSmall}
+                >
+                  Cancel
+                </button>
+              </>
+            ) : (
               <button
                 type="button"
                 onClick={handleDelete}
-                disabled={deleting}
-                className={`${styles.btnDanger} ${styles.btnDangerSolid}`}
-                style={{ fontSize: "0.8rem", padding: "0.35rem 0.7rem" }}
+                className={styles.btnDanger}
+                style={{ fontSize: "0.8rem", padding: "0.3rem 0.6rem" }}
               >
-                {deleting ? "…" : "Confirm?"}
+                Delete
               </button>
-              <button
-                type="button"
-                onClick={() => setDeleteConfirm(false)}
-                className={styles.btnOutlineSmall}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={handleDelete}
-              className={styles.btnDanger}
-              style={{ fontSize: "0.8rem", padding: "0.35rem 0.7rem" }}
-            >
-              Delete
-            </button>
-          )
-        )}
+            )
+          )}
+        </div>
       </div>
     </div>
   );
@@ -589,7 +605,7 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : (
-          <div className={styles.eventsGrid}>
+          <div className={styles.eventsList}>
             {displayItems.map((item) =>
               item.kind === "group" ? (
                 <GroupCard key={item.data.id} group={item.data} getDaysUntil={getDaysUntil} />

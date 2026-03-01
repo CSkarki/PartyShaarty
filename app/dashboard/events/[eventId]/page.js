@@ -338,24 +338,20 @@ export default function EventDashboardPage() {
           </div>
         </section>
 
-        {/* Setup + Actions Row */}
-        <section className={styles.midRow}>
-          <div className={styles.setupCard}>
+        {/* Event Setup — only shown when draft */}
+        {isDraft && (
+          <section className={styles.setupCard}>
             <div className={styles.cardTitleRow}>
               <div>
                 <h2 className={styles.cardTitle}>Event Setup</h2>
-                <p className={styles.cardSub}>
-                  {isLive ? "Your event is live" : "Complete these steps to go live"}
-                </p>
+                <p className={styles.cardSub}>Complete these steps to go live</p>
               </div>
-              {isDraft && (
-                <div className={styles.setupProgress}>
-                  <span className={styles.setupProgressText}>{setupSteps}/3</span>
-                  <div className={styles.setupProgressBar}>
-                    <div className={styles.setupProgressFill} style={{ width: `${(setupSteps / 3) * 100}%` }} />
-                  </div>
+              <div className={styles.setupProgress}>
+                <span className={styles.setupProgressText}>{setupSteps}/3</span>
+                <div className={styles.setupProgressBar}>
+                  <div className={styles.setupProgressFill} style={{ width: `${(setupSteps / 3) * 100}%` }} />
                 </div>
-              )}
+              </div>
             </div>
 
             <ul className={styles.checkList}>
@@ -367,7 +363,7 @@ export default function EventDashboardPage() {
                   <span className={styles.checkLabel}>Add event details</span>
                   <span className={styles.checkDesc}>Name, date, location &amp; message</span>
                 </div>
-                {!hasEventDetails && isDraft && (
+                {!hasEventDetails && (
                   <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Set up →</a>
                 )}
               </li>
@@ -379,7 +375,7 @@ export default function EventDashboardPage() {
                   <span className={styles.checkLabel}>Upload a cover photo</span>
                   <span className={styles.checkDesc}>Make your invite page beautiful</span>
                 </div>
-                {!hasCoverPhoto && isDraft && (
+                {!hasCoverPhoto && (
                   <a href={`/dashboard/events/${eventId}/settings`} className={styles.checkAction}>Upload →</a>
                 )}
               </li>
@@ -391,97 +387,76 @@ export default function EventDashboardPage() {
                   <span className={styles.checkLabel}>Share &amp; collect RSVPs</span>
                   <span className={styles.checkDesc}>Send your invite link to guests</span>
                 </div>
-                {!hasRsvps && event?.slug && isDraft && (
+                {!hasRsvps && event?.slug && (
                   <button type="button" onClick={copyInviteLink} className={styles.checkAction}>
                     {copied ? "Copied!" : "Copy link →"}
                   </button>
                 )}
               </li>
             </ul>
+          </section>
+        )}
 
-            {isLive && (
-              <div className={styles.setupComplete}>
-                ✦ Event is live — guests can now RSVP!
-              </div>
+        {/* Manage Event — full-width 4-column action tiles */}
+        <section className={styles.actionsCardFull}>
+          <h2 className={styles.cardTitle}>Manage Event</h2>
+          <p className={styles.cardSub}>All your tools in one place</p>
+          <div className={styles.actionGridLarge}>
+            <a href={`/dashboard/events/${eventId}/settings`} className={styles.actionTileLg}>
+              <span className={styles.actionIconLg}>⚙</span>
+              <span className={styles.actionLabelLg}>Event Settings</span>
+              <span className={styles.actionDescLg}>{isLive ? "View details (locked)" : "Edit details & cover"}</span>
+            </a>
+            <a href={`/dashboard/events/${eventId}/gallery`} className={styles.actionTileLg}>
+              <span className={styles.actionIconLg}>🖼</span>
+              <span className={styles.actionLabelLg}>Photo Gallery</span>
+              <span className={styles.actionDescLg}>Upload &amp; share albums</span>
+            </a>
+            <a href="/dashboard/reminders" className={styles.actionTileLg}>
+              <span className={styles.actionIconLg}>✉</span>
+              <span className={styles.actionLabelLg}>Send Reminders</span>
+              <span className={styles.actionDescLg}>Email or WhatsApp</span>
+            </a>
+            <a href="/dashboard/thankyou" className={styles.actionTileLg}>
+              <span className={styles.actionIconLg}>♡</span>
+              <span className={styles.actionLabelLg}>Send Thank You</span>
+              <span className={styles.actionDescLg}>After the event</span>
+            </a>
+            <a href={`/api/export?eventId=${eventId}`} download="rsvps.xlsx" className={styles.actionTileLg}>
+              <span className={styles.actionIconLg}>↓</span>
+              <span className={styles.actionLabelLg}>Export Excel</span>
+              <span className={styles.actionDescLg}>Download guest list</span>
+            </a>
+            <button
+              type="button"
+              onClick={() => setShowImport(v => !v)}
+              className={`${styles.actionTileLg} ${showImport ? styles.actionTileLgActive : ""}`}
+            >
+              <span className={styles.actionIconLg}>↑</span>
+              <span className={styles.actionLabelLg}>Import CSV</span>
+              <span className={styles.actionDescLg}>Bulk add RSVPs</span>
+            </button>
+            <button
+              type="button"
+              onClick={toggleQr}
+              className={`${styles.actionTileLg} ${showQr ? styles.actionTileLgActive : ""}`}
+            >
+              <span className={styles.actionIconLg}>⊡</span>
+              <span className={styles.actionLabelLg}>QR Code</span>
+              <span className={styles.actionDescLg}>Print for table cards</span>
+            </button>
+            {event?.slug && (
+              <a
+                href={`/${event.slug}/slideshow`}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.actionTileLg}
+              >
+                <span className={styles.actionIconLg}>▶</span>
+                <span className={styles.actionLabelLg}>Live Slideshow</span>
+                <span className={styles.actionDescLg}>For projector or TV</span>
+              </a>
             )}
-          </div>
-
-          <div className={styles.actionsCard}>
-            <h2 className={styles.cardTitle}>Manage Event</h2>
-            <p className={styles.cardSub}>All your tools in one place</p>
-            <div className={styles.actionGrid}>
-              <a href={`/dashboard/events/${eventId}/settings`} className={styles.actionItem}>
-                <span className={styles.actionIcon}>⚙</span>
-                <div>
-                  <span className={styles.actionLabel}>Event Settings</span>
-                  <span className={styles.actionDesc}>{isLive ? "View details (locked)" : "Details & cover photo"}</span>
-                </div>
-              </a>
-              <a href={`/dashboard/events/${eventId}/gallery`} className={styles.actionItem}>
-                <span className={styles.actionIcon}>⬡</span>
-                <div>
-                  <span className={styles.actionLabel}>Photo Gallery</span>
-                  <span className={styles.actionDesc}>Upload &amp; share albums</span>
-                </div>
-              </a>
-              <a href="/dashboard/reminders" className={styles.actionItem}>
-                <span className={styles.actionIcon}>✉</span>
-                <div>
-                  <span className={styles.actionLabel}>Send Reminders</span>
-                  <span className={styles.actionDesc}>Email or WhatsApp</span>
-                </div>
-              </a>
-              <a href="/dashboard/thankyou" className={styles.actionItem}>
-                <span className={styles.actionIcon}>♡</span>
-                <div>
-                  <span className={styles.actionLabel}>Send Thank You</span>
-                  <span className={styles.actionDesc}>After the event</span>
-                </div>
-              </a>
-              <a href={`/api/export?eventId=${eventId}`} download="rsvps.xlsx" className={styles.actionItem}>
-                <span className={styles.actionIcon}>↓</span>
-                <div>
-                  <span className={styles.actionLabel}>Export Excel</span>
-                  <span className={styles.actionDesc}>Download guest list</span>
-                </div>
-              </a>
-              <button
-                type="button"
-                onClick={() => setShowImport(v => !v)}
-                className={`${styles.actionItem} ${showImport ? styles.actionItemActive : ""}`}
-              >
-                <span className={styles.actionIcon}>↑</span>
-                <div>
-                  <span className={styles.actionLabel}>Import CSV</span>
-                  <span className={styles.actionDesc}>Bulk add RSVPs</span>
-                </div>
-              </button>
-              <button
-                type="button"
-                onClick={toggleQr}
-                className={`${styles.actionItem} ${showQr ? styles.actionItemActive : ""}`}
-              >
-                <span className={styles.actionIcon}>◫</span>
-                <div>
-                  <span className={styles.actionLabel}>QR Code</span>
-                  <span className={styles.actionDesc}>Print for table cards</span>
-                </div>
-              </button>
-              {event?.slug && (
-                <a
-                  href={`/${event.slug}/slideshow`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.actionItem}
-                >
-                  <span className={styles.actionIcon}>▶</span>
-                  <div>
-                    <span className={styles.actionLabel}>Live Slideshow</span>
-                    <span className={styles.actionDesc}>For projector or TV</span>
-                  </div>
-                </a>
-              )}
-            </div>
           </div>
         </section>
 
@@ -566,6 +541,93 @@ export default function EventDashboardPage() {
             </div>
           </section>
         )}
+
+        {/* Guest List / RSVPs */}
+        <section className={styles.rsvpSection}>
+          <div className={styles.rsvpHeader}>
+            <div>
+              <h2 className={styles.rsvpTitle}>Guest List</h2>
+              <span className={styles.rsvpCount}>
+                {totalRsvps} {totalRsvps === 1 ? "response" : "responses"}
+              </span>
+            </div>
+            <div className={styles.rsvpControls}>
+              <div className={styles.filterTabs}>
+                <button
+                  className={`${styles.filterTab} ${rsvpFilter === "all" ? styles.filterTabActive : ""}`}
+                  onClick={() => setRsvpFilter("all")}
+                >
+                  All ({totalRsvps})
+                </button>
+                <button
+                  className={`${styles.filterTab} ${rsvpFilter === "yes" ? styles.filterTabActive : ""}`}
+                  onClick={() => setRsvpFilter("yes")}
+                >
+                  Attending ({attending})
+                </button>
+                <button
+                  className={`${styles.filterTab} ${rsvpFilter === "no" ? styles.filterTabActive : ""}`}
+                  onClick={() => setRsvpFilter("no")}
+                >
+                  Declined ({declined})
+                </button>
+              </div>
+              <a href={`/api/export?eventId=${eventId}`} download="rsvps.xlsx" className={styles.btnOutlineSmall}>
+                Export ↓
+              </a>
+            </div>
+          </div>
+
+          <div className={styles.tableWrap}>
+            {filteredRsvps.length === 0 ? (
+              <div className={styles.emptyState}>
+                <p className={styles.emptyTitle}>No responses yet</p>
+                <p className={styles.emptyText}>Share your invite link to start collecting RSVPs.</p>
+                {event?.slug && totalRsvps === 0 && (
+                  <button
+                    type="button"
+                    onClick={copyInviteLink}
+                    className={styles.btnPrimary}
+                    style={{ marginTop: "1.25rem" }}
+                  >
+                    {copied ? "Copied!" : "Copy Invite Link"}
+                  </button>
+                )}
+              </div>
+            ) : (
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRsvps.map((r, i) => (
+                    <tr key={i}>
+                      <td className={styles.tdName}>{r.name}</td>
+                      <td className={styles.tdEmail}>{r.email}</td>
+                      <td>
+                        <span className={`${styles.badge} ${r.attending === "Yes" ? styles.badgeYes : styles.badgeNo}`}>
+                          {r.attending === "Yes" ? "Attending" : "Declined"}
+                        </span>
+                      </td>
+                      <td className={styles.tdMsg}>{r.message || <span className={styles.noMsg}>—</span>}</td>
+                      <td className={styles.tdDate}>
+                        {r.timestamp
+                          ? new Date(r.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
 
         {/* ── Danger Zone ── */}
         <section className={styles.dangerZone}>
@@ -659,93 +721,6 @@ export default function EventDashboardPage() {
               )}
             </>
           )}
-        </section>
-
-        {/* Guest List / RSVPs */}
-        <section className={styles.rsvpSection}>
-          <div className={styles.rsvpHeader}>
-            <div>
-              <h2 className={styles.rsvpTitle}>Guest List</h2>
-              <span className={styles.rsvpCount}>
-                {totalRsvps} {totalRsvps === 1 ? "response" : "responses"}
-              </span>
-            </div>
-            <div className={styles.rsvpControls}>
-              <div className={styles.filterTabs}>
-                <button
-                  className={`${styles.filterTab} ${rsvpFilter === "all" ? styles.filterTabActive : ""}`}
-                  onClick={() => setRsvpFilter("all")}
-                >
-                  All ({totalRsvps})
-                </button>
-                <button
-                  className={`${styles.filterTab} ${rsvpFilter === "yes" ? styles.filterTabActive : ""}`}
-                  onClick={() => setRsvpFilter("yes")}
-                >
-                  Attending ({attending})
-                </button>
-                <button
-                  className={`${styles.filterTab} ${rsvpFilter === "no" ? styles.filterTabActive : ""}`}
-                  onClick={() => setRsvpFilter("no")}
-                >
-                  Declined ({declined})
-                </button>
-              </div>
-              <a href={`/api/export?eventId=${eventId}`} download="rsvps.xlsx" className={styles.btnOutlineSmall}>
-                Export ↓
-              </a>
-            </div>
-          </div>
-
-          <div className={styles.tableWrap}>
-            {filteredRsvps.length === 0 ? (
-              <div className={styles.emptyState}>
-                <p className={styles.emptyTitle}>No responses yet</p>
-                <p className={styles.emptyText}>Share your invite link to start collecting RSVPs.</p>
-                {event?.slug && totalRsvps === 0 && (
-                  <button
-                    type="button"
-                    onClick={copyInviteLink}
-                    className={styles.btnPrimary}
-                    style={{ marginTop: "1.25rem" }}
-                  >
-                    {copied ? "Copied!" : "Copy Invite Link"}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Message</th>
-                    <th>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRsvps.map((r, i) => (
-                    <tr key={i}>
-                      <td className={styles.tdName}>{r.name}</td>
-                      <td className={styles.tdEmail}>{r.email}</td>
-                      <td>
-                        <span className={`${styles.badge} ${r.attending === "Yes" ? styles.badgeYes : styles.badgeNo}`}>
-                          {r.attending === "Yes" ? "Attending" : "Declined"}
-                        </span>
-                      </td>
-                      <td className={styles.tdMsg}>{r.message || <span className={styles.noMsg}>—</span>}</td>
-                      <td className={styles.tdDate}>
-                        {r.timestamp
-                          ? new Date(r.timestamp).toLocaleDateString("en-IN", { day: "numeric", month: "short" })
-                          : "—"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
         </section>
       </main>
     </div>
