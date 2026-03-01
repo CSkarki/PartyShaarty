@@ -1,5 +1,5 @@
 import { createSupabaseServerClient, requireHostProfile } from "../../../../../lib/supabase-server";
-import { getAlbum, renameAlbum, deleteAlbumRecord } from "../../../../../lib/gallery-store";
+import { getAlbum, renameAlbum, updateAlbumSlideshowEnabled, deleteAlbumRecord } from "../../../../../lib/gallery-store";
 import { listPhotosInAlbum, deletePhotoByPath } from "../../../../../lib/supabase";
 
 export async function PATCH(request, { params }) {
@@ -12,24 +12,29 @@ export async function PATCH(request, { params }) {
   }
 
   const { albumId } = params;
-  const { name } = await request.json();
-
-  if (!name || typeof name !== "string" || !name.trim()) {
-    return Response.json({ error: "Album name is required" }, { status: 400 });
-  }
+  const body = await request.json();
 
   try {
     const album = await getAlbum(albumId, profile.id);
     if (!album) return Response.json({ error: "Album not found" }, { status: 404 });
-    await renameAlbum(albumId, name, profile.id);
+
+    if (typeof body.slideshow_enabled === "boolean") {
+      await updateAlbumSlideshowEnabled(albumId, body.slideshow_enabled, profile.id);
+      return Response.json({ ok: true });
+    }
+
+    if (!body.name || typeof body.name !== "string" || !body.name.trim()) {
+      return Response.json({ error: "Album name is required" }, { status: 400 });
+    }
+    await renameAlbum(albumId, body.name, profile.id);
     return Response.json({ ok: true });
   } catch (err) {
-    console.error("Rename album error:", err.message);
-    return Response.json({ error: "Failed to rename album" }, { status: 500 });
+    console.error("Update album error:", err.message);
+    return Response.json({ error: "Failed to update album" }, { status: 500 });
   }
 }
 
-export async function DELETE(request, { params }) {
+export async function DELETE(_request, { params }) {
   const supabase = createSupabaseServerClient();
   let profile;
   try {

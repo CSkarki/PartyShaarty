@@ -19,7 +19,10 @@ export async function GET(request, { params }) {
   const ev = event[0];
 
   try {
-    const albums = await listAlbumsByEvent(ev.id);
+    const allAlbums = await listAlbumsByEvent(ev.id);
+    // Only include albums the host has enabled for the slideshow
+    // slideshow_enabled defaults to true; treat undefined (pre-migration) as true
+    const albums = allAlbums.filter((a) => a.slideshow_enabled !== false);
     if (!albums.length) {
       return Response.json({ eventName: ev.event_name, eventDate: ev.event_date, photos: [] }, { headers: NO_CACHE });
     }

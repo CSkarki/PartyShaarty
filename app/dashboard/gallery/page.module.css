@@ -144,6 +144,36 @@
   margin-bottom: 0.75rem;
 }
 
+.slideshowBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.22rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 0.625rem;
+  transition: opacity 0.15s;
+  user-select: none;
+}
+
+.slideshowBadge:hover {
+  opacity: 0.75;
+}
+
+.slideshowOn {
+  background: rgba(201, 148, 26, 0.1);
+  color: var(--accent);
+  border: 1px solid rgba(201, 148, 26, 0.3);
+}
+
+.slideshowOff {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
 .albumCardActions {
   display: flex;
   gap: 0.5rem;

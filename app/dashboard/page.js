@@ -103,8 +103,35 @@ function EventCard({ event, getDaysUntil, onDeleted }) {
           <a href={`/${event.slug}/invite`} target="_blank" rel="noreferrer" className={styles.btnOutlineSmall}>
             View Invite ↗
           </a>
+          {isLive && daysUntil !== null && daysUntil < 0 && (
+            <a href={`/${event.slug}/memory`} target="_blank" rel="noreferrer" className={styles.btnMemories}>
+              Memories ✦
+            </a>
+          )}
         </div>
       </div>
+      {isLive && (
+        <div className={styles.eventListCardStats}>
+          <span className={styles.eventStatItem}>
+            <span className={styles.eventStatNum}>{event.rsvp_total ?? 0}</span> RSVPs
+          </span>
+          <span className={styles.eventStatDot}>·</span>
+          <span className={styles.eventStatItem}>
+            <span className={`${styles.eventStatNum} ${styles.eventStatGreen}`}>{event.rsvp_attending ?? 0}</span> Attending
+          </span>
+          <span className={styles.eventStatDot}>·</span>
+          <span className={styles.eventStatItem}>
+            <span className={`${styles.eventStatNum} ${styles.eventStatRed}`}>{event.rsvp_declined ?? 0}</span> Declined
+          </span>
+          <span className={styles.eventStatDot}>·</span>
+          <span className={styles.eventStatItem}>
+            <span className={`${styles.eventStatNum} ${styles.eventStatAccent}`}>
+              {event.rsvp_total > 0 ? Math.round((event.rsvp_attending / event.rsvp_total) * 100) : 0}%
+            </span> Accepted
+          </span>
+        </div>
+      )}
+
       <div className={styles.eventListCardFoot}>
         <a href={inviteUrl} target="_blank" rel="noreferrer" className={styles.inviteShareLink}>
           {inviteUrl.replace(/^https?:\/\//, "")}
@@ -337,7 +364,9 @@ export default function DashboardPage() {
 
   function getDaysUntil(dateStr) {
     if (!dateStr) return null;
-    const d = new Date(dateStr);
+    // Strip ordinal suffixes so "Feb 21st 2026" parses correctly
+    const cleaned = dateStr.replace(/(\d+)(st|nd|rd|th)\b/gi, "$1");
+    const d = new Date(cleaned);
     if (isNaN(d.getTime())) return null;
     return Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
   }

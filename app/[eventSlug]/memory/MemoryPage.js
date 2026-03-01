@@ -163,6 +163,9 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
               <a href={`/${eventSlug}/gallery`} className={styles.stripLink}>
                 View all {photos.length} memories &rarr;
               </a>
+              <a href={`/${eventSlug}/slideshow`} target="_blank" rel="noreferrer" className={styles.slideshowLink}>
+                ▶ Photo Slideshow
+              </a>
             </div>
           </section>
         )}

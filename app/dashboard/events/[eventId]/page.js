@@ -190,7 +190,6 @@ export default function EventDashboardPage() {
   const totalRsvps = rsvps.length;
   const attending = rsvps.filter(r => r.attending === "Yes").length;
   const declined = rsvps.filter(r => r.attending === "No").length;
-  const acceptanceRate = totalRsvps > 0 ? Math.round((attending / totalRsvps) * 100) : 0;
 
   const hasEventDetails = !!(event?.event_name && event?.event_date);
   const hasCoverPhoto = !!event?.event_image_path;
@@ -202,7 +201,8 @@ export default function EventDashboardPage() {
 
   function getDaysUntil(dateStr) {
     if (!dateStr) return null;
-    const d = new Date(dateStr);
+    const cleaned = dateStr.replace(/(\d+)(st|nd|rd|th)\b/gi, "$1");
+    const d = new Date(cleaned);
     if (isNaN(d.getTime())) return null;
     return Math.ceil((d - new Date()) / (1000 * 60 * 60 * 24));
   }
@@ -315,26 +315,6 @@ export default function EventDashboardPage() {
                 )}
               </div>
             )}
-          </div>
-        </section>
-
-        {/* Stats Row */}
-        <section className={styles.statsRow}>
-          <div className={styles.statCard}>
-            <span className={styles.statNumber}>{totalRsvps}</span>
-            <span className={styles.statLabel}>Total RSVPs</span>
-          </div>
-          <div className={`${styles.statCard} ${styles.statCardGreen}`}>
-            <span className={styles.statNumber}>{attending}</span>
-            <span className={styles.statLabel}>Attending</span>
-          </div>
-          <div className={`${styles.statCard} ${styles.statCardRed}`}>
-            <span className={styles.statNumber}>{declined}</span>
-            <span className={styles.statLabel}>Declined</span>
-          </div>
-          <div className={`${styles.statCard} ${styles.statCardAccent}`}>
-            <span className={styles.statNumber}>{acceptanceRate}%</span>
-            <span className={styles.statLabel}>Acceptance Rate</span>
           </div>
         </section>
 

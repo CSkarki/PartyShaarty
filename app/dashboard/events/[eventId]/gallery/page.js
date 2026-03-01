@@ -107,6 +107,23 @@ export default function EventGalleryPage() {
     } catch {}
   }
 
+  async function handleToggleSlideshow(album) {
+    const next = album.slideshow_enabled === false ? true : false;
+    try {
+      const res = await fetch(`/api/gallery/albums/${album.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ slideshow_enabled: next }),
+      });
+      if (res.ok) {
+        setAlbums((prev) =>
+          prev.map((a) => a.id === album.id ? { ...a, slideshow_enabled: next } : a)
+        );
+      }
+    } catch {}
+  }
+
   async function handleDeleteAlbum(album) {
     if (!confirm(`Delete album "${album.name}" and all its photos?`)) return;
     try {
@@ -473,6 +490,13 @@ export default function EventGalleryPage() {
               <p className={galleryStyles.albumStat}>
                 {album.share_count} guest{album.share_count !== 1 ? "s" : ""}
               </p>
+              <div
+                className={`${galleryStyles.slideshowBadge} ${album.slideshow_enabled === false ? galleryStyles.slideshowOff : galleryStyles.slideshowOn}`}
+                onClick={(e) => { e.stopPropagation(); handleToggleSlideshow(album); }}
+                title={album.slideshow_enabled === false ? "Click to include in slideshow" : "Click to exclude from slideshow"}
+              >
+                {album.slideshow_enabled === false ? "▶ Excluded from Slideshow" : "▶ In Slideshow"}
+              </div>
               <div className={galleryStyles.albumCardActions} onClick={(e) => e.stopPropagation()}>
                 <button
                   className={galleryStyles.albumEditBtn}
