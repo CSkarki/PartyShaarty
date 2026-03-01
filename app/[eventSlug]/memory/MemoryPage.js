@@ -21,10 +21,8 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
     count: photos.filter((p) => p.albumId === id).length,
   }));
 
-  // First 6 photos for the polaroid strip
   const stripPhotos = photos.slice(0, 6);
 
-  // Keyboard navigation for lightbox
   const handleKeyDown = useCallback(
     (e) => {
       if (lightboxIdx === null) return;
@@ -57,39 +55,91 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
         </div>
       </nav>
 
-      {/* ── Hero ────────────────────────────────────────── */}
-      <div className={styles.hero}>
-        <div className={styles.heroOrnament}>✦ ❁ ✦</div>
-        <p className={styles.heroLabel}>With Grateful Hearts</p>
-        <h1 className={styles.heroTitle}>Thank You</h1>
-        {event.event_name && (
-          <p className={styles.heroEventName}>{event.event_name}</p>
-        )}
-        {event.event_date && (
-          <p className={styles.heroDate}>{event.event_date}</p>
-        )}
-        <div className={styles.heroBorderBottom} />
+      {/* ── Hero Triptych (3 vertical frames, full first view) ── */}
+      <div className={styles.heroSplit}>
+
+        {/* FRAME 1: warm gradient + "Thank You" */}
+        <div className={styles.heroLeft}>
+          <div className={styles.heroLeftInner}>
+            <div className={styles.heroOrnament}>✦ ❁ ✦</div>
+            <p className={styles.heroLabel}>With Grateful Hearts</p>
+            <h1 className={styles.heroTitle}>Thank<br />You</h1>
+            {event.event_name && (
+              <p className={styles.heroEventName}>{event.event_name}</p>
+            )}
+            {event.event_date && (
+              <p className={styles.heroDate}>{event.event_date}</p>
+            )}
+          </div>
+          <div className={styles.heroScrollHint}>↓ scroll for memories</div>
+        </div>
+
+        {/* FRAME 2: thank-you letter on cream */}
+        <div className={styles.heroCenter}>
+          <div className={styles.letterContent}>
+            <span className={styles.letterOpenQuote}>&ldquo;</span>
+            <p className={styles.letterText}>
+              {event.event_message ||
+                "Every laugh shared, every blessing given, every warm presence you brought — we carry it all in our hearts. Thank you for making this day so beautifully unforgettable."}
+            </p>
+            {event.display_name && (
+              <p className={styles.letterSig}>
+                With love &amp; gratitude,
+                <strong>{event.display_name}</strong>
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* FRAME 3: cover image or first photo */}
+        <div className={styles.heroRight}>
+          {hasCover ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={coverUrl}
+                alt={event.event_name || "Event"}
+                className={styles.heroRightImg}
+                onError={() => setCoverImgError(true)}
+              />
+              <div className={styles.heroRightOverlay}>
+                {photos.length > 0 && (
+                  <span className={styles.heroRightBadge}>
+                    {photos.length} memories
+                  </span>
+                )}
+              </div>
+            </>
+          ) : stripPhotos[0] ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={stripPhotos[0].url}
+                alt="Memory"
+                className={styles.heroRightImg}
+              />
+              <div className={styles.heroRightOverlay}>
+                {photos.length > 0 && (
+                  <span className={styles.heroRightBadge}>
+                    {photos.length} memories
+                  </span>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className={styles.heroRightEmpty}>
+              <span>❁</span>
+              <p>Memories await</p>
+            </div>
+          )}
+        </div>
+
       </div>
 
-      {/* ── Main ────────────────────────────────────────── */}
+      {/* ── Memories content ────────────────────────────── */}
       <main className={styles.main}>
 
-        {/* ── 1. THANK YOU LETTER ─────────────────────── */}
-        <section className={styles.letterSection}>
-          <span className={styles.letterOpenQuote}>&ldquo;</span>
-          <p className={styles.letterText}>
-            {event.event_message ||
-              "Every laugh shared, every blessing given, every warm presence you brought — we carry it all in our hearts. Thank you for making this day so beautifully unforgettable."}
-          </p>
-          {event.display_name && (
-            <p className={styles.letterSig}>
-              With love &amp; gratitude,
-              <strong>{event.display_name}</strong>
-            </p>
-          )}
-        </section>
-
-        {/* ── 2. PHOTO POLAROID STRIP ─────────────────── */}
+        {/* ── Photo Polaroid Strip ────────────────────── */}
         {photos.length > 0 && (
           <section className={styles.stripSection}>
             <h2 className={styles.sectionHeading}>Glimpses of Joy</h2>
@@ -117,7 +167,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
           </section>
         )}
 
-        {/* ── 3. ALBUM CARDS ──────────────────────────── */}
+        {/* ── Album Cards ─────────────────────────────── */}
         {albumDetails.length > 0 && (
           <section className={styles.albumSection}>
             <h2 className={styles.sectionHeading}>Browse the Albums</h2>
@@ -132,11 +182,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
                 >
                   {album.thumbnail ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={album.thumbnail}
-                      alt={album.name}
-                      className={styles.albumThumb}
-                    />
+                    <img src={album.thumbnail} alt={album.name} className={styles.albumThumb} />
                   ) : (
                     <div className={styles.albumThumbEmpty}>📷</div>
                   )}
@@ -171,7 +217,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
           </section>
         )}
 
-        {/* ── 4. INVITE SNAPSHOT ──────────────────────── */}
+        {/* ── Invite Snapshot ─────────────────────────── */}
         <section className={styles.snapSection}>
           <p className={styles.snapLabel}>✦ &nbsp; You Were There &nbsp; ✦</p>
 
@@ -191,16 +237,10 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
               )}
               <div className={styles.snapMeta}>
                 {event.event_date && (
-                  <div>
-                    <span className={styles.snapMetaIcon}>📅</span>
-                    {event.event_date}
-                  </div>
+                  <div><span className={styles.snapMetaIcon}>📅</span>{event.event_date}</div>
                 )}
                 {event.event_location && (
-                  <div>
-                    <span className={styles.snapMetaIcon}>📍</span>
-                    {event.event_location}
-                  </div>
+                  <div><span className={styles.snapMetaIcon}>📍</span>{event.event_location}</div>
                 )}
               </div>
               {event.display_name && (
@@ -227,13 +267,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
           className={styles.lightbox}
           onClick={(e) => { if (e.target === e.currentTarget) setLightboxIdx(null); }}
         >
-          <button
-            className={styles.lightboxClose}
-            onClick={() => setLightboxIdx(null)}
-            aria-label="Close"
-          >
-            ✕
-          </button>
+          <button className={styles.lightboxClose} onClick={() => setLightboxIdx(null)} aria-label="Close">✕</button>
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

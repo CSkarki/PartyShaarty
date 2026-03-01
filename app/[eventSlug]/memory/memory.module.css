@@ -21,7 +21,7 @@
 }
 
 .navInner {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
 }
@@ -34,149 +34,250 @@
   letter-spacing: 0.02em;
 }
 
-/* ─── Hero ──────────────────────────────────────────────────── */
-.hero {
+/* ─── Hero Triptych (3 vertical frames) ────────────────────── */
+.heroSplit {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  min-height: calc(100vh - 54px);
   position: relative;
-  background: linear-gradient(135deg, #6b1a1a 0%, #9b3a10 50%, #c9511b 100%);
-  padding: 4.5rem 2rem 4rem;
-  text-align: center;
-  overflow: hidden;
 }
 
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 60% 50% at 20% 30%, rgba(201, 148, 26, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 80% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse 30% 30% at 50% 10%, rgba(224, 123, 16, 0.2) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-/* Gold top border */
-.hero::after {
+/* Gold top stripe */
+.heroSplit::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
   height: 4px;
   background: linear-gradient(90deg, transparent, #c9941a 20%, #e8c060 50%, #c9941a 80%, transparent);
+  z-index: 2;
 }
 
-.heroBorderBottom {
+/* Gold bottom stripe */
+.heroSplit::after {
+  content: "";
   position: absolute;
   bottom: 0; left: 0; right: 0;
   height: 4px;
   background: linear-gradient(90deg, transparent, #c9941a 20%, #e8c060 50%, #c9941a 80%, transparent);
+  z-index: 2;
+}
+
+/* Gold vertical divider mixin — applied via ::after on left and center */
+.heroLeft,
+.heroCenter {
+  position: relative;
+}
+
+.heroLeft::after,
+.heroCenter::after {
+  content: "";
+  position: absolute;
+  top: 10%;
+  right: 0;
+  bottom: 10%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(201, 148, 26, 0.45) 20%,
+    #d4aa40 50%,
+    rgba(201, 148, 26, 0.45) 80%,
+    transparent 100%
+  );
+  z-index: 1;
+}
+
+/* ── Frame 1: warm gradient ───────────────────────────────── */
+.heroLeft {
+  background: linear-gradient(155deg, #6b1a1a 0%, #9b3a10 55%, #c9511b 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 3rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* Bokeh overlay */
+.heroLeft::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 65% 55% at 25% 30%, rgba(201, 148, 26, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 45% at 75% 72%, rgba(255, 255, 255, 0.06) 0%, transparent 48%),
+    radial-gradient(ellipse 35% 35% at 55% 8%, rgba(224, 123, 16, 0.22) 0%, transparent 52%);
+  pointer-events: none;
+}
+
+.heroLeftInner {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .heroOrnament {
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   letter-spacing: 0.65rem;
-  color: rgba(255, 215, 120, 0.7);
-  margin-bottom: 0.75rem;
-  position: relative;
+  color: rgba(255, 215, 120, 0.65);
+  margin-bottom: 0.8rem;
 }
 
 .heroLabel {
-  font-size: 0.64rem;
+  font-size: 0.62rem;
   text-transform: uppercase;
-  letter-spacing: 0.3em;
-  color: rgba(255, 220, 140, 0.75);
-  margin-bottom: 0.6rem;
-  position: relative;
+  letter-spacing: 0.32em;
+  color: rgba(255, 220, 140, 0.72);
+  margin-bottom: 0.75rem;
 }
 
-/* "Thank You" — large, impactful */
+/* "Thank You" — massive, white */
 .heroTitle {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(3.8rem, 11vw, 6.5rem);
+  font-size: clamp(3.2rem, 5.5vw, 6rem);
   color: #fff;
-  line-height: 1.0;
-  margin-bottom: 0.3rem;
-  position: relative;
-  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.28);
+  line-height: 0.95;
+  margin-bottom: 1.1rem;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.25);
 }
 
-/* Event name — gold italic below "Thank You" */
+/* Event name — gold italic */
 .heroEventName {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(1.1rem, 2.8vw, 1.55rem);
+  font-size: clamp(0.9rem, 1.4vw, 1.25rem);
   color: #e8c060;
   font-style: italic;
   margin-bottom: 0.55rem;
-  position: relative;
   letter-spacing: 0.01em;
 }
 
 .heroDate {
-  font-size: 0.85rem;
-  color: rgba(255, 220, 160, 0.65);
-  position: relative;
+  font-size: 0.8rem;
+  color: rgba(255, 220, 160, 0.6);
   font-style: italic;
   letter-spacing: 0.04em;
 }
 
-/* ─── Main ──────────────────────────────────────────────────── */
-.main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 4rem 2rem 5rem;
+.heroScrollHint {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 220, 140, 0.38);
+  padding-bottom: 1.5rem;
+  z-index: 1;
 }
 
-/* ─── 1. Thank You Letter ───────────────────────────────────── */
-.letterSection {
-  max-width: 660px;
-  margin: 0 auto 5rem;
+/* ── Frame 2: cream + letter ──────────────────────────────── */
+.heroCenter {
+  background: #fdf5e9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4.5rem 3rem;
+}
+
+.letterContent {
+  max-width: 380px;
+  width: 100%;
   text-align: center;
-  padding: 3rem 3rem 2.5rem;
-  background: #fffdf5;
-  border-radius: 18px;
-  border: 1px solid rgba(201, 148, 26, 0.2);
-  box-shadow:
-    0 0 0 5px rgba(253, 245, 233, 1),
-    0 0 0 6px rgba(201, 148, 26, 0.1),
-    0 8px 32px rgba(107, 26, 26, 0.08);
+}
+
+/* ── Frame 3: cover image / photo visual ─────────────────── */
+.heroRight {
   position: relative;
+  overflow: hidden;
+  background: linear-gradient(155deg, #3a0e0e 0%, #6b2a10 100%);
 }
 
-/* Warm gold top border strip on letter card */
-.letterSection::before {
-  content: "";
+.heroRightImg {
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, transparent, #c9941a 25%, #e8c060 50%, #c9941a 75%, transparent);
-  border-radius: 18px 18px 0 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
-/* Large decorative open quote */
+/* Dark gradient overlay so badge text is readable */
+.heroRightOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 50%,
+    rgba(30, 10, 0, 0.6) 100%
+  );
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 2rem;
+}
+
+.heroRightBadge {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255, 220, 160, 0.85);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(201, 148, 26, 0.4);
+  padding: 0.35rem 0.9rem;
+  border-radius: 20px;
+  backdrop-filter: blur(4px);
+}
+
+/* Empty state for frame 3 */
+.heroRightEmpty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: rgba(201, 148, 26, 0.5);
+  font-size: 3rem;
+}
+
+.heroRightEmpty p {
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-family: "Outfit", sans-serif;
+  color: rgba(201, 148, 26, 0.4);
+}
+
+/* Large decorative open-quote */
 .letterOpenQuote {
   font-family: "DM Serif Display", serif;
   font-size: 5.5rem;
-  color: rgba(201, 148, 26, 0.14);
-  line-height: 0.45;
+  color: rgba(201, 148, 26, 0.13);
+  line-height: 0.4;
   display: block;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   user-select: none;
 }
 
 .letterText {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  font-size: clamp(1rem, 1.6vw, 1.25rem);
   line-height: 1.95;
   color: #3a1800;
   font-style: italic;
-  margin: 0 0 1.75rem;
+  margin: 0 0 2rem;
 }
 
 .letterSig {
   font-size: 0.875rem;
   color: #7a5a3a;
   font-style: italic;
-  border-top: 1px solid rgba(201, 148, 26, 0.15);
+  border-top: 1px solid rgba(201, 148, 26, 0.18);
   padding-top: 1.25rem;
-  margin-top: 0.25rem;
 }
 
 .letterSig strong {
@@ -185,13 +286,20 @@
   font-size: 1.4rem;
   color: #c9941a;
   font-style: normal;
-  margin-top: 0.2rem;
+  margin-top: 0.25rem;
+}
+
+/* ─── Main (everything below the split) ─────────────────────── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 5rem 2rem 5rem;
 }
 
 /* ─── Section headings (shared) ─────────────────────────────── */
 .sectionHeading {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  font-size: clamp(1.5rem, 3vw, 2rem);
   color: #2a1200;
   text-align: center;
   margin-bottom: 0.35rem;
@@ -215,7 +323,7 @@
   margin-bottom: 1.75rem;
 }
 
-/* ─── 2. Photo Polaroid Strip ───────────────────────────────── */
+/* ─── Photo Polaroid Strip ──────────────────────────────────── */
 .stripSection {
   margin-bottom: 5rem;
 }
@@ -237,7 +345,6 @@
   border-radius: 2px;
 }
 
-/* Polaroid photo card */
 .polaroid {
   flex-shrink: 0;
   width: 190px;
@@ -245,14 +352,13 @@
   padding: 8px 8px 38px;
   box-shadow:
     0 4px 14px rgba(107, 26, 26, 0.16),
-    0 1px 4px rgba(107, 26, 26, 0.1);
+    0 1px 4px rgba(107, 26, 26, 0.08);
   cursor: pointer;
   scroll-snap-align: start;
   position: relative;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* Alternating gentle rotations */
 .polaroid:nth-child(1) { transform: rotate(-2.2deg); }
 .polaroid:nth-child(2) { transform: rotate(1.8deg); }
 .polaroid:nth-child(3) { transform: rotate(-0.8deg); }
@@ -274,7 +380,7 @@
 }
 
 .polaroidCaption {
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   text-align: center;
   color: #7a5a3a;
   margin: 0.55rem 0 0;
@@ -310,7 +416,7 @@
   border-color: #c9941a;
 }
 
-/* ─── 3. Album Cards ────────────────────────────────────────── */
+/* ─── Album Cards ───────────────────────────────────────────── */
 .albumSection {
   margin-bottom: 5rem;
 }
@@ -319,7 +425,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 1.25rem;
-  margin-top: 0.25rem;
 }
 
 .albumCard {
@@ -353,7 +458,7 @@
   align-items: center;
   justify-content: center;
   font-size: 2.5rem;
-  background: linear-gradient(135deg, #c9511b 0%, #c9941a 100%);
+  background: linear-gradient(135deg, #c9511b, #c9941a);
 }
 
 .albumInfo {
@@ -392,7 +497,7 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
   max-width: 540px;
-  margin: 1.5rem auto 1.5rem;
+  margin: 1.5rem auto;
 }
 
 .placeholderCard {
@@ -410,14 +515,6 @@
 .placeholderCard:nth-child(2) { background: linear-gradient(135deg, #c9511b, #9b3a10); }
 .placeholderCard:nth-child(3) { background: linear-gradient(135deg, #c9941a, #8b6010); }
 
-.placeholderCard::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 65%);
-  pointer-events: none;
-}
-
 .placeholderMessage {
   font-size: 0.95rem;
   color: #7a5a3a;
@@ -431,14 +528,14 @@
   border: 1px solid rgba(201, 148, 26, 0.18);
 }
 
-/* ─── 4. Invite Snapshot Card ───────────────────────────────── */
+/* ─── Invite Snapshot ───────────────────────────────────────── */
 .snapSection {
   margin-bottom: 3rem;
 }
 
 .snapLabel {
   text-align: center;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: #7a5a3a;
@@ -454,14 +551,12 @@
   overflow: hidden;
   box-shadow:
     0 0 0 5px rgba(201, 148, 26, 0.07),
-    0 8px 32px rgba(107, 26, 26, 0.13);
+    0 8px 32px rgba(107, 26, 26, 0.12);
   transform: rotate(-0.6deg);
   transition: transform 0.3s;
 }
 
-.snapCard:hover {
-  transform: rotate(0deg);
-}
+.snapCard:hover { transform: rotate(0deg); }
 
 .snapCover {
   width: 100%;
@@ -490,9 +585,7 @@
   color: #5a3a1a;
 }
 
-.snapMetaIcon {
-  margin-right: 0.4rem;
-}
+.snapMetaIcon { margin-right: 0.4rem; }
 
 .snapHost {
   margin-top: 0.9rem;
@@ -531,9 +624,7 @@
   font-size: 0.8rem;
 }
 
-.footerLinks a:hover {
-  text-decoration: underline;
-}
+.footerLinks a:hover { text-decoration: underline; }
 
 /* ─── Lightbox ───────────────────────────────────────────────── */
 .lightbox {
@@ -556,8 +647,7 @@
 
 .lightboxClose {
   position: absolute;
-  top: 1.25rem;
-  right: 1.5rem;
+  top: 1.25rem; right: 1.5rem;
   background: none;
   border: none;
   color: rgba(255, 220, 160, 0.8);
@@ -577,8 +667,7 @@
   background: rgba(201, 148, 26, 0.2);
   border: 1px solid rgba(201, 148, 26, 0.4);
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  width: 50px; height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -591,7 +680,6 @@
 
 .lightboxNav:hover:not(:disabled) { background: rgba(201, 148, 26, 0.4); }
 .lightboxNav:disabled { opacity: 0.3; cursor: not-allowed; }
-
 .lightboxPrev { left: 1.25rem; }
 .lightboxNext { right: 1.25rem; }
 
@@ -607,37 +695,63 @@
 }
 
 /* ─── Responsive ─────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .hero { padding: 3.5rem 1.5rem 3rem; }
-
-  .main { padding: 2.5rem 1.25rem 4rem; }
-
-  .letterSection {
-    padding: 2.25rem 1.5rem 2rem;
-    margin-bottom: 3.5rem;
+@media (max-width: 1024px) {
+  /* 2 columns on tablet: drop frame 3 below */
+  .heroSplit {
+    grid-template-columns: 1fr 1fr;
+    min-height: unset;
   }
 
-  .letterOpenQuote { font-size: 4rem; }
+  .heroRight {
+    grid-column: 1 / -1;
+    min-height: 40vw;
+    max-height: 50vw;
+  }
 
-  .stripSection { margin-bottom: 3.5rem; }
+  .heroScrollHint { display: none; }
+}
 
-  .polaroid { width: 155px; }
+@media (max-width: 700px) {
+  /* Single column on mobile */
+  .heroSplit {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
 
-  .albumSection { margin-bottom: 3.5rem; }
+  .heroLeft {
+    padding: 4rem 2rem 3rem;
+    min-height: 60vw;
+  }
 
-  .snapCard { transform: none; }
+  .heroLeft::after,
+  .heroCenter::after { display: none; }
+
+  .heroCenter {
+    padding: 3rem 1.75rem;
+  }
+
+  .heroRight {
+    grid-column: auto;
+    min-height: 55vw;
+    max-height: 65vw;
+  }
+
+  .letterContent { max-width: 100%; }
+
+  .heroTitle { font-size: clamp(3rem, 14vw, 4.5rem); }
+
+  .main { padding: 3.5rem 1.25rem 4rem; }
+
+  .polaroid { width: 150px; }
 
   .placeholderGrid {
     grid-template-columns: 1fr;
     max-width: 200px;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .lightboxNav { width: 40px; height: 40px; font-size: 1.2rem; }
   .lightboxPrev { left: 0.5rem; }
   .lightboxNext { right: 0.5rem; }
-}
-
-@media (max-width: 480px) {
-  .heroTitle { font-size: clamp(3rem, 16vw, 4.5rem); }
-  .polaroid { width: 140px; }
 }
