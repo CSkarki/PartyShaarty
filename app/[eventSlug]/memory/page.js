@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { unstable_noStore } from "next/cache";
 import { createSupabaseAdminClient } from "../../../lib/supabase-server";
 import { listPhotosInAlbum } from "../../../lib/supabase";
 import { listAlbumsByEvent } from "../../../lib/gallery-store";
@@ -46,6 +47,7 @@ function isEventInFuture(eventDate) {
 }
 
 export default async function MemoryPageRoute({ params }) {
+  unstable_noStore(); // ensure no cache — DB updates (event_name, event_message, display_name) show immediately
   const { eventSlug } = params;
   const admin = createSupabaseAdminClient();
 
@@ -54,6 +56,14 @@ export default async function MemoryPageRoute({ params }) {
     .single();
 
   if (!event) notFound();
+
+  if (process.env.NODE_ENV === "development") {
+    console.log("[memory/page] event from DB:", {
+      event_name: event.event_name,
+      event_message: event.event_message?.slice(0, 50) + (event.event_message?.length > 50 ? "…" : ""),
+      display_name: event.display_name,
+    });
+  }
 
   // Only redirect to invite if the event is clearly in the future.
   // Past events, no-date events, and unparseable dates all show the memory page.

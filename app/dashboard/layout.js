@@ -6,8 +6,14 @@ export const metadata = {
 };
 
 export default async function DashboardLayout({ children }) {
-  const supabase = createSupabaseServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/auth/login");
+  let user = null;
+  try {
+    const supabase = createSupabaseServerClient();
+    const { data: { user: u } } = await supabase.auth.getUser();
+    user = u;
+  } catch {
+    // Invalid/expired session (e.g. refresh token not found)
+  }
+  if (!user) redirect("/auth/login?next=/dashboard");
   return <>{children}</>;
 }
