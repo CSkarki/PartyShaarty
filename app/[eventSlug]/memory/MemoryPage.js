@@ -5,39 +5,34 @@ import styles from "./memory.module.css";
 
 export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }) {
   const [photos] = useState(initialPhotos || []);
-  const [activeAlbum, setActiveAlbum] = useState("all");
   const [lightboxIdx, setLightboxIdx] = useState(null);
   const [coverImgError, setCoverImgError] = useState(false);
 
-  // Unique albums (name + id) from photos
+  // Derive album details from photos
   const albumMap = photos.reduce((acc, p) => {
     if (p.albumName && p.albumId && !acc[p.albumName]) acc[p.albumName] = p.albumId;
     return acc;
   }, {});
-  const albums = Object.keys(albumMap);
 
-  // Filtered photos based on selected album chip
-  const filtered =
-    activeAlbum === "all"
-      ? photos
-      : photos.filter((p) => p.albumName === activeAlbum);
+  const albumDetails = Object.entries(albumMap).map(([name, id]) => ({
+    name,
+    id,
+    thumbnail: photos.find((p) => p.albumId === id)?.url,
+    count: photos.filter((p) => p.albumId === id).length,
+  }));
 
-  // Reset lightbox if out-of-range after filter change
-  useEffect(() => {
-    if (lightboxIdx !== null && lightboxIdx >= filtered.length) {
-      setLightboxIdx(filtered.length > 0 ? filtered.length - 1 : null);
-    }
-  }, [filtered.length, lightboxIdx]);
+  // First 6 photos for the polaroid strip
+  const stripPhotos = photos.slice(0, 6);
 
   // Keyboard navigation for lightbox
   const handleKeyDown = useCallback(
     (e) => {
       if (lightboxIdx === null) return;
       if (e.key === "ArrowLeft") setLightboxIdx((i) => Math.max(0, i - 1));
-      if (e.key === "ArrowRight") setLightboxIdx((i) => Math.min(filtered.length - 1, i + 1));
+      if (e.key === "ArrowRight") setLightboxIdx((i) => Math.min(photos.length - 1, i + 1));
       if (e.key === "Escape") setLightboxIdx(null);
     },
-    [lightboxIdx, filtered.length]
+    [lightboxIdx, photos.length]
   );
 
   useEffect(() => {
@@ -45,7 +40,6 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  // Lock body scroll when lightbox is open
   useEffect(() => {
     document.body.style.overflow = lightboxIdx !== null ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
@@ -56,172 +50,169 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
   return (
     <div className={styles.page}>
 
-      {/* ── Nav ──────────────────────────────────── */}
+      {/* ── Nav ─────────────────────────────────────────── */}
       <nav className={styles.nav}>
         <div className={styles.navInner}>
           <a href="/" className={styles.navBrand}>Utsavé</a>
-          {event.event_name && (
-            <span className={styles.navEventName}>{event.event_name}</span>
-          )}
         </div>
       </nav>
 
-      {/* ── Hero Banner ───────────────────────────── */}
+      {/* ── Hero ────────────────────────────────────────── */}
       <div className={styles.hero}>
         <div className={styles.heroOrnament}>✦ ❁ ✦</div>
         <p className={styles.heroLabel}>With Grateful Hearts</p>
         <h1 className={styles.heroTitle}>Thank You</h1>
-        <p className={styles.heroSubtitle}>
-          for celebrating{event.event_name ? <> <em>{event.event_name}</em></> : " with us"}
-        </p>
+        {event.event_name && (
+          <p className={styles.heroEventName}>{event.event_name}</p>
+        )}
         {event.event_date && (
           <p className={styles.heroDate}>{event.event_date}</p>
         )}
         <div className={styles.heroBorderBottom} />
       </div>
 
-      {/* ── Main Content ──────────────────────────── */}
+      {/* ── Main ────────────────────────────────────────── */}
       <main className={styles.main}>
 
-        {/* ── Thank You Section ─────────────────── */}
-        <section className={styles.thankYouSection}>
-
-          <div className={styles.thankYouOrnamentRow}>
-            <span className={styles.thankYouLine} />
-            <span className={styles.thankYouOrnamentGlyph}>❁</span>
-            <span className={styles.thankYouLine} />
-          </div>
-
-          <p className={styles.thankYouPreamble}>
-            Your presence was our greatest gift
+        {/* ── 1. THANK YOU LETTER ─────────────────────── */}
+        <section className={styles.letterSection}>
+          <span className={styles.letterOpenQuote}>&ldquo;</span>
+          <p className={styles.letterText}>
+            {event.event_message ||
+              "Every laugh shared, every blessing given, every warm presence you brought — we carry it all in our hearts. Thank you for making this day so beautifully unforgettable."}
           </p>
-
-          {hasCover && (
-            <div className={styles.thankYouCoverWrap}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={coverUrl}
-                alt={event.event_name || "Celebration"}
-                className={styles.thankYouCover}
-                onError={() => setCoverImgError(true)}
-              />
-            </div>
-          )}
-
-          {event.event_message ? (
-            <blockquote className={styles.thankYouQuote}>
-              <span className={styles.thankYouQuoteMarkOpen}>&ldquo;</span>
-              {event.event_message}
-              <span className={styles.thankYouQuoteMarkClose}>&rdquo;</span>
-            </blockquote>
-          ) : (
-            <p className={styles.thankYouDefault}>
-              Every laugh, every blessing, every moment of joy you brought — we carry
-              it in our hearts. Thank you for making this day so deeply memorable.
-            </p>
-          )}
-
-          {(event.event_date || event.event_location) && (
-            <div className={styles.thankYouMeta}>
-              {event.event_date && (
-                <div className={styles.thankYouMetaItem}>
-                  <span className={styles.thankYouMetaIcon}>📅</span>
-                  <span>{event.event_date}</span>
-                </div>
-              )}
-              {event.event_location && (
-                <div className={styles.thankYouMetaItem}>
-                  <span className={styles.thankYouMetaIcon}>📍</span>
-                  <span>{event.event_location}</span>
-                </div>
-              )}
-            </div>
-          )}
-
           {event.display_name && (
-            <p className={styles.thankYouSig}>
+            <p className={styles.letterSig}>
               With love &amp; gratitude,
               <strong>{event.display_name}</strong>
             </p>
           )}
-
-          <div className={styles.thankYouDivider}>
-            <span>✦</span>
-          </div>
-
         </section>
 
-        {/* ── Photo Memories ───────────────────── */}
-        <h2 className={styles.sectionHeading}>Our Cherished Memories</h2>
+        {/* ── 2. PHOTO POLAROID STRIP ─────────────────── */}
+        {photos.length > 0 && (
+          <section className={styles.stripSection}>
+            <h2 className={styles.sectionHeading}>Glimpses of Joy</h2>
+            <p className={styles.sectionSubtitle}>A few frames from that beautiful day</p>
 
-        {photos.length === 0 ? (
-          /* ── Empty state ── */
-          <>
-            <p className={styles.sectionSubtitle}>The photos are being curated with love…</p>
-            <div className={styles.placeholderGrid}>
-              <div className={styles.placeholderCard}>
-                <span className={styles.placeholderCardIcon}>📷</span>
-              </div>
-              <div className={styles.placeholderCard}>
-                <span className={styles.placeholderCardIcon}>🌸</span>
-              </div>
-              <div className={styles.placeholderCard}>
-                <span className={styles.placeholderCardIcon}>✨</span>
-              </div>
-            </div>
-            <p className={styles.placeholderMessage}>
-              Every beautiful moment captured that day will be shared here.
-              <br />
-              Come back soon to relive the memories together.
-            </p>
-          </>
-        ) : (
-          /* ── Photo grid ── */
-          <>
-            <p className={styles.sectionSubtitle}>
-              {photos.length} {photos.length === 1 ? "memory" : "memories"} from this beautiful day
-              {albums.length > 1 ? `, across ${albums.length} albums` : ""}
-            </p>
-
-            {albums.length > 1 && (
-              <div className={styles.filterChips}>
-                <button
-                  className={`${styles.filterChip} ${activeAlbum === "all" ? styles.filterChipActive : ""}`}
-                  onClick={() => setActiveAlbum("all")}
-                >
-                  All
-                </button>
-                {albums.map((album) => (
-                  <a
-                    key={album}
-                    href={`/${eventSlug}/gallery?album=${albumMap[album]}`}
-                    className={`${styles.filterChip} ${activeAlbum === album ? styles.filterChipActive : ""}`}
-                  >
-                    {album}
-                  </a>
-                ))}
-              </div>
-            )}
-
-            <div className={styles.masonryGrid}>
-              {filtered.map((photo, idx) => (
+            <div className={styles.stripScroll}>
+              {stripPhotos.map((photo, idx) => (
                 <div
                   key={`${photo.url}-${idx}`}
-                  className={styles.masonryItem}
+                  className={styles.polaroid}
                   onClick={() => setLightboxIdx(idx)}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={photo.url} alt={photo.albumName} />
-                  <div className={styles.masonryOverlay}>{photo.albumName}</div>
+                  <p className={styles.polaroidCaption}>{photo.albumName}</p>
                 </div>
               ))}
             </div>
-          </>
+
+            <div className={styles.stripCta}>
+              <a href={`/${eventSlug}/gallery`} className={styles.stripLink}>
+                View all {photos.length} memories &rarr;
+              </a>
+            </div>
+          </section>
         )}
+
+        {/* ── 3. ALBUM CARDS ──────────────────────────── */}
+        {albumDetails.length > 0 && (
+          <section className={styles.albumSection}>
+            <h2 className={styles.sectionHeading}>Browse the Albums</h2>
+            <p className={styles.sectionSubtitle}>Curated collections from the celebration</p>
+
+            <div className={styles.albumGrid}>
+              {albumDetails.map((album) => (
+                <a
+                  key={album.id}
+                  href={`/${eventSlug}/gallery?album=${album.id}`}
+                  className={styles.albumCard}
+                >
+                  {album.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={album.thumbnail}
+                      alt={album.name}
+                      className={styles.albumThumb}
+                    />
+                  ) : (
+                    <div className={styles.albumThumbEmpty}>📷</div>
+                  )}
+                  <div className={styles.albumInfo}>
+                    <div className={styles.albumName}>
+                      {album.name}
+                      <span className={styles.albumArrow}>&rarr;</span>
+                    </div>
+                    <div className={styles.albumCount}>
+                      {album.count} {album.count === 1 ? "photo" : "photos"}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Empty state ─────────────────────────────── */}
+        {photos.length === 0 && (
+          <section className={styles.emptySection}>
+            <h2 className={styles.sectionHeading}>Memories Coming Soon</h2>
+            <div className={styles.placeholderGrid}>
+              <div className={styles.placeholderCard}><span>📷</span></div>
+              <div className={styles.placeholderCard}><span>🌸</span></div>
+              <div className={styles.placeholderCard}><span>✨</span></div>
+            </div>
+            <p className={styles.placeholderMessage}>
+              Every beautiful moment captured that day will be shared here.
+              <br />Come back soon to relive the memories together.
+            </p>
+          </section>
+        )}
+
+        {/* ── 4. INVITE SNAPSHOT ──────────────────────── */}
+        <section className={styles.snapSection}>
+          <p className={styles.snapLabel}>✦ &nbsp; You Were There &nbsp; ✦</p>
+
+          <div className={styles.snapCard}>
+            {hasCover && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={coverUrl}
+                alt={event.event_name || "Event"}
+                className={styles.snapCover}
+                onError={() => setCoverImgError(true)}
+              />
+            )}
+            <div className={styles.snapDetails}>
+              {event.event_name && (
+                <h3 className={styles.snapEventName}>{event.event_name}</h3>
+              )}
+              <div className={styles.snapMeta}>
+                {event.event_date && (
+                  <div>
+                    <span className={styles.snapMetaIcon}>📅</span>
+                    {event.event_date}
+                  </div>
+                )}
+                {event.event_location && (
+                  <div>
+                    <span className={styles.snapMetaIcon}>📍</span>
+                    {event.event_location}
+                  </div>
+                )}
+              </div>
+              {event.display_name && (
+                <p className={styles.snapHost}>Hosted by {event.display_name}</p>
+              )}
+            </div>
+          </div>
+        </section>
 
       </main>
 
-      {/* ── Footer ───────────────────────────────── */}
+      {/* ── Footer ──────────────────────────────────────── */}
       <footer className={styles.footer}>
         <div className={styles.footerHeart}>♥</div>
         <p className={styles.footerText}>A memory preserved with love, on Utsavé</p>
@@ -230,8 +221,8 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
         </div>
       </footer>
 
-      {/* ── Lightbox ──────────────────────────────── */}
-      {lightboxIdx !== null && filtered[lightboxIdx] && (
+      {/* ── Lightbox ────────────────────────────────────── */}
+      {lightboxIdx !== null && photos[lightboxIdx] && (
         <div
           className={styles.lightbox}
           onClick={(e) => { if (e.target === e.currentTarget) setLightboxIdx(null); }}
@@ -246,31 +237,31 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={filtered[lightboxIdx].url}
-            alt={filtered[lightboxIdx].albumName}
+            src={photos[lightboxIdx].url}
+            alt={photos[lightboxIdx].albumName}
             className={styles.lightboxImg}
           />
 
-          {filtered.length > 1 && (
+          {photos.length > 1 && (
             <>
               <button
                 className={`${styles.lightboxNav} ${styles.lightboxPrev}`}
                 onClick={() => setLightboxIdx((i) => Math.max(0, i - 1))}
                 disabled={lightboxIdx === 0}
-                aria-label="Previous photo"
+                aria-label="Previous"
               >‹</button>
               <button
                 className={`${styles.lightboxNav} ${styles.lightboxNext}`}
-                onClick={() => setLightboxIdx((i) => Math.min(filtered.length - 1, i + 1))}
-                disabled={lightboxIdx === filtered.length - 1}
-                aria-label="Next photo"
+                onClick={() => setLightboxIdx((i) => Math.min(photos.length - 1, i + 1))}
+                disabled={lightboxIdx === photos.length - 1}
+                aria-label="Next"
               >›</button>
             </>
           )}
 
           <div className={styles.lightboxInfo}>
-            {filtered[lightboxIdx].albumName}&nbsp;·&nbsp;
-            {lightboxIdx + 1} / {filtered.length}
+            {photos[lightboxIdx].albumName}&nbsp;·&nbsp;
+            {lightboxIdx + 1} / {photos.length}
           </div>
         </div>
       )}

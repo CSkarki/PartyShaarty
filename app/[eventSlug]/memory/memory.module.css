@@ -1,4 +1,4 @@
-/* ─── Base Page ────────────────────────────────────────────── */
+/* ─── Page ──────────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
   background: #fdf5e9;
@@ -6,16 +6,16 @@
   font-family: "Outfit", sans-serif;
 }
 
-/* ─── Nav ──────────────────────────────────────────────────── */
+/* ─── Nav ───────────────────────────────────────────────────── */
 .nav {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(253, 245, 233, 0.92);
+  background: rgba(253, 245, 233, 0.93);
   backdrop-filter: blur(8px);
-  border-bottom: 1px solid rgba(201, 148, 26, 0.2);
+  border-bottom: 1px solid rgba(201, 148, 26, 0.18);
   padding: 0 2rem;
-  height: 56px;
+  height: 54px;
   display: flex;
   align-items: center;
 }
@@ -24,27 +24,17 @@
   max-width: 1100px;
   margin: 0 auto;
   width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 .navBrand {
   font-family: "DM Serif Display", serif;
-  font-size: 1.35rem;
+  font-size: 1.3rem;
   color: #c9941a;
   text-decoration: none;
   letter-spacing: 0.02em;
 }
 
-.navEventName {
-  font-size: 0.78rem;
-  color: #7a5a3a;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-/* ─── Hero Banner ──────────────────────────────────────────── */
+/* ─── Hero ──────────────────────────────────────────────────── */
 .hero {
   position: relative;
   background: linear-gradient(135deg, #6b1a1a 0%, #9b3a10 50%, #c9511b 100%);
@@ -53,294 +43,167 @@
   overflow: hidden;
 }
 
-/* Bokeh background */
 .hero::before {
   content: "";
   position: absolute;
   inset: 0;
   background:
     radial-gradient(ellipse 60% 50% at 20% 30%, rgba(201, 148, 26, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 80% 70%, rgba(255, 255, 255, 0.07) 0%, transparent 50%),
-    radial-gradient(ellipse 30% 30% at 50% 10%, rgba(224, 123, 16, 0.22) 0%, transparent 50%);
+    radial-gradient(ellipse 40% 40% at 80% 70%, rgba(255, 255, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 30% 30% at 50% 10%, rgba(224, 123, 16, 0.2) 0%, transparent 50%);
   pointer-events: none;
 }
 
-/* Gold border top */
+/* Gold top border */
 .hero::after {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   height: 4px;
   background: linear-gradient(90deg, transparent, #c9941a 20%, #e8c060 50%, #c9941a 80%, transparent);
 }
 
 .heroBorderBottom {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 0; left: 0; right: 0;
   height: 4px;
   background: linear-gradient(90deg, transparent, #c9941a 20%, #e8c060 50%, #c9941a 80%, transparent);
 }
 
 .heroOrnament {
-  font-size: 1rem;
-  letter-spacing: 0.6rem;
-  color: rgba(255, 215, 120, 0.75);
+  font-size: 0.9rem;
+  letter-spacing: 0.65rem;
+  color: rgba(255, 215, 120, 0.7);
   margin-bottom: 0.75rem;
   position: relative;
 }
 
 .heroLabel {
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   text-transform: uppercase;
-  letter-spacing: 0.28em;
-  color: rgba(255, 220, 140, 0.8);
-  margin-bottom: 0.75rem;
+  letter-spacing: 0.3em;
+  color: rgba(255, 220, 140, 0.75);
+  margin-bottom: 0.6rem;
   position: relative;
 }
 
-/* "Thank You" — big, warm, impactful */
+/* "Thank You" — large, impactful */
 .heroTitle {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-size: clamp(3.8rem, 11vw, 6.5rem);
   color: #fff;
   line-height: 1.0;
   margin-bottom: 0.3rem;
   position: relative;
-  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
-  letter-spacing: -0.01em;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.28);
 }
 
-/* "for celebrating [Event Name]" */
-.heroSubtitle {
-  font-family: "Outfit", sans-serif;
-  font-size: clamp(1rem, 2.8vw, 1.45rem);
-  color: rgba(255, 220, 160, 0.9);
-  margin-bottom: 0.75rem;
-  position: relative;
-  font-weight: 300;
-}
-
-.heroSubtitle em {
-  font-style: normal;
+/* Event name — gold italic below "Thank You" */
+.heroEventName {
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(1.1rem, 2.8vw, 1.55rem);
   color: #e8c060;
-  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 0.55rem;
+  position: relative;
+  letter-spacing: 0.01em;
 }
 
 .heroDate {
-  font-size: 0.92rem;
-  color: rgba(255, 220, 160, 0.75);
+  font-size: 0.85rem;
+  color: rgba(255, 220, 160, 0.65);
   position: relative;
   font-style: italic;
   letter-spacing: 0.04em;
 }
 
-/* ─── Main Content ─────────────────────────────────────────── */
+/* ─── Main ──────────────────────────────────────────────────── */
 .main {
   max-width: 1100px;
   margin: 0 auto;
   padding: 4rem 2rem 5rem;
 }
 
-/* ─── Thank You Section ─────────────────────────────────────── */
-.thankYouSection {
-  max-width: 720px;
+/* ─── 1. Thank You Letter ───────────────────────────────────── */
+.letterSection {
+  max-width: 660px;
   margin: 0 auto 5rem;
   text-align: center;
-}
-
-/* Ornamental divider row: ── ❁ ── */
-.thankYouOrnamentRow {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 2rem;
-}
-
-.thankYouLine {
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 148, 26, 0.45), transparent);
-}
-
-.thankYouOrnamentGlyph {
-  font-size: 1.6rem;
-  color: #c9941a;
-  flex-shrink: 0;
-  line-height: 1;
-}
-
-/* "Your presence was our greatest gift" */
-.thankYouPreamble {
-  font-family: "DM Serif Display", serif;
-  font-size: clamp(1.3rem, 3vw, 1.85rem);
-  color: #c9941a;
-  font-style: italic;
-  margin-bottom: 2.25rem;
-  line-height: 1.35;
-}
-
-/* Cover image — framed like a precious keepsake photo */
-.thankYouCoverWrap {
-  margin: 0 auto 2.5rem;
-  max-width: 560px;
-  border-radius: 10px;
-  overflow: hidden;
+  padding: 3rem 3rem 2.5rem;
+  background: #fffdf5;
+  border-radius: 18px;
+  border: 1px solid rgba(201, 148, 26, 0.2);
   box-shadow:
-    0 0 0 4px rgba(201, 148, 26, 0.22),
-    0 0 0 8px rgba(201, 148, 26, 0.07),
-    0 10px 40px rgba(107, 26, 26, 0.22);
-  transform: rotate(0.5deg);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.thankYouCoverWrap:hover {
-  transform: rotate(0deg) scale(1.01);
-  box-shadow:
-    0 0 0 4px rgba(201, 148, 26, 0.35),
-    0 0 0 8px rgba(201, 148, 26, 0.1),
-    0 14px 50px rgba(107, 26, 26, 0.28);
-}
-
-.thankYouCover {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 420px;
-  object-fit: cover;
-}
-
-/* Event message — blockquote thank-you note */
-.thankYouQuote {
-  margin: 0 0 2rem;
-  padding: 1.5rem 2rem 1.5rem 1.75rem;
-  background: rgba(201, 148, 26, 0.06);
-  border-left: 3px solid rgba(201, 148, 26, 0.55);
-  border-radius: 0 12px 12px 0;
-  text-align: left;
-  font-size: 1rem;
-  line-height: 1.85;
-  color: #5a3a1a;
-  font-style: italic;
+    0 0 0 5px rgba(253, 245, 233, 1),
+    0 0 0 6px rgba(201, 148, 26, 0.1),
+    0 8px 32px rgba(107, 26, 26, 0.08);
   position: relative;
 }
 
-.thankYouQuoteMarkOpen {
-  font-family: "DM Serif Display", serif;
-  font-size: 2.4rem;
-  color: rgba(201, 148, 26, 0.5);
-  line-height: 0;
-  vertical-align: -0.45em;
-  margin-right: 0.2em;
-  display: inline-block;
-  font-style: normal;
+/* Warm gold top border strip on letter card */
+.letterSection::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #c9941a 25%, #e8c060 50%, #c9941a 75%, transparent);
+  border-radius: 18px 18px 0 0;
 }
 
-.thankYouQuoteMarkClose {
+/* Large decorative open quote */
+.letterOpenQuote {
   font-family: "DM Serif Display", serif;
-  font-size: 2.4rem;
-  color: rgba(201, 148, 26, 0.5);
-  line-height: 0;
-  vertical-align: -0.45em;
-  margin-left: 0.15em;
-  display: inline-block;
-  font-style: normal;
+  font-size: 5.5rem;
+  color: rgba(201, 148, 26, 0.14);
+  line-height: 0.45;
+  display: block;
+  margin-bottom: 1.25rem;
+  user-select: none;
 }
 
-/* Default thank-you text when no event_message */
-.thankYouDefault {
-  font-size: 1.05rem;
-  line-height: 1.85;
-  color: #5a3a1a;
+.letterText {
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+  line-height: 1.95;
+  color: #3a1800;
   font-style: italic;
-  margin-bottom: 2rem;
-  padding: 1.5rem 2rem;
-  background: rgba(201, 148, 26, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(201, 148, 26, 0.18);
+  margin: 0 0 1.75rem;
 }
 
-/* Date + Venue pills */
-.thankYouMeta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem 2rem;
-  justify-content: center;
-  margin-bottom: 2.25rem;
-  padding: 1.25rem 1.5rem;
-  background: rgba(201, 148, 26, 0.05);
-  border-radius: 12px;
-  border: 1px solid rgba(201, 148, 26, 0.15);
-}
-
-.thankYouMetaItem {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.92rem;
-  color: #5a3a1a;
-}
-
-.thankYouMetaIcon {
-  font-size: 1.05rem;
-  flex-shrink: 0;
-}
-
-/* "With love & gratitude, Host Name" signature */
-.thankYouSig {
-  font-size: 0.95rem;
+.letterSig {
+  font-size: 0.875rem;
   color: #7a5a3a;
   font-style: italic;
-  line-height: 1.5;
-  margin-bottom: 2.5rem;
+  border-top: 1px solid rgba(201, 148, 26, 0.15);
+  padding-top: 1.25rem;
+  margin-top: 0.25rem;
 }
 
-.thankYouSig strong {
+.letterSig strong {
   display: block;
   font-family: "DM Serif Display", serif;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   color: #c9941a;
   font-style: normal;
-  margin-top: 0.25rem;
-  letter-spacing: 0.01em;
+  margin-top: 0.2rem;
 }
 
-/* Bottom divider ── ✦ ── */
-.thankYouDivider {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  color: rgba(201, 148, 26, 0.5);
-  font-size: 1.1rem;
-}
-
-.thankYouDivider::before,
-.thankYouDivider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 148, 26, 0.35), transparent);
-}
-
-/* ─── Section Heading (Photos) ─────────────────────────────── */
+/* ─── Section headings (shared) ─────────────────────────────── */
 .sectionHeading {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
   color: #2a1200;
   text-align: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.35rem;
 }
 
 .sectionHeading::after {
   content: "";
   display: block;
-  width: 60px;
+  width: 48px;
   height: 3px;
   background: linear-gradient(90deg, #c9941a, #e8c060);
-  margin: 0.6rem auto 0;
+  margin: 0.5rem auto 0;
   border-radius: 2px;
 }
 
@@ -348,95 +211,335 @@
   text-align: center;
   font-size: 0.875rem;
   color: #7a5a3a;
-  margin-bottom: 2rem;
-}
-
-/* ─── Album Filter Chips ────────────────────────────────────── */
-.filterChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
+  font-style: italic;
   margin-bottom: 1.75rem;
 }
 
-.filterChip {
-  display: inline-block;
-  padding: 0.35rem 0.95rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid rgba(201, 148, 26, 0.35);
+/* ─── 2. Photo Polaroid Strip ───────────────────────────────── */
+.stripSection {
+  margin-bottom: 5rem;
+}
+
+.stripScroll {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 1.25rem 0.5rem 2.5rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(201, 148, 26, 0.3) transparent;
+}
+
+.stripScroll::-webkit-scrollbar { height: 4px; }
+.stripScroll::-webkit-scrollbar-track { background: transparent; }
+.stripScroll::-webkit-scrollbar-thumb {
+  background: rgba(201, 148, 26, 0.3);
+  border-radius: 2px;
+}
+
+/* Polaroid photo card */
+.polaroid {
+  flex-shrink: 0;
+  width: 190px;
   background: #fffdf5;
-  color: #7a5a3a;
+  padding: 8px 8px 38px;
+  box-shadow:
+    0 4px 14px rgba(107, 26, 26, 0.16),
+    0 1px 4px rgba(107, 26, 26, 0.1);
   cursor: pointer;
-  font-family: inherit;
+  scroll-snap-align: start;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Alternating gentle rotations */
+.polaroid:nth-child(1) { transform: rotate(-2.2deg); }
+.polaroid:nth-child(2) { transform: rotate(1.8deg); }
+.polaroid:nth-child(3) { transform: rotate(-0.8deg); }
+.polaroid:nth-child(4) { transform: rotate(2.4deg); }
+.polaroid:nth-child(5) { transform: rotate(-1.5deg); }
+.polaroid:nth-child(6) { transform: rotate(1.0deg); }
+
+.polaroid:hover {
+  transform: rotate(0deg) scale(1.07) translateY(-6px) !important;
+  box-shadow: 0 10px 28px rgba(107, 26, 26, 0.24);
+  z-index: 2;
+}
+
+.polaroid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.polaroidCaption {
+  font-size: 0.65rem;
+  text-align: center;
+  color: #7a5a3a;
+  margin: 0.55rem 0 0;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stripCta {
+  text-align: center;
+  margin-top: 0.25rem;
+}
+
+.stripLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #c9941a;
+  font-size: 0.875rem;
+  font-weight: 500;
   text-decoration: none;
+  border: 1px solid rgba(201, 148, 26, 0.4);
+  padding: 0.55rem 1.5rem;
+  border-radius: 24px;
+  background: rgba(201, 148, 26, 0.04);
   transition: all 0.15s;
 }
 
-.filterChip:hover {
+.stripLink:hover {
+  background: rgba(201, 148, 26, 0.1);
   border-color: #c9941a;
-  color: #c9941a;
 }
 
-.filterChipActive {
-  background: rgba(201, 148, 26, 0.12);
-  border-color: #c9941a;
-  color: #c9941a;
+/* ─── 3. Album Cards ────────────────────────────────────────── */
+.albumSection {
+  margin-bottom: 5rem;
 }
 
-/* ─── Masonry Photo Grid ────────────────────────────────────── */
-.masonryGrid {
-  columns: 3;
-  column-gap: 1rem;
+.albumGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1.25rem;
+  margin-top: 0.25rem;
 }
 
-.masonryItem {
-  break-inside: avoid;
-  margin-bottom: 1rem;
-  border-radius: 10px;
+.albumCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 14px;
   overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  box-shadow: 0 2px 12px rgba(139, 69, 19, 0.1);
+  background: #fffdf5;
+  border: 1px solid rgba(201, 148, 26, 0.2);
+  box-shadow: 0 2px 10px rgba(107, 26, 26, 0.07);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.masonryItem:hover {
-  transform: scale(1.025);
-  box-shadow: 0 6px 24px rgba(139, 69, 19, 0.18);
+.albumCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(107, 26, 26, 0.15);
 }
 
-.masonryItem img {
-  display: block;
+.albumThumb {
   width: 100%;
-  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
 }
 
-.masonryOverlay {
+.albumThumbEmpty {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, #c9511b 0%, #c9941a 100%);
+}
+
+.albumInfo {
+  padding: 0.85rem 1rem 1rem;
+}
+
+.albumName {
+  font-family: "DM Serif Display", serif;
+  font-size: 1rem;
+  color: #2a1200;
+  margin-bottom: 0.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.albumArrow {
+  color: #c9941a;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.albumCount {
+  font-size: 0.78rem;
+  color: #7a5a3a;
+}
+
+/* ─── Empty State ───────────────────────────────────────────── */
+.emptySection {
+  margin-bottom: 5rem;
+  text-align: center;
+}
+
+.placeholderGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  max-width: 540px;
+  margin: 1.5rem auto 1.5rem;
+}
+
+.placeholderCard {
+  border-radius: 12px;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.placeholderCard:nth-child(1) { background: linear-gradient(135deg, #e07b10, #c9941a); }
+.placeholderCard:nth-child(2) { background: linear-gradient(135deg, #c9511b, #9b3a10); }
+.placeholderCard:nth-child(3) { background: linear-gradient(135deg, #c9941a, #8b6010); }
+
+.placeholderCard::before {
+  content: "";
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 0.45rem 0.75rem;
-  background: linear-gradient(transparent, rgba(42, 18, 0, 0.72));
-  color: rgba(255, 220, 160, 0.9);
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.placeholderMessage {
+  font-size: 0.95rem;
+  color: #7a5a3a;
+  font-style: italic;
+  line-height: 1.75;
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 1.25rem 1.5rem;
+  background: rgba(201, 148, 26, 0.07);
+  border-radius: 12px;
+  border: 1px solid rgba(201, 148, 26, 0.18);
+}
+
+/* ─── 4. Invite Snapshot Card ───────────────────────────────── */
+.snapSection {
+  margin-bottom: 3rem;
+}
+
+.snapLabel {
+  text-align: center;
   font-size: 0.7rem;
-  letter-spacing: 0.05em;
-  opacity: 0;
-  transition: opacity 0.2s;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #7a5a3a;
+  margin-bottom: 1.75rem;
 }
 
-.masonryItem:hover .masonryOverlay {
-  opacity: 1;
+.snapCard {
+  max-width: 420px;
+  margin: 0 auto;
+  background: #fffdf5;
+  border: 1px solid rgba(201, 148, 26, 0.28);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 5px rgba(201, 148, 26, 0.07),
+    0 8px 32px rgba(107, 26, 26, 0.13);
+  transform: rotate(-0.6deg);
+  transition: transform 0.3s;
 }
 
-/* ─── Lightbox ──────────────────────────────────────────────── */
+.snapCard:hover {
+  transform: rotate(0deg);
+}
+
+.snapCover {
+  width: 100%;
+  max-height: 230px;
+  object-fit: cover;
+  display: block;
+}
+
+.snapDetails {
+  padding: 1.5rem;
+}
+
+.snapEventName {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.45rem;
+  color: #2a1200;
+  line-height: 1.2;
+  margin-bottom: 0.9rem;
+}
+
+.snapMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: #5a3a1a;
+}
+
+.snapMetaIcon {
+  margin-right: 0.4rem;
+}
+
+.snapHost {
+  margin-top: 0.9rem;
+  font-size: 0.78rem;
+  color: #7a5a3a;
+  border-top: 1px solid rgba(201, 148, 26, 0.15);
+  padding-top: 0.8rem;
+  font-style: italic;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 3rem 2rem 4rem;
+  border-top: 1px solid rgba(201, 148, 26, 0.18);
+  color: #7a5a3a;
+  font-size: 0.825rem;
+}
+
+.footerHeart {
+  font-size: 1.5rem;
+  color: #c9511b;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.footerText {
+  font-style: italic;
+  margin-bottom: 0.85rem;
+  color: #7a5a3a;
+}
+
+.footerLinks a {
+  color: #c9941a;
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.footerLinks a:hover {
+  text-decoration: underline;
+}
+
+/* ─── Lightbox ───────────────────────────────────────────────── */
 .lightbox {
   position: fixed;
   inset: 0;
-  background: rgba(10, 5, 0, 0.93);
+  background: rgba(8, 4, 0, 0.94);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -465,9 +568,7 @@
   font-family: inherit;
 }
 
-.lightboxClose:hover {
-  color: #fff;
-}
+.lightboxClose:hover { color: #fff; }
 
 .lightboxNav {
   position: absolute;
@@ -488,200 +589,55 @@
   font-family: inherit;
 }
 
-.lightboxNav:hover:not(:disabled) {
-  background: rgba(201, 148, 26, 0.4);
-}
+.lightboxNav:hover:not(:disabled) { background: rgba(201, 148, 26, 0.4); }
+.lightboxNav:disabled { opacity: 0.3; cursor: not-allowed; }
 
-.lightboxNav:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.lightboxPrev {
-  left: 1.25rem;
-}
-
-.lightboxNext {
-  right: 1.25rem;
-}
+.lightboxPrev { left: 1.25rem; }
+.lightboxNext { right: 1.25rem; }
 
 .lightboxInfo {
   position: absolute;
   bottom: 1.5rem;
   left: 50%;
   transform: translateX(-50%);
-  text-align: center;
-  color: rgba(255, 220, 160, 0.7);
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
+  color: rgba(255, 220, 160, 0.65);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
   white-space: nowrap;
 }
 
-/* ─── Empty / Placeholder State ─────────────────────────────── */
-.placeholderGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.placeholderCard {
-  border-radius: 12px;
-  aspect-ratio: 4 / 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.placeholderCard:nth-child(1) {
-  background: linear-gradient(135deg, #e07b10 0%, #c9941a 100%);
-}
-
-.placeholderCard:nth-child(2) {
-  background: linear-gradient(135deg, #c9511b 0%, #9b3a10 100%);
-}
-
-.placeholderCard:nth-child(3) {
-  background: linear-gradient(135deg, #c9941a 0%, #8b6010 100%);
-}
-
-.placeholderCard::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.16) 0%, transparent 65%),
-    radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.07) 0%, transparent 40%),
-    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.07) 0%, transparent 40%);
-  pointer-events: none;
-}
-
-.placeholderCardIcon {
-  position: relative;
-  z-index: 1;
-}
-
-.placeholderMessage {
-  text-align: center;
-  font-size: 1rem;
-  color: #7a5a3a;
-  font-style: italic;
-  line-height: 1.75;
-  max-width: 460px;
-  margin: 0 auto;
-  padding: 1.25rem 1.75rem;
-  background: rgba(201, 148, 26, 0.08);
-  border-radius: 12px;
-  border: 1px solid rgba(201, 148, 26, 0.2);
-}
-
-/* ─── Footer ────────────────────────────────────────────────── */
-.footer {
-  text-align: center;
-  padding: 3rem 2rem 4rem;
-  border-top: 1px solid rgba(201, 148, 26, 0.2);
-  color: #7a5a3a;
-  font-size: 0.825rem;
-}
-
-.footerHeart {
-  font-size: 1.6rem;
-  color: #c9511b;
-  margin-bottom: 0.6rem;
-  display: block;
-}
-
-.footerText {
-  font-style: italic;
-  margin-bottom: 0.85rem;
-  color: #7a5a3a;
-}
-
-.footerLinks {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-}
-
-.footerLinks a {
-  color: #c9941a;
-  text-decoration: none;
-  font-size: 0.8rem;
-}
-
-.footerLinks a:hover {
-  text-decoration: underline;
-}
-
-/* ─── Responsive ────────────────────────────────────────────── */
+/* ─── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .hero {
-    padding: 3.5rem 1.5rem 3rem;
-  }
+  .hero { padding: 3.5rem 1.5rem 3rem; }
 
-  .main {
-    padding: 2.5rem 1.25rem 4rem;
-  }
+  .main { padding: 2.5rem 1.25rem 4rem; }
 
-  .thankYouSection {
-    max-width: 100%;
+  .letterSection {
+    padding: 2.25rem 1.5rem 2rem;
     margin-bottom: 3.5rem;
   }
 
-  .thankYouCoverWrap {
-    max-width: 100%;
-    transform: none;
-  }
+  .letterOpenQuote { font-size: 4rem; }
 
-  .thankYouQuote {
-    padding: 1.25rem 1.25rem 1.25rem 1.25rem;
-    font-size: 0.95rem;
-  }
+  .stripSection { margin-bottom: 3.5rem; }
 
-  .thankYouMeta {
-    gap: 0.5rem 1rem;
-    padding: 1rem 1.25rem;
-  }
+  .polaroid { width: 155px; }
 
-  .masonryGrid {
-    columns: 2;
-  }
+  .albumSection { margin-bottom: 3.5rem; }
+
+  .snapCard { transform: none; }
 
   .placeholderGrid {
     grid-template-columns: 1fr;
-    max-width: 280px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 200px;
   }
 
-  .lightboxNav {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
-  }
-
-  .lightboxPrev {
-    left: 0.5rem;
-  }
-
-  .lightboxNext {
-    right: 0.5rem;
-  }
+  .lightboxNav { width: 40px; height: 40px; font-size: 1.2rem; }
+  .lightboxPrev { left: 0.5rem; }
+  .lightboxNext { right: 0.5rem; }
 }
 
 @media (max-width: 480px) {
-  .masonryGrid {
-    columns: 1;
-  }
-
-  .heroTitle {
-    font-size: clamp(2.8rem, 14vw, 4rem);
-  }
-
-  .thankYouPreamble {
-    font-size: 1.15rem;
-  }
+  .heroTitle { font-size: clamp(3rem, 16vw, 4.5rem); }
+  .polaroid { width: 140px; }
 }
