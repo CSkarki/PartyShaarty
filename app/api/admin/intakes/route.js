@@ -1,5 +1,5 @@
-import { createSupabaseServerClient } from "../../../../../lib/supabase-server";
-import { listIntakesForAdmin } from "../../../../../lib/admin-intakes";
+import { createSupabaseServerClient } from "../../../../lib/supabase-server";
+import { listIntakesForAdmin } from "../../../../lib/admin-intakes";
 
 async function requireSuperAdmin(supabase) {
   const { data: { user } } = await supabase.auth.getUser();
