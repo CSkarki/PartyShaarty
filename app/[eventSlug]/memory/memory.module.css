@@ -1,4 +1,4 @@
-/* ─── Base Page ───────────────────────────────────────── */
+/* ─── Base Page ────────────────────────────────────────────── */
 .page {
   min-height: 100vh;
   background: #fdf5e9;
@@ -6,7 +6,7 @@
   font-family: "Outfit", sans-serif;
 }
 
-/* ─── Nav ─────────────────────────────────────────────── */
+/* ─── Nav ──────────────────────────────────────────────────── */
 .nav {
   position: sticky;
   top: 0;
@@ -44,11 +44,11 @@
   text-transform: uppercase;
 }
 
-/* ─── Hero Banner ─────────────────────────────────────── */
+/* ─── Hero Banner ──────────────────────────────────────────── */
 .hero {
   position: relative;
   background: linear-gradient(135deg, #6b1a1a 0%, #9b3a10 50%, #c9511b 100%);
-  padding: 4rem 2rem 3.5rem;
+  padding: 4.5rem 2rem 4rem;
   text-align: center;
   overflow: hidden;
 }
@@ -98,195 +98,237 @@
   text-transform: uppercase;
   letter-spacing: 0.28em;
   color: rgba(255, 220, 140, 0.8);
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   position: relative;
 }
 
+/* "Thank You" — big, warm, impactful */
 .heroTitle {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-size: clamp(3.5rem, 10vw, 6rem);
   color: #fff;
-  line-height: 1.1;
-  margin-bottom: 0.65rem;
+  line-height: 1.0;
+  margin-bottom: 0.3rem;
   position: relative;
-  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.3);
+  letter-spacing: -0.01em;
+}
+
+/* "for celebrating [Event Name]" */
+.heroSubtitle {
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(1rem, 2.8vw, 1.45rem);
+  color: rgba(255, 220, 160, 0.9);
+  margin-bottom: 0.75rem;
+  position: relative;
+  font-weight: 300;
+}
+
+.heroSubtitle em {
+  font-style: normal;
+  color: #e8c060;
+  font-weight: 400;
 }
 
 .heroDate {
-  font-size: 1rem;
-  color: rgba(255, 220, 160, 0.9);
+  font-size: 0.92rem;
+  color: rgba(255, 220, 160, 0.75);
   position: relative;
   font-style: italic;
-}
-
-/* ─── Main Content ────────────────────────────────────── */
-.main {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 3rem 2rem 5rem;
-}
-
-/* ─── Keepsake Invite Card ────────────────────────────── */
-.keepsakeLabel {
-  text-align: center;
-  font-size: 0.78rem;
-  font-style: italic;
-  color: #7a5a3a;
-  letter-spacing: 0.1em;
-  margin-bottom: 1rem;
-}
-
-.inviteCard {
-  position: relative;
-  background: #fffdf5;
-  border: 1px solid rgba(201, 148, 26, 0.35);
-  border-radius: 16px;
-  box-shadow:
-    0 4px 24px rgba(139, 69, 19, 0.1),
-    0 1px 6px rgba(139, 69, 19, 0.06);
-  transform: rotate(-0.4deg);
-  overflow: hidden;
-  max-width: 820px;
-  margin: 0 auto 4rem;
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  min-height: 340px;
-}
-
-/* Gold corner ornaments */
-.inviteCard::before,
-.inviteCard::after {
-  content: "✦";
-  position: absolute;
-  font-size: 1.1rem;
-  color: rgba(201, 148, 26, 0.45);
-  z-index: 2;
-  line-height: 1;
-}
-
-.inviteCard::before {
-  top: 12px;
-  left: 16px;
-}
-
-.inviteCard::after {
-  bottom: 12px;
-  right: 16px;
-}
-
-.inviteCardImageWrap {
-  position: relative;
-  background: linear-gradient(135deg, #2a0a00 0%, #4a1a0a 100%);
-  min-height: 280px;
-  border-radius: 15px 0 0 15px;
-  overflow: hidden;
-}
-
-.inviteCardImage {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-}
-
-.inviteCardImagePlaceholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  color: rgba(201, 148, 26, 0.65);
-  font-family: "Cormorant Garamond", serif;
-  font-size: 1rem;
-  text-align: center;
-  padding: 2rem;
   letter-spacing: 0.04em;
 }
 
-.inviteCardImagePlaceholder span {
-  font-size: 2.2rem;
-  opacity: 0.55;
+/* ─── Main Content ─────────────────────────────────────────── */
+.main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 4rem 2rem 5rem;
 }
 
-.inviteCardContent {
-  padding: 2rem 2rem 1.75rem;
+/* ─── Thank You Section ─────────────────────────────────────── */
+.thankYouSection {
+  max-width: 720px;
+  margin: 0 auto 5rem;
+  text-align: center;
+}
+
+/* Ornamental divider row: ── ❁ ── */
+.thankYouOrnamentRow {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
 }
 
-.inviteCardTitle {
+.thankYouLine {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 148, 26, 0.45), transparent);
+}
+
+.thankYouOrnamentGlyph {
+  font-size: 1.6rem;
+  color: #c9941a;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+/* "Your presence was our greatest gift" */
+.thankYouPreamble {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
-  color: #2a1200;
-  line-height: 1.15;
-  margin-bottom: 0.3rem;
+  font-size: clamp(1.3rem, 3vw, 1.85rem);
+  color: #c9941a;
+  font-style: italic;
+  margin-bottom: 2.25rem;
+  line-height: 1.35;
 }
 
-.inviteCardSubtitle {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  color: #7a5a3a;
-  margin-bottom: 1.25rem;
+/* Cover image — framed like a precious keepsake photo */
+.thankYouCoverWrap {
+  margin: 0 auto 2.5rem;
+  max-width: 560px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 4px rgba(201, 148, 26, 0.22),
+    0 0 0 8px rgba(201, 148, 26, 0.07),
+    0 10px 40px rgba(107, 26, 26, 0.22);
+  transform: rotate(0.5deg);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.inviteCardDetails {
-  border-top: 1px solid rgba(201, 148, 26, 0.2);
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
+.thankYouCoverWrap:hover {
+  transform: rotate(0deg) scale(1.01);
+  box-shadow:
+    0 0 0 4px rgba(201, 148, 26, 0.35),
+    0 0 0 8px rgba(201, 148, 26, 0.1),
+    0 14px 50px rgba(107, 26, 26, 0.28);
 }
 
-.inviteCardMessage {
-  font-size: 0.9rem;
-  line-height: 1.65;
+.thankYouCover {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+/* Event message — blockquote thank-you note */
+.thankYouQuote {
+  margin: 0 0 2rem;
+  padding: 1.5rem 2rem 1.5rem 1.75rem;
+  background: rgba(201, 148, 26, 0.06);
+  border-left: 3px solid rgba(201, 148, 26, 0.55);
+  border-radius: 0 12px 12px 0;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.85;
   color: #5a3a1a;
   font-style: italic;
-  margin-bottom: 0.25rem;
+  position: relative;
 }
 
-.inviteCardMeta {
+.thankYouQuoteMarkOpen {
+  font-family: "DM Serif Display", serif;
+  font-size: 2.4rem;
+  color: rgba(201, 148, 26, 0.5);
+  line-height: 0;
+  vertical-align: -0.45em;
+  margin-right: 0.2em;
+  display: inline-block;
+  font-style: normal;
+}
+
+.thankYouQuoteMarkClose {
+  font-family: "DM Serif Display", serif;
+  font-size: 2.4rem;
+  color: rgba(201, 148, 26, 0.5);
+  line-height: 0;
+  vertical-align: -0.45em;
+  margin-left: 0.15em;
+  display: inline-block;
+  font-style: normal;
+}
+
+/* Default thank-you text when no event_message */
+.thankYouDefault {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #5a3a1a;
+  font-style: italic;
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: rgba(201, 148, 26, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(201, 148, 26, 0.18);
+}
+
+/* Date + Venue pills */
+.thankYouMeta {
   display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
+  flex-wrap: wrap;
+  gap: 0.6rem 2rem;
+  justify-content: center;
+  margin-bottom: 2.25rem;
+  padding: 1.25rem 1.5rem;
+  background: rgba(201, 148, 26, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(201, 148, 26, 0.15);
 }
 
-.inviteCardMetaItem {
-  font-size: 0.875rem;
-  color: #2a1200;
+.thankYouMetaItem {
   display: flex;
-  align-items: baseline;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.92rem;
+  color: #5a3a1a;
 }
 
-.inviteCardMetaLabel {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #c9941a;
-  font-weight: 600;
-  min-width: 52px;
+.thankYouMetaIcon {
+  font-size: 1.05rem;
   flex-shrink: 0;
 }
 
-.inviteCardHost {
-  margin-top: 0.75rem;
-  font-size: 0.78rem;
+/* "With love & gratitude, Host Name" signature */
+.thankYouSig {
+  font-size: 0.95rem;
   color: #7a5a3a;
-  border-top: 1px solid rgba(201, 148, 26, 0.15);
-  padding-top: 0.75rem;
+  font-style: italic;
+  line-height: 1.5;
+  margin-bottom: 2.5rem;
 }
 
-/* ─── Section Heading ─────────────────────────────────── */
+.thankYouSig strong {
+  display: block;
+  font-family: "DM Serif Display", serif;
+  font-size: 1.5rem;
+  color: #c9941a;
+  font-style: normal;
+  margin-top: 0.25rem;
+  letter-spacing: 0.01em;
+}
+
+/* Bottom divider ── ✦ ── */
+.thankYouDivider {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  color: rgba(201, 148, 26, 0.5);
+  font-size: 1.1rem;
+}
+
+.thankYouDivider::before,
+.thankYouDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 148, 26, 0.35), transparent);
+}
+
+/* ─── Section Heading (Photos) ─────────────────────────────── */
 .sectionHeading {
   font-family: "DM Serif Display", serif;
-  font-size: clamp(1.6rem, 3.5vw, 2rem);
+  font-size: clamp(1.6rem, 3.5vw, 2.1rem);
   color: #2a1200;
   text-align: center;
   margin-bottom: 0.5rem;
@@ -309,7 +351,7 @@
   margin-bottom: 2rem;
 }
 
-/* ─── Album Filter Chips ──────────────────────────────── */
+/* ─── Album Filter Chips ────────────────────────────────────── */
 .filterChips {
   display: flex;
   flex-wrap: wrap;
@@ -344,7 +386,7 @@
   color: #c9941a;
 }
 
-/* ─── Masonry Photo Grid ──────────────────────────────── */
+/* ─── Masonry Photo Grid ────────────────────────────────────── */
 .masonryGrid {
   columns: 3;
   column-gap: 1rem;
@@ -390,7 +432,7 @@
   opacity: 1;
 }
 
-/* ─── Lightbox ────────────────────────────────────────── */
+/* ─── Lightbox ──────────────────────────────────────────────── */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -475,7 +517,7 @@
   white-space: nowrap;
 }
 
-/* ─── Empty / Placeholder State ──────────────────────── */
+/* ─── Empty / Placeholder State ─────────────────────────────── */
 .placeholderGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -506,7 +548,6 @@
   background: linear-gradient(135deg, #c9941a 0%, #8b6010 100%);
 }
 
-/* Soft radial glow overlay on placeholder cards */
 .placeholderCard::before {
   content: "";
   position: absolute;
@@ -537,20 +578,32 @@
   border: 1px solid rgba(201, 148, 26, 0.2);
 }
 
-/* ─── Footer ──────────────────────────────────────────── */
+/* ─── Footer ────────────────────────────────────────────────── */
 .footer {
   text-align: center;
-  padding: 2.5rem 2rem 3rem;
+  padding: 3rem 2rem 4rem;
   border-top: 1px solid rgba(201, 148, 26, 0.2);
   color: #7a5a3a;
   font-size: 0.825rem;
+}
+
+.footerHeart {
+  font-size: 1.6rem;
+  color: #c9511b;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.footerText {
+  font-style: italic;
+  margin-bottom: 0.85rem;
+  color: #7a5a3a;
 }
 
 .footerLinks {
   display: flex;
   gap: 1.5rem;
   justify-content: center;
-  margin-top: 0.75rem;
 }
 
 .footerLinks a {
@@ -563,23 +616,34 @@
   text-decoration: underline;
 }
 
-/* ─── Responsive ──────────────────────────────────────── */
+/* ─── Responsive ────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .inviteCard {
-    grid-template-columns: 1fr;
-    transform: none;
-    border-radius: 12px;
+  .hero {
+    padding: 3.5rem 1.5rem 3rem;
+  }
+
+  .main {
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .thankYouSection {
     max-width: 100%;
+    margin-bottom: 3.5rem;
   }
 
-  .inviteCardImageWrap {
-    min-height: 55vw;
-    max-height: 60vw;
-    border-radius: 12px 12px 0 0;
+  .thankYouCoverWrap {
+    max-width: 100%;
+    transform: none;
   }
 
-  .inviteCardContent {
-    padding: 1.5rem 1.25rem;
+  .thankYouQuote {
+    padding: 1.25rem 1.25rem 1.25rem 1.25rem;
+    font-size: 0.95rem;
+  }
+
+  .thankYouMeta {
+    gap: 0.5rem 1rem;
+    padding: 1rem 1.25rem;
   }
 
   .masonryGrid {
@@ -591,14 +655,6 @@
     max-width: 280px;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  .hero {
-    padding: 3rem 1.5rem 2.5rem;
-  }
-
-  .main {
-    padding: 2rem 1.25rem 4rem;
   }
 
   .lightboxNav {
@@ -619,5 +675,13 @@
 @media (max-width: 480px) {
   .masonryGrid {
     columns: 1;
+  }
+
+  .heroTitle {
+    font-size: clamp(2.8rem, 14vw, 4rem);
+  }
+
+  .thankYouPreamble {
+    font-size: 1.15rem;
   }
 }

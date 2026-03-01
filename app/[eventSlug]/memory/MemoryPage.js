@@ -22,7 +22,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
       ? photos
       : photos.filter((p) => p.albumName === activeAlbum);
 
-  // Reset lightbox if it becomes out-of-range after filter change
+  // Reset lightbox if out-of-range after filter change
   useEffect(() => {
     if (lightboxIdx !== null && lightboxIdx >= filtered.length) {
       setLightboxIdx(filtered.length > 0 ? filtered.length - 1 : null);
@@ -33,10 +33,8 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
   const handleKeyDown = useCallback(
     (e) => {
       if (lightboxIdx === null) return;
-      if (e.key === "ArrowLeft")
-        setLightboxIdx((i) => Math.max(0, i - 1));
-      if (e.key === "ArrowRight")
-        setLightboxIdx((i) => Math.min(filtered.length - 1, i + 1));
+      if (e.key === "ArrowLeft") setLightboxIdx((i) => Math.max(0, i - 1));
+      if (e.key === "ArrowRight") setLightboxIdx((i) => Math.min(filtered.length - 1, i + 1));
       if (e.key === "Escape") setLightboxIdx(null);
     },
     [lightboxIdx, filtered.length]
@@ -50,112 +48,116 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
   // Lock body scroll when lightbox is open
   useEffect(() => {
     document.body.style.overflow = lightboxIdx !== null ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
+    return () => { document.body.style.overflow = ""; };
   }, [lightboxIdx]);
 
   const hasCover = coverUrl && !coverImgError;
 
   return (
     <div className={styles.page}>
-      {/* ── Nav ─────────────────────────────────────── */}
+
+      {/* ── Nav ──────────────────────────────────── */}
       <nav className={styles.nav}>
         <div className={styles.navInner}>
-          <a href="/" className={styles.navBrand}>
-            Utsavé
-          </a>
+          <a href="/" className={styles.navBrand}>Utsavé</a>
           {event.event_name && (
             <span className={styles.navEventName}>{event.event_name}</span>
           )}
         </div>
       </nav>
 
-      {/* ── Hero Banner ──────────────────────────────── */}
+      {/* ── Hero Banner ───────────────────────────── */}
       <div className={styles.hero}>
         <div className={styles.heroOrnament}>✦ ❁ ✦</div>
-        <div className={styles.heroLabel}>Cherishing the Memories</div>
-        <h1 className={styles.heroTitle}>
-          {event.event_name || "A Beautiful Celebration"}
-        </h1>
+        <p className={styles.heroLabel}>With Grateful Hearts</p>
+        <h1 className={styles.heroTitle}>Thank You</h1>
+        <p className={styles.heroSubtitle}>
+          for celebrating{event.event_name ? <> <em>{event.event_name}</em></> : " with us"}
+        </p>
         {event.event_date && (
           <p className={styles.heroDate}>{event.event_date}</p>
         )}
         <div className={styles.heroBorderBottom} />
       </div>
 
-      {/* ── Main Content ─────────────────────────────── */}
+      {/* ── Main Content ──────────────────────────── */}
       <main className={styles.main}>
-        {/* ── Keepsake Invite Card ────────────────── */}
-        <p className={styles.keepsakeLabel}>✦ &nbsp; A keepsake of your invite &nbsp; ✦</p>
-        <div className={styles.inviteCard}>
-          {/* Left: image */}
-          <div className={styles.inviteCardImageWrap}>
-            {hasCover ? (
-              // eslint-disable-next-line @next/next/no-img-element
+
+        {/* ── Thank You Section ─────────────────── */}
+        <section className={styles.thankYouSection}>
+
+          <div className={styles.thankYouOrnamentRow}>
+            <span className={styles.thankYouLine} />
+            <span className={styles.thankYouOrnamentGlyph}>❁</span>
+            <span className={styles.thankYouLine} />
+          </div>
+
+          <p className={styles.thankYouPreamble}>
+            Your presence was our greatest gift
+          </p>
+
+          {hasCover && (
+            <div className={styles.thankYouCoverWrap}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={coverUrl}
-                alt="Event cover"
-                className={styles.inviteCardImage}
+                alt={event.event_name || "Celebration"}
+                className={styles.thankYouCover}
                 onError={() => setCoverImgError(true)}
               />
-            ) : (
-              <div className={styles.inviteCardImagePlaceholder}>
-                <span>✦</span>
-                {event.display_name
-                  ? `${event.display_name}'s Celebration`
-                  : "A Beautiful Celebration"}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Right: event details */}
-          <div className={styles.inviteCardContent}>
-            <h2 className={styles.inviteCardTitle}>
-              {event.event_name || "You're Invited"}
-            </h2>
-            <p className={styles.inviteCardSubtitle}>We celebrated with you</p>
+          {event.event_message ? (
+            <blockquote className={styles.thankYouQuote}>
+              <span className={styles.thankYouQuoteMarkOpen}>&ldquo;</span>
+              {event.event_message}
+              <span className={styles.thankYouQuoteMarkClose}>&rdquo;</span>
+            </blockquote>
+          ) : (
+            <p className={styles.thankYouDefault}>
+              Every laugh, every blessing, every moment of joy you brought — we carry
+              it in our hearts. Thank you for making this day so deeply memorable.
+            </p>
+          )}
 
-            <div className={styles.inviteCardDetails}>
-              {event.event_message && (
-                <p className={styles.inviteCardMessage}>
-                  &ldquo;{event.event_message}&rdquo;
-                </p>
+          {(event.event_date || event.event_location) && (
+            <div className={styles.thankYouMeta}>
+              {event.event_date && (
+                <div className={styles.thankYouMetaItem}>
+                  <span className={styles.thankYouMetaIcon}>📅</span>
+                  <span>{event.event_date}</span>
+                </div>
               )}
-
-              <div className={styles.inviteCardMeta}>
-                {event.event_date && (
-                  <div className={styles.inviteCardMetaItem}>
-                    <span className={styles.inviteCardMetaLabel}>Date</span>
-                    <span>{event.event_date}</span>
-                  </div>
-                )}
-                {event.event_location && (
-                  <div className={styles.inviteCardMetaItem}>
-                    <span className={styles.inviteCardMetaLabel}>Venue</span>
-                    <span>{event.event_location}</span>
-                  </div>
-                )}
-              </div>
-
-              {event.display_name && (
-                <p className={styles.inviteCardHost}>
-                  Hosted by {event.display_name}
-                </p>
+              {event.event_location && (
+                <div className={styles.thankYouMetaItem}>
+                  <span className={styles.thankYouMetaIcon}>📍</span>
+                  <span>{event.event_location}</span>
+                </div>
               )}
             </div>
-          </div>
-        </div>
+          )}
 
-        {/* ── Photo Memories ───────────────────────── */}
-        <h2 className={styles.sectionHeading}>📸 Moments We&apos;ll Treasure</h2>
+          {event.display_name && (
+            <p className={styles.thankYouSig}>
+              With love &amp; gratitude,
+              <strong>{event.display_name}</strong>
+            </p>
+          )}
+
+          <div className={styles.thankYouDivider}>
+            <span>✦</span>
+          </div>
+
+        </section>
+
+        {/* ── Photo Memories ───────────────────── */}
+        <h2 className={styles.sectionHeading}>Our Cherished Memories</h2>
 
         {photos.length === 0 ? (
           /* ── Empty state ── */
           <>
-            <p className={styles.sectionSubtitle}>
-              The memories are being curated…
-            </p>
+            <p className={styles.sectionSubtitle}>The photos are being curated with love…</p>
             <div className={styles.placeholderGrid}>
               <div className={styles.placeholderCard}>
                 <span className={styles.placeholderCardIcon}>📷</span>
@@ -168,25 +170,23 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
               </div>
             </div>
             <p className={styles.placeholderMessage}>
-              Your host is still curating the memories.
+              Every beautiful moment captured that day will be shared here.
               <br />
-              Come back soon to relive every beautiful moment. 📷
+              Come back soon to relive the memories together.
             </p>
           </>
         ) : (
           /* ── Photo grid ── */
           <>
             <p className={styles.sectionSubtitle}>
-              {photos.length} {photos.length === 1 ? "memory" : "memories"}
-              {albums.length > 1 ? ` across ${albums.length} albums` : ""}
+              {photos.length} {photos.length === 1 ? "memory" : "memories"} from this beautiful day
+              {albums.length > 1 ? `, across ${albums.length} albums` : ""}
             </p>
 
             {albums.length > 1 && (
               <div className={styles.filterChips}>
                 <button
-                  className={`${styles.filterChip} ${
-                    activeAlbum === "all" ? styles.filterChipActive : ""
-                  }`}
+                  className={`${styles.filterChip} ${activeAlbum === "all" ? styles.filterChipActive : ""}`}
                   onClick={() => setActiveAlbum("all")}
                 >
                   All
@@ -195,9 +195,7 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
                   <a
                     key={album}
                     href={`/${eventSlug}/gallery?album=${albumMap[album]}`}
-                    className={`${styles.filterChip} ${
-                      activeAlbum === album ? styles.filterChipActive : ""
-                    }`}
+                    className={`${styles.filterChip} ${activeAlbum === album ? styles.filterChipActive : ""}`}
                   >
                     {album}
                   </a>
@@ -220,24 +218,23 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
             </div>
           </>
         )}
+
       </main>
 
-      {/* ── Footer ───────────────────────────────────── */}
+      {/* ── Footer ───────────────────────────────── */}
       <footer className={styles.footer}>
-        <div>Created with ✦ Utsavé</div>
+        <div className={styles.footerHeart}>♥</div>
+        <p className={styles.footerText}>A memory preserved with love, on Utsavé</p>
         <div className={styles.footerLinks}>
           <a href="/">Back to Utsavé</a>
-          <a href={`/${eventSlug}/invite`}>View Original Invite</a>
         </div>
       </footer>
 
-      {/* ── Lightbox ─────────────────────────────────── */}
+      {/* ── Lightbox ──────────────────────────────── */}
       {lightboxIdx !== null && filtered[lightboxIdx] && (
         <div
           className={styles.lightbox}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setLightboxIdx(null);
-          }}
+          onClick={(e) => { if (e.target === e.currentTarget) setLightboxIdx(null); }}
         >
           <button
             className={styles.lightboxClose}
@@ -261,28 +258,23 @@ export default function MemoryPage({ event, coverUrl, eventSlug, initialPhotos }
                 onClick={() => setLightboxIdx((i) => Math.max(0, i - 1))}
                 disabled={lightboxIdx === 0}
                 aria-label="Previous photo"
-              >
-                ‹
-              </button>
+              >‹</button>
               <button
                 className={`${styles.lightboxNav} ${styles.lightboxNext}`}
-                onClick={() =>
-                  setLightboxIdx((i) => Math.min(filtered.length - 1, i + 1))
-                }
+                onClick={() => setLightboxIdx((i) => Math.min(filtered.length - 1, i + 1))}
                 disabled={lightboxIdx === filtered.length - 1}
                 aria-label="Next photo"
-              >
-                ›
-              </button>
+              >›</button>
             </>
           )}
 
           <div className={styles.lightboxInfo}>
-            {filtered[lightboxIdx].albumName}&nbsp; · &nbsp;
+            {filtered[lightboxIdx].albumName}&nbsp;·&nbsp;
             {lightboxIdx + 1} / {filtered.length}
           </div>
         </div>
       )}
+
     </div>
   );
 }
