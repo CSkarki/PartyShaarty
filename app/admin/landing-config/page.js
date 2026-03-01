@@ -37,12 +37,11 @@ export default async function LandingConfigPage() {
             <span className={styles.logo}>Utsavé</span>
           </a>
           <span className={styles.headerLabel}>Super Admin — Landing Config</span>
-          <a
-            href="/admin/events"
-            style={{ marginLeft: "auto", fontSize: "0.825rem", color: "#5c5c5c", textDecoration: "none" }}
-          >
-            Event Requests →
-          </a>
+          <div style={{ marginLeft: "auto", display: "flex", gap: "1rem", fontSize: "0.825rem" }}>
+            <a href="/admin" style={{ color: "#5c5c5c", textDecoration: "none" }}>Dashboard</a>
+            <a href="/admin/intakes" style={{ color: "#5c5c5c", textDecoration: "none" }}>Intakes</a>
+            <a href="/admin/events" style={{ color: "#5c5c5c", textDecoration: "none" }}>Events</a>
+          </div>
         </div>
       </header>
 

@@ -1,0 +1,132 @@
+/* Super Admin Dashboard — /admin */
+
+.page {
+  min-height: 100vh;
+  background: #f5f3ef;
+  font-family: "Outfit", sans-serif;
+}
+
+.header {
+  background: #fff;
+  border-bottom: 1px solid #e8e4dd;
+  padding: 0.9rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.logoLink {
+  text-decoration: none;
+}
+
+.logo {
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: #c9941a;
+  letter-spacing: 0.02em;
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5c5c5c;
+  padding: 0.25rem 0.6rem;
+  background: #faf7f2;
+  border: 1px solid #e8e4dd;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+
+.main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+.title {
+  font-family: "DM Serif Display", serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin: 0 0 0.35rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #5c5c5c;
+  margin: 0 0 2rem;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  display: block;
+  background: #fff;
+  border: 1px solid #e8e4dd;
+  border-radius: 14px;
+  padding: 1.5rem 1.4rem;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.card:hover {
+  border-color: #c9941a;
+  box-shadow: 0 4px 16px rgba(201, 148, 26, 0.12);
+}
+
+.cardIcon {
+  display: inline-block;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #c9941a;
+  line-height: 1;
+}
+
+.cardTitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.4rem;
+  line-height: 1.3;
+}
+
+.cardDesc {
+  font-size: 0.875rem;
+  color: #5c5c5c;
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.cardCta {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #c9941a;
+}
+
+.card:hover .cardCta {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
