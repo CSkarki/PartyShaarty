@@ -12,29 +12,34 @@ export async function middleware(request) {
 
   let session = null;
   if (supabaseUrl && supabaseAnonKey) {
-    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
-      cookies: {
-        get(name) {
-          return request.cookies.get(name)?.value;
+    try {
+      const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+        cookies: {
+          get(name) {
+            return request.cookies.get(name)?.value;
+          },
+          set(name, value, options) {
+            request.cookies.set({ name, value, ...options });
+            response = NextResponse.next({
+              request: { headers: request.headers },
+            });
+            response.cookies.set({ name, value, ...options });
+          },
+          remove(name, options) {
+            request.cookies.set({ name, value: "", ...options });
+            response = NextResponse.next({
+              request: { headers: request.headers },
+            });
+            response.cookies.set({ name, value: "", ...options });
+          },
         },
-        set(name, value, options) {
-          request.cookies.set({ name, value, ...options });
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
-          response.cookies.set({ name, value, ...options });
-        },
-        remove(name, options) {
-          request.cookies.set({ name, value: "", ...options });
-          response = NextResponse.next({
-            request: { headers: request.headers },
-          });
-          response.cookies.set({ name, value: "", ...options });
-        },
-      },
-    });
-    const { data } = await supabase.auth.getSession();
-    session = data?.session ?? null;
+      });
+      const { data } = await supabase.auth.getSession();
+      session = data?.session ?? null;
+    } catch {
+      // Invalid/expired refresh token in cookies — treat as no session, redirect to login
+      session = null;
+    }
   }
 
   const { pathname } = request.nextUrl;
