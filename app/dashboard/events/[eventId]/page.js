@@ -395,10 +395,17 @@ export default function EventDashboardPage() {
             <div className={styles.setupGroup}>
               <div className={styles.setupGroupHeader}>
                 <span className={styles.setupGroupTitle}>Design your celebration</span>
-                <span className={styles.setupGroupSub}>Tell us your vision &amp; get a recommendation</span>
+                {!hasIntake && (
+                  <span className={styles.setupGroupSub}>Tell us your vision &amp; get a recommendation</span>
+                )}
                 {hasIntake && <span className={styles.setupGroupBadge}>✓ Done</span>}
               </div>
               <div className={styles.setupGroupAction}>
+                {hasIntake && (
+                  <span className={styles.setupGroupHint}>
+                    <span className={styles.checkDesc}>Your celebration plan and how we’ll keep in touch (email & phone).</span>
+                  </span>
+                )}
                 <a href={`/dashboard/events/${eventId}/intake`} className={styles.checkAction}>
                   {hasIntake ? "View →" : "Start →"}
                 </a>

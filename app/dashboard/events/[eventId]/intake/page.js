@@ -382,9 +382,6 @@ export default function IntakePage() {
             <div className={styles.stepCard}>
               <div className={styles.stepHeader}>
                 <h1 className={styles.stepTitle}>Summary &amp; contact</h1>
-                <p className={styles.stepSubtitle}>
-                  Our team will reach you via the email and phone number below.
-                </p>
               </div>
 
               <div className={styles.summaryBlock}>
@@ -397,31 +394,35 @@ export default function IntakePage() {
                     </li>
                   ))}
                 </ul>
-              </div>
 
-              <div className={styles.contactFields}>
-                <label className={styles.contactLabel}>
-                  Email <span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="email"
-                  required
-                  className={styles.contactInput}
-                  placeholder="you@example.com"
-                  value={answers.contact_email || ""}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, contact_email: e.target.value }))}
-                />
-                <label className={styles.contactLabel}>
-                  Phone number <span className={styles.required}>*</span>
-                </label>
-                <input
-                  type="tel"
-                  required
-                  className={styles.contactInput}
-                  placeholder="+1 234 567 8900"
-                  value={answers.contact_phone || ""}
-                  onChange={(e) => setAnswers((prev) => ({ ...prev, contact_phone: e.target.value }))}
-                />
+                <p className={styles.summaryMessage}>
+                  Our team will reach you via the email and phone number below.
+                </p>
+
+                <div className={styles.contactFields}>
+                  <label className={styles.contactLabel}>
+                    Email <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    className={styles.contactInput}
+                    placeholder="you@example.com"
+                    value={answers.contact_email || ""}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, contact_email: e.target.value }))}
+                  />
+                  <label className={styles.contactLabel}>
+                    Phone number <span className={styles.required}>*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    className={styles.contactInput}
+                    placeholder="+1 234 567 8900"
+                    value={answers.contact_phone || ""}
+                    onChange={(e) => setAnswers((prev) => ({ ...prev, contact_phone: e.target.value }))}
+                  />
+                </div>
               </div>
 
               {saveError && (
@@ -457,7 +458,7 @@ export default function IntakePage() {
                 <div className={styles.recommendOrnament}>✦ ❁ ✦</div>
                 <h1 className={styles.recommendTitle}>Your Celebration Blueprint</h1>
                 <p className={styles.recommendSubtitle}>
-                  Based on your vision, here's what we recommend for{eventName ? ` ${eventName}` : " your event"}.
+                  Based on your responses, here is a summary of your celebration preferences.
                 </p>
               </div>
 
@@ -471,20 +472,45 @@ export default function IntakePage() {
                 ))}
               </div>
 
+              <div className={styles.recommendContact}>
+                <p className={styles.recommendContactMessage}>
+                  Our team will reach you via the email and phone number below.
+                </p>
+                {(answers.contact_email?.trim() || answers.contact_phone?.trim()) ? (
+                  <div className={styles.recommendContactDetails}>
+                    <div className={styles.recommendContactRow}>
+                      <span className={styles.recommendContactLabel}>Email</span>
+                      <span className={styles.recommendContactValue}>{answers.contact_email?.trim() || "—"}</span>
+                    </div>
+                    <div className={styles.recommendContactRow}>
+                      <span className={styles.recommendContactLabel}>Phone number</span>
+                      <span className={styles.recommendContactValue}>{answers.contact_phone?.trim() || "—"}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className={styles.recommendContactHint}>
+                    You didn&apos;t add contact details yet. Click the button below to go to the Summary &amp; contact step and enter your <strong>email</strong> and <strong>phone number</strong> (required) so we can reach you.
+                  </p>
+                )}
+                {(!answers.contact_email?.trim() || !answers.contact_phone?.trim()) && (
+                  <button
+                    type="button"
+                    className={styles.recommendContactCta}
+                    onClick={() => setStep(6)}
+                  >
+                    Add email &amp; phone →
+                  </button>
+                )}
+              </div>
+
               <div className={styles.ctaRow}>
                 <button
                   type="button"
                   className={styles.ctaPrimary}
                   onClick={() => router.push(`/dashboard/events/${eventId}`)}
                 >
-                  Create My Celebration Page →
+                  Go Back to Event Management →
                 </button>
-                <a
-                  href="mailto:hello@utsave.in?subject=Premium%20Celebration%20Planning"
-                  className={styles.ctaSecondary}
-                >
-                  Explore Premium Options ✦
-                </a>
               </div>
 
               <button

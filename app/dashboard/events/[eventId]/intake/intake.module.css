@@ -211,6 +211,14 @@
   text-align: right;
 }
 
+.summaryMessage {
+  font-size: 0.9rem;
+  color: var(--text);
+  margin: 1.25rem 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
 .contactFields {
   display: flex;
   flex-direction: column;
@@ -469,6 +477,71 @@
 
 .recommendLine:last-child {
   border-bottom: none;
+}
+
+/* Contact confirmation on recommendation screen */
+.recommendContact {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  text-align: left;
+}
+
+.recommendContactMessage {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.recommendContactDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recommendContactRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.recommendContactLabel {
+  color: var(--text-muted);
+  min-width: 6rem;
+}
+
+.recommendContactValue {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.recommendContactHint {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.recommendContactCta {
+  margin-top: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, color 0.15s;
+}
+
+.recommendContactCta:hover {
+  background: var(--accent-dim);
+  color: var(--accent-deep, #8b4513);
 }
 
 /* ─── CTAs ───────────────────────────────────────────────── */

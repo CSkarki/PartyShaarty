@@ -325,8 +325,20 @@
 
 .setupGroupAction {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
+  gap: 1rem;
+}
+
+.setupGroupAction .checkAction:only-child {
+  margin-left: auto;
+}
+
+.setupGroupHint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex: 1;
+  line-height: 1.4;
 }
 
 .cardTitleRow {
