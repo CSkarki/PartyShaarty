@@ -10,7 +10,7 @@ export async function POST(request) {
   }
 
   // Accept eventSlug (new) or hostSlug (legacy) for backward compat
-  const { name, email, phone, attending, message, eventSlug, hostSlug } = body;
+  const { name, email, phone, attending, message, adultsCount, kidsCount, eventSlug, hostSlug } = body;
   const slug = eventSlug || hostSlug;
 
   if (!name || typeof name !== "string" || !email || typeof email !== "string" || !attending) {
@@ -36,7 +36,7 @@ export async function POST(request) {
   }
 
   try {
-    await addRsvp({ name, email, phone, attending, message }, event.host_id, event.id);
+    await addRsvp({ name, email, phone, attending, message, adults_count: adultsCount ?? null, kids_count: kidsCount ?? null }, event.host_id, event.id);
     return Response.json({ ok: true });
   } catch (err) {
     console.error("RSVP API error:", err.message);

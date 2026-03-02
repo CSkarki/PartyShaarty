@@ -196,6 +196,9 @@ export default function EventDashboardPage() {
   const totalRsvps = rsvps.length;
   const attending = rsvps.filter(r => r.attending === "Yes").length;
   const declined = rsvps.filter(r => r.attending === "No").length;
+  const totalAdults = rsvps.filter(r => r.attending === "Yes").reduce((s, r) => s + (r.adults_count || 0), 0);
+  const totalKids = rsvps.filter(r => r.attending === "Yes").reduce((s, r) => s + (r.kids_count || 0), 0);
+  const hasHeadcountData = rsvps.some(r => r.adults_count != null || r.kids_count != null);
 
   const hasEventDetails = !!(event?.event_name && event?.event_date);
   const hasCoverPhoto = !!event?.event_image_path;
@@ -600,6 +603,20 @@ export default function EventDashboardPage() {
             </div>
           </div>
 
+          {hasHeadcountData && attending > 0 && (
+            <div style={{ display: "flex", gap: "1.25rem", padding: "0.6rem 0", borderBottom: "1px solid var(--border)", marginBottom: "0.25rem", flexWrap: "wrap" }}>
+              <span style={{ fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                Headcount (attending):
+              </span>
+              <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--text)" }}>
+                Adults (13+): <strong>{totalAdults}</strong>
+              </span>
+              <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "var(--text)" }}>
+                Kids (under 13): <strong>{totalKids}</strong>
+              </span>
+            </div>
+          )}
+
           <div className={styles.tableWrap}>
             {filteredRsvps.length === 0 ? (
               <div className={styles.emptyState}>
@@ -623,6 +640,8 @@ export default function EventDashboardPage() {
                     <th>Name</th>
                     <th>Email</th>
                     <th>Status</th>
+                    <th>Adults</th>
+                    <th>Kids</th>
                     <th>Message</th>
                     <th>Date</th>
                   </tr>
@@ -637,6 +656,8 @@ export default function EventDashboardPage() {
                           {r.attending === "Yes" ? "Attending" : "Declined"}
                         </span>
                       </td>
+                      <td className={styles.tdDate}>{r.adults_count != null ? r.adults_count : <span className={styles.noMsg}>—</span>}</td>
+                      <td className={styles.tdDate}>{r.kids_count != null ? r.kids_count : <span className={styles.noMsg}>—</span>}</td>
                       <td className={styles.tdMsg}>{r.message || <span className={styles.noMsg}>—</span>}</td>
                       <td className={styles.tdDate}>
                         {r.timestamp

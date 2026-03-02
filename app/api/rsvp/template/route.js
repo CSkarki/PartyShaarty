@@ -6,8 +6,8 @@ export async function GET() {
   try { await requireHostProfile(supabase); } catch (res) { return res; }
 
   const aoa = [
-    ["Name*", "Email*", "Phone", "Attending*", "Message"],
-    ["Jane Doe", "jane@example.com", "555-1234", "Yes", "Looking forward to it!"],
+    ["Name*", "Email*", "Phone", "Attending*", "Adults (13+)", "Kids (under 13)", "Message"],
+    ["Jane Doe", "jane@example.com", "555-1234", "Yes", 2, 1, "Looking forward to it!"],
   ];
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   const csv = XLSX.utils.sheet_to_csv(ws);

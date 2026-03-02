@@ -311,6 +311,100 @@
   color: #dc2626;
 }
 
+/* ─── Headcount Section (Adults + Kids) ─────────────── */
+.headcountSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg, #faf7f2);
+  border: 1px solid var(--border, #e8e0d4);
+  border-radius: 10px;
+}
+
+.headcountTitle {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.headcountRow {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.headcountField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.headcountField label {
+  font-size: 0.8rem;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.headcountInput {
+  padding: 0.45rem 0.65rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+.headcountInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Suite mode inline counts */
+.fnCounts {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border, #e8e0d4);
+  margin-top: 0.25rem;
+}
+
+.fnCountField {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.fnCountField label {
+  white-space: nowrap;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.fnCountInput {
+  width: 58px;
+  padding: 0.3rem 0.4rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+  text-align: center;
+}
+
+.fnCountInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .invite__layout {

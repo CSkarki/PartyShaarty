@@ -444,7 +444,7 @@ export default function IntakePage() {
                     disabled={!isStepComplete(6) || saving}
                     onClick={handleFinish}
                   >
-                    {saving ? "Saving…" : "Submit &amp; see recommendation →"}
+                    {saving ? "Saving…" : "Save"}
                   </button>
                 </div>
               </div>

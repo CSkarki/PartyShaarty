@@ -8,15 +8,19 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [attending, setAttending] = useState("");
+  const [adultsCount, setAdultsCount] = useState("");
+  const [kidsCount, setKidsCount] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [imageError, setImageError] = useState(false);
   const statusRef = useRef(null);
 
-  // Per-function responses for Wedding Suite: { [eventSlug]: "Yes" | "No" | "" }
+  // Per-function responses for Wedding Suite: { [eventSlug]: { attending, adults, kids } }
   const [fnResponses, setFnResponses] = useState(() =>
-    groupEvents ? Object.fromEntries(groupEvents.map((g) => [g.event_slug, ""])) : {}
+    groupEvents
+      ? Object.fromEntries(groupEvents.map((g) => [g.event_slug, { attending: "", adults: "", kids: "" }]))
+      : {}
   );
 
   useEffect(() => {
@@ -25,8 +29,8 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
     }
   }, [status]);
 
-  function setFnResponse(slug, value) {
-    setFnResponses((prev) => ({ ...prev, [slug]: value }));
+  function setFnField(slug, field, value) {
+    setFnResponses((prev) => ({ ...prev, [slug]: { ...prev[slug], [field]: value } }));
   }
 
   async function handleSubmit(e) {
@@ -40,7 +44,9 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
       }
       const responses = groupEvents.map((g) => ({
         slug: g.event_slug,
-        attending: fnResponses[g.event_slug] || "No",
+        attending: fnResponses[g.event_slug].attending || "No",
+        adultsCount: fnResponses[g.event_slug].adults ? parseInt(fnResponses[g.event_slug].adults, 10) : null,
+        kidsCount: fnResponses[g.event_slug].kids ? parseInt(fnResponses[g.event_slug].kids, 10) : null,
       }));
       setLoading(true);
       setStatus(null);
@@ -64,7 +70,7 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
         if (!res.ok) throw new Error(data.error || `RSVP failed (${res.status})`);
         setStatus({ type: "success", text: "Thank you! Your RSVPs have been recorded." });
         setName(""); setEmail(""); setPhone(""); setMessage("");
-        setFnResponses(Object.fromEntries(groupEvents.map((g) => [g.event_slug, ""])));
+        setFnResponses(Object.fromEntries(groupEvents.map((g) => [g.event_slug, { attending: "", adults: "", kids: "" }])));
       } catch (err) {
         clearTimeout(timeoutId);
         setStatus({ type: "error", text: err.name === "AbortError" ? "Request timed out. Try again." : err.message || "Network error." });
@@ -94,6 +100,8 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
           email: email.trim(),
           phone: phone.trim() || undefined,
           attending,
+          adultsCount: adultsCount ? parseInt(adultsCount, 10) : null,
+          kidsCount: kidsCount ? parseInt(kidsCount, 10) : null,
           message: message.trim() || "",
           eventSlug,
         }),
@@ -107,6 +115,8 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
       setEmail("");
       setPhone("");
       setAttending("");
+      setAdultsCount("");
+      setKidsCount("");
       setMessage("");
     } catch (err) {
       clearTimeout(timeoutId);
@@ -216,19 +226,45 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
                           <div className={styles.fnToggle}>
                             <button
                               type="button"
-                              onClick={() => setFnResponse(g.event_slug, "Yes")}
-                              className={`${styles.fnBtn} ${fnResponses[g.event_slug] === "Yes" ? styles.fnBtnYes : ""}`}
+                              onClick={() => setFnField(g.event_slug, "attending", "Yes")}
+                              className={`${styles.fnBtn} ${fnResponses[g.event_slug].attending === "Yes" ? styles.fnBtnYes : ""}`}
                             >
                               Attending
                             </button>
                             <button
                               type="button"
-                              onClick={() => setFnResponse(g.event_slug, "No")}
-                              className={`${styles.fnBtn} ${fnResponses[g.event_slug] === "No" ? styles.fnBtnNo : ""}`}
+                              onClick={() => setFnField(g.event_slug, "attending", "No")}
+                              className={`${styles.fnBtn} ${fnResponses[g.event_slug].attending === "No" ? styles.fnBtnNo : ""}`}
                             >
                               Can&apos;t make it
                             </button>
                           </div>
+                          {fnResponses[g.event_slug].attending === "Yes" && (
+                            <div className={styles.fnCounts}>
+                              <div className={styles.fnCountField}>
+                                <label>Adults (13+)</label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  className={styles.fnCountInput}
+                                  value={fnResponses[g.event_slug].adults}
+                                  onChange={(e) => setFnField(g.event_slug, "adults", e.target.value)}
+                                  placeholder="0"
+                                />
+                              </div>
+                              <div className={styles.fnCountField}>
+                                <label>Kids (under 13)</label>
+                                <input
+                                  type="number"
+                                  min="0"
+                                  className={styles.fnCountInput}
+                                  value={fnResponses[g.event_slug].kids}
+                                  onChange={(e) => setFnField(g.event_slug, "kids", e.target.value)}
+                                  placeholder="0"
+                                />
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -261,6 +297,35 @@ export default function InviteForm({ profile, eventSlug, coverUrl, groupEvents }
                         <span>No</span>
                       </label>
                     </div>
+                    {attending === "Yes" && (
+                      <div className={styles.headcountSection}>
+                        <span className={styles.headcountTitle}>How many guests?</span>
+                        <div className={styles.headcountRow}>
+                          <div className={styles.headcountField}>
+                            <label>Adults (13+)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              className={styles.headcountInput}
+                              value={adultsCount}
+                              onChange={(e) => setAdultsCount(e.target.value)}
+                              placeholder="0"
+                            />
+                          </div>
+                          <div className={styles.headcountField}>
+                            <label>Kids (under 13)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              className={styles.headcountInput}
+                              value={kidsCount}
+                              onChange={(e) => setKidsCount(e.target.value)}
+                              placeholder="0"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
 

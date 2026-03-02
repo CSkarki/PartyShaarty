@@ -22,7 +22,7 @@ export async function POST(request) {
   let created = 0;
   const errors = [];
 
-  for (const { slug, attending } of responses) {
+  for (const { slug, attending, adultsCount, kidsCount } of responses) {
     if (!slug || !attending) continue;
 
     // Resolve event + host from slug
@@ -35,7 +35,7 @@ export async function POST(request) {
 
     try {
       await addRsvp(
-        { name, email, phone: phone || null, attending, message: message || "" },
+        { name, email, phone: phone || null, attending, message: message || "", adults_count: adultsCount ?? null, kids_count: kidsCount ?? null },
         ev.host_id,
         ev.id
       );

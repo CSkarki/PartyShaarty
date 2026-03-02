@@ -25,8 +25,8 @@ export async function GET(request) {
       arr = await listRsvps(profile.id);
     }
 
-    const head = ["Timestamp", "Name", "Email", "Attending", "Message"];
-    const data = [head, ...arr.map((r) => [r.timestamp, r.name, r.email, r.attending, r.message || ""])];
+    const head = ["Timestamp", "Name", "Email", "Attending", "Adults (13+)", "Kids (under 13)", "Message"];
+    const data = [head, ...arr.map((r) => [r.timestamp, r.name, r.email, r.attending, r.adults_count ?? "", r.kids_count ?? "", r.message || ""])];
 
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(data);

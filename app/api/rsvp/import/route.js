@@ -50,6 +50,8 @@ export async function POST(request) {
     email:     headers.indexOf("email"),
     phone:     headers.indexOf("phone"),
     attending: headers.indexOf("attending"),
+    adults:    headers.findIndex((h) => h.startsWith("adults")),
+    kids:      headers.findIndex((h) => h.startsWith("kids")),
     message:   headers.indexOf("message"),
   };
 
@@ -71,6 +73,10 @@ export async function POST(request) {
     const phone     = idx.phone    !== -1 ? String(row[idx.phone]    ?? "").trim() : "";
     const attending = String(row[idx.attending] ?? "").trim();
     const message   = idx.message !== -1 ? String(row[idx.message]  ?? "").trim() : "";
+    const adultsRaw = idx.adults  !== -1 ? String(row[idx.adults]   ?? "").trim() : "";
+    const kidsRaw   = idx.kids    !== -1 ? String(row[idx.kids]     ?? "").trim() : "";
+    const adults_count = adultsRaw !== "" ? parseInt(adultsRaw, 10) || null : null;
+    const kids_count   = kidsRaw   !== "" ? parseInt(kidsRaw,   10) || null : null;
 
     // Skip completely blank rows
     if (!name && !email && !attending) { skipped++; continue; }
@@ -89,7 +95,7 @@ export async function POST(request) {
 
     try {
       await addRsvp(
-        { name, email, phone: phone || null, attending: norm, message: message || "" },
+        { name, email, phone: phone || null, attending: norm, message: message || "", adults_count, kids_count },
         profile.id,
         resolvedEventId
       );
