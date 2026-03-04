@@ -23,7 +23,7 @@ export default async function Home({ searchParams }) {
 
   // Hardcoded fallback — works even if DB is unreachable
   if (!theme) {
-    theme = DEFAULT_THEMES.wedding;
+    theme = DEFAULT_THEMES.anniversary;
   }
 
   return <LandingTemplate theme={theme} />;

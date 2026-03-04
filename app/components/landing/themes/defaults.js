@@ -98,7 +98,7 @@ const WEDDING = {
   },
   hero: {
     badge:       "Built for Indian weddings",
-    headline:    "Every function.\nEvery memory.\nOne place.",
+    headline:    "Plan the functions.\nGather the family.\nWe'll handle the rest.",
     subheadline: "From your daughter's Mehndi to your son's Namkaran — Utsavé gives you invites, RSVPs, photo galleries, and WhatsApp reminders for every celebration in your family's life.",
     ctaText:     "Begin your celebration →",
     ctaHref:     "/auth/register",
@@ -131,10 +131,10 @@ const FESTIVAL = {
     accentDeep: "#9b2226",
   },
   hero: {
-    badge:       "Festival season is here",
-    headline:    "Every festival.\nEvery color.\nOne platform.",
-    subheadline: "Plan your Diwali puja, Holi bash, Navratri garba, or Eid dinner — with invites, RSVPs, and WhatsApp messaging your community will love.",
-    ctaText:     "Start planning your festival →",
+    badge:       "For every Indian celebration, everywhere",
+    headline:    "Light the diyas.\nThrow the colors.\nWe'll handle the rest.",
+    subheadline: "Your family spans continents — but your Diwali, Holi, Navratri, or Eid shouldn't feel that way. Beautiful invites, effortless RSVPs, gentle reminders, and a Memories gallery that keeps the celebration alive long after the lights go out.",
+    ctaText:     "Start your festival →",
     ctaHref:     "/auth/register",
     photos: [
       { src: "https://images.pexels.com/photos/7686304/pexels-photo-7686304.jpeg?auto=compress&cs=tinysrgb&w=800",   alt: "Family celebrating Diwali with sparklers" },
@@ -144,8 +144,8 @@ const FESTIVAL = {
   },
   eventTypeKeys: ["diwali", "holi", "navratri", "puja", "birthday", "wedding", "graduation"],
   ctaBanner: {
-    headline: "Make this festival season unforgettable.",
-    sub:      "Invites, RSVPs, WhatsApp blasts — all in one place.",
+    headline: "This festival season, bring everyone together.",
+    sub:      "Free to start. No WhatsApp chaos required.",
     cta:      "Start for free →",
     href:     "/auth/register",
   },
@@ -166,7 +166,7 @@ const PUJA = {
   },
   hero: {
     badge:       "Sacred ceremonies, beautifully organised",
-    headline:    "Every puja.\nEvery blessing.\nPerfectly planned.",
+    headline:    "Light the diya.\nFold your hands.\nWe'll handle the rest.",
     subheadline: "From Satyanarayan to Griha Pravesh, Shivratri to Janmashtami — invite your family, collect RSVPs, and share the memories, all from one platform.",
     ctaText:     "Organise your ceremony →",
     ctaHref:     "/auth/register",
@@ -200,7 +200,7 @@ const ANNIVERSARY = {
   },
   hero: {
     badge:       "Celebrate a lifetime of love",
-    headline:    "25 years.\n50 years.\nEvery memory preserved.",
+    headline:    "A lifetime of love.\nNow celebrate it.\nWe'll handle the rest.",
     subheadline: "Make your Silver or Golden anniversary a celebration the whole family will remember — with beautiful invite pages, RSVPs, photo galleries, and WhatsApp reminders.",
     ctaText:     "Plan the celebration →",
     ctaHref:     "/auth/register",
@@ -234,7 +234,7 @@ const BIRTHDAY_KID = {
   },
   hero: {
     badge:       "Because every first deserves a party",
-    headline:    "Their 1st birthday.\nYour biggest\ncelebration.",
+    headline:    "One tiny human.\nOne big celebration.\nWe'll handle the rest.",
     subheadline: "Plan your little one's first birthday with family from across the world — beautiful invite pages, RSVPs, photo galleries, and WhatsApp reminders in one joyful platform.",
     ctaText:     "Plan the birthday party →",
     ctaHref:     "/auth/register",
@@ -268,7 +268,7 @@ const BIRTHDAY_ADULT = {
   },
   hero: {
     badge:       "Fifty is fabulous",
-    headline:    "A milestone birthday\ndeserves a\ngrand celebration.",
+    headline:    "Fifty is fabulous.\nMake it legendary.\nWe'll handle the rest.",
     subheadline: "Plan a 40th, 50th, or any milestone birthday with the elegance it deserves — invites, RSVPs, private photo galleries, and WhatsApp reminders for all the family.",
     ctaText:     "Plan the birthday →",
     ctaHref:     "/auth/register",

@@ -10,10 +10,10 @@ import styles from "./page.module.css";
 const EVENT_TYPE_OPTIONS = [
   { value: "wedding_suite", icon: "💍", label: "Wedding Suite", special: true, detail: "5 linked functions" },
   { value: "birthday",      icon: "🎂", label: "Birthday" },
-  { value: "diwali",        icon: "🪔", label: "Festival / Diwali" },
+  { value: "diwali",        icon: "🪔 🎨 ", label: "Festival" },
   { value: "puja",          icon: "🙏", label: "Puja / Ceremony" },
   { value: "namkaran",      icon: "👶", label: "Namkaran" },
-  { value: "godh_bharai",   icon: "🌸", label: "Godh Bharai" },
+  { value: "anniversary",   icon: "💑", label: "Anniversary" },
   { value: "graduation",    icon: "🎓", label: "Graduation" },
   { value: "other",         icon: "✦",  label: "Other" },
 ];
