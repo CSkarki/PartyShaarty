@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "../../../lib/supabase-browser";
 import styles from "./intake.module.css";
@@ -97,7 +97,7 @@ const GUEST_COUNTS = ["Under 50", "50–150", "150–350", "350+"];
 const BUDGETS = ["Under $5,000", "$5,000 – $15,000", "$15,000 – $30,000", "$30,000+", "Still deciding"];
 
 /* ─── Component ─────────────────────────────────────────────────────────── */
-export default function OnboardingIntakePage() {
+function OnboardingIntakeForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const mode = searchParams.get("mode") === "full" ? "full" : "light";
@@ -539,5 +539,13 @@ export default function OnboardingIntakePage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function OnboardingIntakePage() {
+  return (
+    <Suspense>
+      <OnboardingIntakeForm />
+    </Suspense>
   );
 }
