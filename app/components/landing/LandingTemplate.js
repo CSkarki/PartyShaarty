@@ -122,9 +122,9 @@ export default function LandingTemplate({ theme }) {
           </h1>
           <p className={styles.heroSub}>{hero.subheadline}</p>
           <div className={styles.heroCtas}>
-            <Link href={hero.ctaHref || "/auth/register"} className={styles.btnPrimary}>
-              {hero.ctaText}
-            </Link>
+            <a href="#we-are-here-for-you" className={styles.btnPrimary}>
+              Want help planning your event?
+            </a>
             <Link href="#how-it-works" className={styles.btnSecondary}>
               See how it works
             </Link>
@@ -271,7 +271,7 @@ export default function LandingTemplate({ theme }) {
 
       {/* ── Help CTA ── */}
       {helpCta?.enabled !== false && (
-        <section className={styles.helpSection}>
+        <section id="we-are-here-for-you" className={styles.helpSection}>
           <p className={styles.helpBadge}>We&apos;re here for you</p>
           <h2 className={styles.helpHeadline}>{helpCta?.headline}</h2>
           <p className={styles.helpSub}>{helpCta?.sub}</p>

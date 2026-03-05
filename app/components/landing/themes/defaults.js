@@ -143,7 +143,7 @@ const FESTIVAL = {
     badge:       "For every Indian celebration, everywhere",
     headline:    "Light the diyas.\nThrow the colors.\nWe'll handle the rest.",
     subheadline: "Your family spans continents — but your Diwali, Holi, Navratri, or Eid shouldn't feel that way. Beautiful invites, effortless RSVPs, gentle reminders, and a Memories gallery that keeps the celebration alive long after the lights go out.",
-    ctaText:     "Start your festival →",
+    ctaText:     "Want help planning your event?",
     ctaHref:     "/auth/register",
     photos: [
       { src: "https://images.pexels.com/photos/7686304/pexels-photo-7686304.jpeg?auto=compress&cs=tinysrgb&w=800",   alt: "Family celebrating Diwali with sparklers" },
@@ -161,7 +161,7 @@ const FESTIVAL = {
   intakeMode: "light",
   helpCta: {
     enabled:    true,
-    headline:   "Want help planning your festival?",
+    headline:   "Want help planning your event?",
     sub:        "Let our team handle the invites, décor, and day-of coordination.",
     email:      "contact@utsav-events.com",
     phone:      "571-908-9101",
