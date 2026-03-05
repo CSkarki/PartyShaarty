@@ -33,14 +33,16 @@ export default function EventDashboardPage() {
   const [deleteReason, setDeleteReason] = useState("");
   const [requestingDeletion, setRequestingDeletion] = useState(false);
   const [deletionRequestSent, setDeletionRequestSent] = useState(false);
+  const [intakeMode, setIntakeMode] = useState("full"); // same as landing "Get Started" (theme intake mode)
 
   const opts = { credentials: "include" };
 
   async function loadEvent() {
-    const [evRes, rsvpRes, intakeRes] = await Promise.all([
+    const [evRes, rsvpRes, intakeRes, themeRes] = await Promise.all([
       fetch(`/api/host/events/${eventId}`, opts),
       fetch(`/api/rsvp/list?eventId=${eventId}`, opts),
       fetch(`/api/host/events/${eventId}/intake`, opts),
+      fetch("/api/landing/active-theme", opts),
     ]);
     if (!evRes.ok) { router.push("/dashboard"); return; }
     const ev = await evRes.json();
@@ -52,6 +54,10 @@ export default function EventDashboardPage() {
     if (intakeRes.ok) {
       const intakeData = await intakeRes.json();
       setHasIntake(!!intakeData.intake);
+    }
+    if (themeRes.ok) {
+      const themeData = await themeRes.json();
+      if (themeData.intakeMode === "light" || themeData.intakeMode === "full") setIntakeMode(themeData.intakeMode);
     }
     setLoading(false);
   }
@@ -409,7 +415,7 @@ export default function EventDashboardPage() {
                     <span className={styles.checkDesc}>Your celebration plan and how we’ll keep in touch (email & phone).</span>
                   </span>
                 )}
-                <a href={`/dashboard/events/${eventId}/intake`} className={styles.checkAction}>
+                <a href={hasIntake ? `/dashboard/events/${eventId}/intake` : `/onboarding/intake?mode=${intakeMode}`} className={styles.checkAction}>
                   {hasIntake ? "View →" : "Start →"}
                 </a>
               </div>
@@ -422,7 +428,7 @@ export default function EventDashboardPage() {
           <h2 className={styles.cardTitle}>Manage Event</h2>
           <p className={styles.cardSub}>All your tools in one place</p>
           <div className={styles.actionGridLarge}>
-            <a href={`/dashboard/events/${eventId}/intake`} className={styles.actionTileLg}>
+            <a href={hasIntake ? `/dashboard/events/${eventId}/intake` : `/onboarding/intake?mode=${intakeMode}`} className={styles.actionTileLg}>
               <span className={styles.actionIconLg}>✦</span>
               <span className={styles.actionLabelLg}>Design your celebration</span>
               <span className={styles.actionDescLg}>{hasIntake ? "View recommendation →" : "Start →"}</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
 const THEME_LABELS = {
@@ -25,7 +26,17 @@ const ALL_EVENT_TYPE_KEYS = [
   { key: "anniversary",label: "Anniversary" },
 ];
 
+const PEXELS_QUERIES = {
+  wedding:        "Indian wedding ceremony celebration",
+  festival:       "Diwali Holi Navratri festival India celebration",
+  puja:           "Hindu puja ceremony family",
+  anniversary:    "wedding anniversary couple celebration",
+  birthday_kid:   "baby first birthday party celebration",
+  birthday_adult: "50th birthday party milestone celebration",
+};
+
 export default function LandingConfigForm({ themes, activeTheme }) {
+  const router = useRouter();
   // ── Panel A: Active theme switcher ──────────────────────────────────────
   const [activatingId, setActivatingId] = useState(null);
   const [activateMsg, setActivateMsg] = useState(null);
@@ -43,6 +54,7 @@ export default function LandingConfigForm({ themes, activeTheme }) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Failed to activate");
       setActivateMsg({ type: "success", text: "Theme activated! Visit / to see it live." });
+      router.refresh(); // refetch theme list so Active badge updates
     } catch (err) {
       setActivateMsg({ type: "error", text: err.message });
     } finally {
@@ -81,10 +93,71 @@ export default function LandingConfigForm({ themes, activeTheme }) {
   // Event type multi-select
   const [eventTypeKeys, setEventTypeKeys] = useState(activeTheme?.eventTypeKeys || []);
 
+  // Pexels picker for hero photos (slot 0=main, 1=top-right, 2=bottom-left)
+  const [pexelsSlot, setPexelsSlot] = useState(null);
+  const [pexelsQuery, setPexelsQuery] = useState("");
+  const [pexelsPhotos, setPexelsPhotos] = useState([]);
+  const [pexelsLoading, setPexelsLoading] = useState(false);
+  const [pexelsPage, setPexelsPage] = useState(1);
+  const [pexelsTotalResults, setPexelsTotalResults] = useState(0);
+
+  // Intake mode + help CTA
+  const [intakeMode,      setIntakeMode]      = useState(activeTheme?.intakeMode || "light");
+  const [helpEnabled,     setHelpEnabled]     = useState(activeTheme?.helpCta?.enabled !== false);
+  const [helpHeadline,    setHelpHeadline]    = useState(activeTheme?.helpCta?.headline || "");
+  const [helpSub,         setHelpSub]         = useState(activeTheme?.helpCta?.sub || "");
+  const [helpEmail,       setHelpEmail]       = useState(activeTheme?.helpCta?.email || "");
+  const [helpPhone,       setHelpPhone]       = useState(activeTheme?.helpCta?.phone || "");
+  const [helpButtonText,  setHelpButtonText]  = useState(activeTheme?.helpCta?.buttonText || "");
+
   function toggleEventType(key) {
     setEventTypeKeys((prev) =>
       prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
+  }
+
+  const editingThemeName = themes.find((t) => t.id === editingThemeId)?.name || "wedding";
+
+  async function openPexelsForSlot(slot) {
+    setPexelsSlot(slot);
+    const defaultQ = PEXELS_QUERIES[editingThemeName] || PEXELS_QUERIES.wedding;
+    setPexelsQuery(defaultQ);
+    setPexelsPhotos([]);
+    setPexelsPage(1);
+    await searchPexels(defaultQ, 1, true);
+  }
+
+  async function searchPexels(query, page = 1, replace = false) {
+    if (!query?.trim()) return;
+    setPexelsLoading(true);
+    try {
+      const res = await fetch(
+        `/api/admin/pexels/search?q=${encodeURIComponent(query.trim())}&page=${page}&per_page=15`,
+        { credentials: "include" }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setPexelsPhotos((prev) => (replace || page === 1 ? (data.photos || []) : [...prev, ...(data.photos || [])]));
+        setPexelsTotalResults(data.total_results || 0);
+        setPexelsPage(data.page || page);
+      }
+    } catch {
+      setPexelsPhotos([]);
+    } finally {
+      setPexelsLoading(false);
+    }
+  }
+
+  function pexelsCdnUrl(photoId) {
+    return `https://images.pexels.com/photos/${photoId}/pexels-photo-${photoId}.jpeg?auto=compress&cs=tinysrgb&w=800`;
+  }
+
+  function pickPexelsPhoto(photo) {
+    const url = pexelsCdnUrl(photo.id);
+    if (pexelsSlot === 0) setPhoto0(url);
+    if (pexelsSlot === 1) setPhoto1(url);
+    if (pexelsSlot === 2) setPhoto2(url);
+    setPexelsSlot(null);
   }
 
   async function handleSave(e) {
@@ -104,6 +177,15 @@ export default function LandingConfigForm({ themes, activeTheme }) {
       palette: { accent: pAccent, accentHover: pHover, accentDim: pDim, bg: pBg, accentDeep: pDeep },
       ctaBanner: { headline: ctaBannerHeadline, sub: ctaBannerSub, cta: ctaBannerCta, href: ctaBannerHref },
       eventTypeKeys,
+      intakeMode,
+      helpCta: {
+        enabled: helpEnabled,
+        headline: helpHeadline,
+        sub: helpSub,
+        email: helpEmail,
+        phone: helpPhone,
+        buttonText: helpButtonText,
+      },
     };
     try {
       const res = await fetch(`/api/admin/landing-themes/${editingThemeId}`, {
@@ -214,18 +296,97 @@ export default function LandingConfigForm({ themes, activeTheme }) {
             </div>
             <div className={styles.field}>
               <label className={styles.label}>Hero photo 1 (main) — URL</label>
-              <input className={styles.input} value={photo0} onChange={(e) => setPhoto0(e.target.value)} placeholder="/assets/celebrations/photos/wedding/pexels-…jpg" />
+              <div className={styles.heroPhotoRow}>
+                <input className={styles.input} value={photo0} onChange={(e) => setPhoto0(e.target.value)} placeholder="Pexels URL or paste any image URL" />
+                <button type="button" className={styles.pexelsPickBtn} onClick={() => openPexelsForSlot(0)} title="Search Pexels (filtered for this theme)">
+                  🔍 Pick from Pexels
+                </button>
+              </div>
             </div>
             <div className={styles.fieldRow}>
               <div className={styles.field}>
-                <label className={styles.label}>Hero photo 2 (top-right)</label>
-                <input className={styles.input} value={photo1} onChange={(e) => setPhoto1(e.target.value)} placeholder="/assets/celebrations/photos/…" />
+                <label className={styles.label}>Hero photo 2 (top-right) — URL</label>
+                <div className={styles.heroPhotoRow}>
+                  <input className={styles.input} value={photo1} onChange={(e) => setPhoto1(e.target.value)} placeholder="Pexels or image URL" />
+                  <button type="button" className={styles.pexelsPickBtn} onClick={() => openPexelsForSlot(1)} title="Search Pexels (filtered for this theme)">
+                    🔍 Pick from Pexels
+                  </button>
+                </div>
               </div>
               <div className={styles.field}>
-                <label className={styles.label}>Hero photo 3 (bottom-left)</label>
-                <input className={styles.input} value={photo2} onChange={(e) => setPhoto2(e.target.value)} placeholder="/assets/celebrations/photos/…" />
+                <label className={styles.label}>Hero photo 3 (bottom-left) — URL</label>
+                <div className={styles.heroPhotoRow}>
+                  <input className={styles.input} value={photo2} onChange={(e) => setPhoto2(e.target.value)} placeholder="Pexels or image URL" />
+                  <button type="button" className={styles.pexelsPickBtn} onClick={() => openPexelsForSlot(2)} title="Search Pexels (filtered for this theme)">
+                    🔍 Pick from Pexels
+                  </button>
+                </div>
               </div>
             </div>
+            {pexelsSlot !== null && (
+              <div className={styles.pexelsPanel}>
+                <p className={styles.pexelsPanelTitle}>
+                  Choose photo for Hero {pexelsSlot === 0 ? "1 (main)" : pexelsSlot === 1 ? "2 (top-right)" : "3 (bottom-left)"}
+                </p>
+                <div className={styles.pexelsSearchBar}>
+                  <input
+                    type="text"
+                    className={styles.pexelsInput}
+                    value={pexelsQuery}
+                    onChange={(e) => setPexelsQuery(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPexels(pexelsQuery, 1, true); } }}
+                    placeholder="Search Pexels…"
+                  />
+                  <button
+                    type="button"
+                    className={styles.pexelsSearchBtn}
+                    onClick={() => searchPexels(pexelsQuery, 1, true)}
+                    disabled={pexelsLoading || !pexelsQuery.trim()}
+                  >
+                    {pexelsLoading ? "…" : "Search"}
+                  </button>
+                  <button type="button" className={styles.pexelsCloseBtn} onClick={() => setPexelsSlot(null)}>Cancel</button>
+                </div>
+                {pexelsPhotos.length === 0 && !pexelsLoading && (
+                  <p className={styles.pexelsLoading}>Enter a search term and click Search.</p>
+                )}
+                {pexelsLoading && pexelsPhotos.length === 0 && (
+                  <p className={styles.pexelsLoading}>Searching…</p>
+                )}
+                {pexelsPhotos.length > 0 && (
+                  <div className={styles.pexelsGrid}>
+                    {pexelsPhotos.map((photo) => (
+                      <button
+                        key={photo.id}
+                        type="button"
+                        className={styles.pexelsThumb}
+                        onClick={() => pickPexelsPhoto(photo)}
+                        title={photo.alt || photo.photographer}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={photo.src_medium} alt={photo.alt || ""} loading="lazy" />
+                        <span className={styles.pexelsThumbCredit}>{photo.photographer}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <div className={styles.pexelsFooter}>
+                  <span className={styles.pexelsAttribution}>
+                    Photos by <a href="https://www.pexels.com" target="_blank" rel="noreferrer">Pexels</a>
+                  </span>
+                  {pexelsPhotos.length < pexelsTotalResults && (
+                    <button
+                      type="button"
+                      className={styles.pexelsLoadMore}
+                      onClick={() => searchPexels(pexelsQuery, pexelsPage + 1, false)}
+                      disabled={pexelsLoading}
+                    >
+                      {pexelsLoading ? "Loading…" : "Load more"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
           </fieldset>
 
           {/* Palette section */}
@@ -291,6 +452,60 @@ export default function LandingConfigForm({ themes, activeTheme }) {
                 <input className={styles.input} value={ctaBannerHref} onChange={(e) => setCtaBannerHref(e.target.value)} placeholder="/auth/register" />
               </div>
             </div>
+          </fieldset>
+
+          {/* Help CTA section */}
+          <fieldset className={styles.fieldset}>
+            <legend className={styles.legend}>Help CTA Section ("We&apos;re here for you")</legend>
+            <div className={styles.field}>
+              <label className={styles.checkLabel}>
+                <input
+                  type="checkbox"
+                  checked={helpEnabled}
+                  onChange={(e) => setHelpEnabled(e.target.checked)}
+                />
+                Show "Need help?" section on landing page
+              </label>
+            </div>
+            <div className={styles.field}>
+              <label className={styles.label}>Intake mode for "Get Started" button</label>
+              <div style={{ display: "flex", gap: "1.5rem", marginTop: "0.25rem" }}>
+                <label className={styles.checkLabel}>
+                  <input type="radio" name="intakeMode" value="light" checked={intakeMode === "light"} onChange={() => setIntakeMode("light")} />
+                  Light (single-page, ~5 fields)
+                </label>
+                <label className={styles.checkLabel}>
+                  <input type="radio" name="intakeMode" value="full" checked={intakeMode === "full"} onChange={() => setIntakeMode("full")} />
+                  Full (6-step questionnaire)
+                </label>
+              </div>
+            </div>
+            {helpEnabled && (
+              <>
+                <div className={styles.field}>
+                  <label className={styles.label}>Headline</label>
+                  <input className={styles.input} value={helpHeadline} onChange={(e) => setHelpHeadline(e.target.value)} placeholder="Want help planning your celebration?" />
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Sub-text</label>
+                  <input className={styles.input} value={helpSub} onChange={(e) => setHelpSub(e.target.value)} placeholder="Let our team design, plan and execute your event — end to end." />
+                </div>
+                <div className={styles.fieldRow}>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Contact email</label>
+                    <input className={styles.input} value={helpEmail} onChange={(e) => setHelpEmail(e.target.value)} placeholder="contact@utsav-events.com" />
+                  </div>
+                  <div className={styles.field}>
+                    <label className={styles.label}>Contact phone</label>
+                    <input className={styles.input} value={helpPhone} onChange={(e) => setHelpPhone(e.target.value)} placeholder="571-908-9101" />
+                  </div>
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>Button text</label>
+                  <input className={styles.input} value={helpButtonText} onChange={(e) => setHelpButtonText(e.target.value)} placeholder="Get Started →" />
+                </div>
+              </>
+            )}
           </fieldset>
 
           {saveMsg && (

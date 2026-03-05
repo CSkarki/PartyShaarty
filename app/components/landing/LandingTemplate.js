@@ -85,7 +85,7 @@ function HeadlineWithBreaks({ text }) {
  * All section content comes from theme.* — no hardcoded text.
  * ─────────────────────────────────────────────────────────────────────────── */
 export default function LandingTemplate({ theme }) {
-  const { palette, hero, eventTypeKeys, ctaBanner } = theme;
+  const { palette, hero, eventTypeKeys, ctaBanner, helpCta, intakeMode } = theme;
 
   // Resolve event type objects from keys
   const eventTypes = (eventTypeKeys || [])
@@ -268,6 +268,26 @@ export default function LandingTemplate({ theme }) {
           ))}
         </div>
       </section>
+
+      {/* ── Help CTA ── */}
+      {helpCta?.enabled !== false && (
+        <section className={styles.helpSection}>
+          <p className={styles.helpBadge}>We&apos;re here for you</p>
+          <h2 className={styles.helpHeadline}>{helpCta?.headline}</h2>
+          <p className={styles.helpSub}>{helpCta?.sub}</p>
+          <div className={styles.helpContacts}>
+            <a href={`mailto:${helpCta?.email}`} className={styles.helpContact}>
+              📧 {helpCta?.email}
+            </a>
+            <a href={`tel:${(helpCta?.phone || "").replace(/\D/g, "")}`} className={styles.helpContact}>
+              📞 {helpCta?.phone}
+            </a>
+          </div>
+          <Link href={`/auth/register?intake=${intakeMode || "light"}`} className={styles.helpBtn}>
+            {helpCta?.buttonText || "Get Started →"}
+          </Link>
+        </section>
+      )}
 
       {/* ── Pricing ── hidden for now */}
 

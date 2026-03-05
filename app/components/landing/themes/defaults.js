@@ -115,6 +115,15 @@ const WEDDING = {
     cta:      "Begin your celebration →",
     href:     "/auth/register",
   },
+  intakeMode: "full",
+  helpCta: {
+    enabled:    true,
+    headline:   "Want help planning your celebration?",
+    sub:        "Let our team design, plan and execute your event — end to end.",
+    email:      "contact@utsav-events.com",
+    phone:      "571-908-9101",
+    buttonText: "Get Started →",
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -148,6 +157,15 @@ const FESTIVAL = {
     sub:      "Free to start. No WhatsApp chaos required.",
     cta:      "Start for free →",
     href:     "/auth/register",
+  },
+  intakeMode: "light",
+  helpCta: {
+    enabled:    true,
+    headline:   "Want help planning your festival?",
+    sub:        "Let our team handle the invites, décor, and day-of coordination.",
+    email:      "contact@utsav-events.com",
+    phone:      "571-908-9101",
+    buttonText: "Get Started →",
   },
 };
 
@@ -183,6 +201,15 @@ const PUJA = {
     cta:      "Get started free →",
     href:     "/auth/register",
   },
+  intakeMode: "light",
+  helpCta: {
+    enabled:    true,
+    headline:   "Want help organising your puja or ceremony?",
+    sub:        "Let our team handle the coordination so you can focus on the blessings.",
+    email:      "contact@utsav-events.com",
+    phone:      "571-908-9101",
+    buttonText: "Get Started →",
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -216,6 +243,15 @@ const ANNIVERSARY = {
     sub:      "Plan it once. Cherish it forever.",
     cta:      "Start planning →",
     href:     "/auth/register",
+  },
+  intakeMode: "full",
+  helpCta: {
+    enabled:    true,
+    headline:   "Want help planning your anniversary celebration?",
+    sub:        "Let our team design and execute a celebration as grand as your love story.",
+    email:      "contact@utsav-events.com",
+    phone:      "571-908-9101",
+    buttonText: "Get Started →",
   },
 };
 
@@ -251,6 +287,15 @@ const BIRTHDAY_KID = {
     cta:      "Start planning →",
     href:     "/auth/register",
   },
+  intakeMode: "light",
+  helpCta: {
+    enabled:    true,
+    headline:   "Want help planning their big day?",
+    sub:        "Let our team take care of every detail so you can be fully present.",
+    email:      "contact@utsav-events.com",
+    phone:      "571-908-9101",
+    buttonText: "Get Started →",
+  },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -284,6 +329,15 @@ const BIRTHDAY_ADULT = {
     sub:      "Start planning in minutes. Free to try.",
     cta:      "Plan the celebration →",
     href:     "/auth/register",
+  },
+  intakeMode: "light",
+  helpCta: {
+    enabled:    true,
+    headline:   "Want help planning this milestone birthday?",
+    sub:        "Let our team design and execute the celebration they deserve.",
+    email:      "contact@utsav-events.com",
+    phone:      "571-908-9101",
+    buttonText: "Get Started →",
   },
 };
 

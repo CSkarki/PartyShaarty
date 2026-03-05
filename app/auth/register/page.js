@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createSupabaseBrowserClient } from "../../../lib/supabase-browser";
 import styles from "../auth.module.css";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const intakeMode = searchParams.get("intake") || "";
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,11 +32,12 @@ export default function RegisterPage() {
       setLoading(false);
       return;
     }
+    const returnTo = intakeMode ? `/onboarding/intake?mode=${intakeMode}` : "/dashboard";
     const { error: signUpError } = await supabase.auth.signUp({
       email: email.trim(),
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/api/auth/callback`,
+        emailRedirectTo: `${window.location.origin}/api/auth/callback?returnTo=${encodeURIComponent(returnTo)}`,
         data: { display_name: displayName.trim() },
       },
     });

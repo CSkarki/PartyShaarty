@@ -5,30 +5,20 @@ import { useParams, useRouter } from "next/navigation";
 import styles from "../../../page.module.css";
 import formStyles from "../../../event/event.module.css";
 
-const CATEGORY_LABELS = {
-  wedding:          "Wedding",
-  mehndi:           "Mehndi",
-  sangeet:          "Sangeet",
-  haldi:            "Haldi",
-  diwali:           "Diwali",
-  holi:             "Holi",
-  navratri:         "Navratri",
-  eid:              "Eid",
-  puja:             "Puja",
-  family:           "Family",
-  birthday:         "Birthday",
-  birthday_1st:     "1st Birthday",
-  birthday_40th:    "40th Birthday",
-  birthday_50th:    "50th Birthday",
-  anniversary_10:   "10th Anniversary",
-  anniversary_25:   "25th Anniversary",
-  anniversary_50:   "50th Anniversary",
-  uttarayani:       "Uttarayani",
-  uttarakhand_fair: "Uttarakhand Fair",
-  marathon:         "Marathon",
-  community:        "Community",
-  outdoor_run:      "Outdoor Run",
+const PEXELS_QUERIES = {
+  wedding:       "Indian wedding ceremony celebration",
+  wedding_suite: "Indian wedding ceremony celebration",
+  diwali:        "Diwali festival diyas lights",
+  holi:          "Holi colors festival India",
+  navratri:      "Navratri garba dance traditional",
+  puja:          "Hindu puja ceremony family",
+  birthday:      "birthday party celebration",
+  namkaran:      "Indian baby naming ceremony",
+  anniversary:   "wedding anniversary couple celebration",
+  graduation:    "graduation celebration family",
+  other:         "celebration party gathering",
 };
+
 
 export default function EventSettingsPage() {
   const { eventId } = useParams();
@@ -39,6 +29,7 @@ export default function EventSettingsPage() {
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState(null);
   const [eventStatus, setEventStatus] = useState("draft");
+  const [eventType, setEventType] = useState("other");
   const [slug, setSlug] = useState("");
 
   const [eventName, setEventName] = useState("");
@@ -49,13 +40,14 @@ export default function EventSettingsPage() {
   const [coverPreview, setCoverPreview] = useState(null);
   const [existingCoverUrl, setExistingCoverUrl] = useState(null);
 
-  // Library picker state
-  const [showLibrary, setShowLibrary] = useState(false);
-  const [libPhotos, setLibPhotos] = useState([]);
-  const [libCategories, setLibCategories] = useState([]);
-  const [libCategory, setLibCategory] = useState("all");
-  const [libLoading, setLibLoading] = useState(false);
-  const [libPicking, setLibPicking] = useState(null);
+  // Pexels live search state
+  const [pexelsOpen, setPexelsOpen] = useState(false);
+  const [pexelsQuery, setPexelsQuery] = useState("");
+  const [pexelsPhotos, setPexelsPhotos] = useState([]);
+  const [pexelsLoading, setPexelsLoading] = useState(false);
+  const [pexelsPage, setPexelsPage] = useState(1);
+  const [pexelsTotalResults, setPexelsTotalResults] = useState(0);
+  const [pexelsPicking, setPexelsPicking] = useState(null);
 
   async function loadEvent() {
     const res = await fetch(`/api/host/events/${eventId}`, { credentials: "include" });
@@ -63,6 +55,7 @@ export default function EventSettingsPage() {
     const data = await res.json();
     setSlug(data.slug || "");
     setEventStatus(data.status || "draft");
+    setEventType(data.event_type || "other");
     setEventName(data.event_name || "");
     setEventDate(data.event_date || "");
     setEventLocation(data.event_location || "");
@@ -90,49 +83,53 @@ export default function EventSettingsPage() {
     const reader = new FileReader();
     reader.onload = (ev) => setCoverPreview(ev.target.result);
     reader.readAsDataURL(file);
-    setShowLibrary(false);
+    setPexelsOpen(false);
   }
 
-  async function openLibrary() {
-    setShowLibrary(true);
-    if (libPhotos.length) return;
-    setLibLoading(true);
-    try {
-      const res = await fetch("/assets/celebrations/manifest.json");
-      const manifest = await res.json();
-      const photos = manifest.photos || [];
-      setLibPhotos(photos);
-      const cats = [...new Set(photos.map((p) => p.category))].sort((a, b) =>
-        (CATEGORY_LABELS[a] || a).localeCompare(CATEGORY_LABELS[b] || b)
-      );
-      setLibCategories(cats);
-    } catch {
-      // silently fail
-    } finally {
-      setLibLoading(false);
+  async function openPexels() {
+    setPexelsOpen(true);
+    if (pexelsPhotos.length === 0) {
+      const q = PEXELS_QUERIES[eventType] || PEXELS_QUERIES.other;
+      setPexelsQuery(q);
+      await searchPexels(q, 1, true);
     }
   }
 
-  async function pickLibraryPhoto(photo) {
-    setLibPicking(photo.id);
+  async function searchPexels(query, page = 1, replace = false) {
+    if (!query.trim()) return;
+    setPexelsLoading(true);
     try {
-      const res = await fetch(photo.file);
-      const blob = await res.blob();
-      if (blob.size > MAX_COVER_BYTES) {
-        setStatus({ type: "error", text: `Library image is too large (${(blob.size / 1024 / 1024).toFixed(1)} MB). Please upload your own image under ${MAX_COVER_MB} MB.` });
-        setShowLibrary(false);
-        return;
+      const res = await fetch(
+        `/api/pexels/search?q=${encodeURIComponent(query.trim())}&page=${page}&per_page=15`,
+        { credentials: "include" }
+      );
+      const data = await res.json();
+      if (res.ok) {
+        setPexelsPhotos((prev) => replace || page === 1 ? data.photos : [...prev, ...data.photos]);
+        setPexelsTotalResults(data.total_results || 0);
+        setPexelsPage(page);
       }
-      const filename = photo.file.split("/").pop();
-      const file = new File([blob], filename, { type: blob.type || "image/jpeg" });
-      setCoverFile(file);
-      setCoverPreview(photo.file);
-      setShowLibrary(false);
     } catch {
-      setCoverPreview(photo.file);
-      setShowLibrary(false);
+      // silently fail
     } finally {
-      setLibPicking(null);
+      setPexelsLoading(false);
+    }
+  }
+
+  async function pickPexelsPhoto(photo) {
+    setPexelsPicking(photo.id);
+    try {
+      const res = await fetch(photo.src_large);
+      const blob = await res.blob();
+      const file = new File([blob], `pexels-${photo.id}.jpg`, { type: "image/jpeg" });
+      setCoverFile(file);
+      setCoverPreview(photo.src_medium);
+      setPexelsOpen(false);
+    } catch {
+      setCoverPreview(photo.src_medium);
+      setPexelsOpen(false);
+    } finally {
+      setPexelsPicking(null);
     }
   }
 
@@ -141,10 +138,6 @@ export default function EventSettingsPage() {
     setCoverPreview(null);
     if (fileRef.current) fileRef.current.value = "";
   }
-
-  const filteredPhotos = libCategory === "all"
-    ? libPhotos
-    : libPhotos.filter((p) => p.category === libCategory);
 
   async function handleSave(e) {
     e.preventDefault();
@@ -279,10 +272,10 @@ export default function EventSettingsPage() {
                   </label>
                   <button
                     type="button"
-                    className={`${formStyles.coverSourceBtn} ${showLibrary ? formStyles.coverSourceBtnActive : ""}`}
-                    onClick={showLibrary ? () => setShowLibrary(false) : openLibrary}
+                    className={`${formStyles.coverSourceBtn} ${pexelsOpen ? formStyles.coverSourceBtnActive : ""}`}
+                    onClick={pexelsOpen ? () => setPexelsOpen(false) : openPexels}
                   >
-                    🖼 App photo library {showLibrary ? "▲" : "▼"}
+                    🔍 Search Pexels {pexelsOpen ? "▲" : "▼"}
                   </button>
                 </div>
               )}
@@ -290,57 +283,76 @@ export default function EventSettingsPage() {
               <p className={formStyles.hint}>
                 {coverPreview || existingCoverUrl
                   ? "This image will be shown on your invite page."
-                  : "Upload your own photo or pick one from the celebration library."}
+                  : "Upload your own photo or search Pexels for the perfect one."}
               </p>
 
-              {/* ── Library picker ── */}
-              {showLibrary && (
+              {/* ── Pexels live search ── */}
+              {pexelsOpen && (
                 <div className={formStyles.libraryPanel}>
-                  {libLoading ? (
-                    <p className={formStyles.libraryLoading}>Loading photos…</p>
-                  ) : (
-                    <>
-                      {/* Category chips */}
-                      <div className={formStyles.libCategoryBar}>
-                        <button
-                          type="button"
-                          className={`${formStyles.libCatChip} ${libCategory === "all" ? formStyles.libCatChipActive : ""}`}
-                          onClick={() => setLibCategory("all")}
-                        >
-                          All ({libPhotos.length})
-                        </button>
-                        {libCategories.map((cat) => {
-                          const count = libPhotos.filter((p) => p.category === cat).length;
-                          return (
-                            <button key={cat} type="button"
-                              className={`${formStyles.libCatChip} ${libCategory === cat ? formStyles.libCatChipActive : ""}`}
-                              onClick={() => setLibCategory(cat)}
-                            >
-                              {CATEGORY_LABELS[cat] || cat} ({count})
-                            </button>
-                          );
-                        })}
-                      </div>
+                  <div className={formStyles.pexelsSearchBar}>
+                    <input
+                      type="text"
+                      className={formStyles.pexelsInput}
+                      value={pexelsQuery}
+                      onChange={(e) => setPexelsQuery(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); searchPexels(pexelsQuery, 1, true); } }}
+                      placeholder="Search photos…"
+                    />
+                    <button
+                      type="button"
+                      className={formStyles.pexelsSearchBtn}
+                      onClick={() => searchPexels(pexelsQuery, 1, true)}
+                      disabled={pexelsLoading || !pexelsQuery.trim()}
+                    >
+                      {pexelsLoading ? "…" : "Search"}
+                    </button>
+                  </div>
 
-                      {/* Photo grid */}
-                      <div className={formStyles.libGrid}>
-                        {filteredPhotos.map((photo) => (
-                          <button key={photo.id} type="button"
-                            className={`${formStyles.libThumb} ${coverPreview === photo.file ? formStyles.libThumbSelected : ""}`}
-                            onClick={() => pickLibraryPhoto(photo)}
-                            disabled={!!libPicking}
-                            title={photo.alt || photo.category}
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={photo.file} alt={photo.alt || ""} loading="lazy" />
-                            {libPicking === photo.id && <span className={formStyles.libThumbOverlay}>…</span>}
-                          </button>
-                        ))}
-                      </div>
-                    </>
+                  {pexelsPhotos.length === 0 && !pexelsLoading && (
+                    <p className={formStyles.libraryLoading}>No results.</p>
                   )}
+                  {pexelsLoading && pexelsPhotos.length === 0 && (
+                    <p className={formStyles.libraryLoading}>Searching…</p>
+                  )}
+
+                  {pexelsPhotos.length > 0 && (
+                    <div className={formStyles.libGrid}>
+                      {pexelsPhotos.map((photo) => (
+                        <button
+                          key={photo.id}
+                          type="button"
+                          className={`${formStyles.libThumb} ${coverPreview === photo.src_medium ? formStyles.libThumbSelected : ""}`}
+                          onClick={() => pickPexelsPhoto(photo)}
+                          disabled={!!pexelsPicking}
+                          title={photo.alt || photo.photographer}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={photo.src_medium} alt={photo.alt || ""} loading="lazy" />
+                          <span className={formStyles.libThumbCredit}>{photo.photographer}</span>
+                          {pexelsPicking === photo.id && <span className={formStyles.libThumbOverlay}>…</span>}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className={formStyles.pexelsFooter}>
+                    <span className={formStyles.pexelsAttribution}>
+                      Photos by <a href="https://www.pexels.com" target="_blank" rel="noreferrer">Pexels</a>
+                    </span>
+                    {pexelsPhotos.length < pexelsTotalResults && (
+                      <button
+                        type="button"
+                        className={formStyles.pexelsLoadMore}
+                        onClick={() => searchPexels(pexelsQuery, pexelsPage + 1, false)}
+                        disabled={pexelsLoading}
+                      >
+                        {pexelsLoading ? "Loading…" : "Load more"}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
+
             </div>
 
             {inviteUrl && (

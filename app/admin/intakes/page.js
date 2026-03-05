@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createSupabaseServerClient } from "../../../lib/supabase-server";
-import { listIntakesForAdmin } from "../../../lib/admin-intakes";
+import { listIntakesForAdmin, listOnboardingIntakesForAdmin } from "../../../lib/admin-intakes";
 import IntakesPanel from "./IntakesPanel";
 import styles from "../landing-config/page.module.css";
 
@@ -13,7 +13,10 @@ export default async function AdminIntakesPage() {
   if (!user) redirect("/auth/login?next=/admin/intakes");
   if (user.email !== process.env.SUPER_ADMIN_EMAIL?.trim()) redirect("/dashboard");
 
-  const intakes = await listIntakesForAdmin().catch(() => []);
+  const [intakes, onboardingIntakes] = await Promise.all([
+    listIntakesForAdmin().catch(() => []),
+    listOnboardingIntakesForAdmin().catch(() => []),
+  ]);
 
   return (
     <div className={styles.page}>
@@ -32,7 +35,7 @@ export default async function AdminIntakesPage() {
       </header>
 
       <main className={styles.main} style={{ maxWidth: 900 }}>
-        <IntakesPanel intakes={intakes} />
+        <IntakesPanel intakes={intakes} onboardingIntakes={onboardingIntakes} />
       </main>
     </div>
   );

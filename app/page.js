@@ -1,6 +1,10 @@
+import { unstable_noStore } from "next/cache";
 import { getActiveTheme, getThemeByName } from "../lib/landing-store";
 import { DEFAULT_THEMES } from "./components/landing/themes/defaults";
 import LandingTemplate from "./components/landing/LandingTemplate";
+
+// Always fetch fresh data — never serve a cached theme
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Utsavé — Every Celebration, Elevated",
@@ -9,7 +13,8 @@ export const metadata = {
 };
 
 export default async function Home({ searchParams }) {
-  // ?theme=festival overrides the active theme for this request (no redeploy needed)
+  unstable_noStore(); // ensure theme is always read fresh from DB
+  // ?theme=... in URL overrides the active theme (e.g. /?theme=festival shows festival)
   const override = searchParams?.theme;
   let theme = null;
 

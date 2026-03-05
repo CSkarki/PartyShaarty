@@ -680,6 +680,88 @@
 
 /* ── CTA Banner ──────────────────────────────────────────────────────────── */
 
+/* ── Help CTA ────────────────────────────────────────────────────────────── */
+
+.helpSection {
+  padding: 5rem 2rem;
+  text-align: center;
+  background: color-mix(in srgb, var(--accent) 6%, var(--bg));
+  border-top: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, var(--border));
+}
+
+.helpBadge {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.helpHeadline {
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-family: "DM Serif Display", "Cormorant Garamond", serif;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.helpSub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  max-width: 520px;
+  margin: 0 auto 2rem;
+  line-height: 1.6;
+}
+
+.helpContacts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.helpContact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  background: var(--surface);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 999px;
+  color: var(--text);
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.helpContact:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  color: var(--accent);
+}
+
+.helpBtn {
+  display: inline-block;
+  padding: 0.85rem 2rem;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.helpBtn:hover {
+  background: var(--accent-hover);
+}
+
 .ctaBanner {
   background: var(--accent);
   padding: 5.5rem 2rem;

@@ -19,6 +19,8 @@ export async function generateMetadata({ params }) {
   };
 }
 
+export const dynamic = "force-dynamic";
+
 // Public — no auth required. Used for marketing campaign links and admin preview.
 export default async function ThemePreview({ params }) {
   const name = params.theme;

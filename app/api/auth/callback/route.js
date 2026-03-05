@@ -63,5 +63,7 @@ export async function GET(request) {
     });
   }
 
-  return NextResponse.redirect(`${origin}/dashboard`);
+  const returnTo = searchParams.get("returnTo") || "/dashboard";
+  const safePath = returnTo.startsWith("/") && !returnTo.startsWith("//") ? returnTo : "/dashboard";
+  return NextResponse.redirect(`${origin}${safePath}`);
 }
