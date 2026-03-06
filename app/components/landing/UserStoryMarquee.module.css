@@ -1,0 +1,89 @@
+.section {
+  padding: 80px 0 60px;
+  background: var(--bg);
+  overflow: hidden;
+  text-align: center;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.headline {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 48px;
+  line-height: 1.3;
+}
+
+/* ── Marquee container ── */
+.marqueeWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  cursor: default;
+}
+
+/* Hover on wrapper pauses both rows simultaneously */
+.marqueeWrapper:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+.marqueeTrack {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  will-change: transform;
+}
+
+.scrollLeft {
+  animation: scrollLeft 35s linear infinite;
+}
+
+.scrollRight {
+  animation: scrollRight 40s linear infinite;
+}
+
+@keyframes scrollLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Individual photo tile ── */
+.tile {
+  position: relative;
+  width: 160px;
+  height: 220px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.tile:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.22);
+  z-index: 1;
+}
+
+.tileImg {
+  object-fit: cover;
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .marqueeTrack {
+    animation: none;
+  }
+}

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import styles from "./LandingTemplate.module.css";
 import { ALL_EVENT_TYPES } from "./themes/defaults";
+import UserStorySection from "./UserStorySection";
 
 /* ─── Universal data (same across all themes) ──────────────────────────────── */
 
@@ -235,6 +236,9 @@ export default function LandingTemplate({ theme }) {
           </div>
         </div>
       </section>
+
+      {/* ── User Story Marquee ── */}
+      <UserStorySection />
 
       {/* ── Features ── */}
       <section className={styles.features} id="features">
