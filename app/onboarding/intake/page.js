@@ -103,6 +103,7 @@ function OnboardingIntakeForm() {
   const mode = searchParams.get("mode") === "full" ? "full" : "light";
 
   const [authChecked, setAuthChecked] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [step, setStep] = useState(1);
   const [done, setDone] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -128,25 +129,24 @@ function OnboardingIntakeForm() {
     contact_phone: "",
   });
 
-  /* Auth gate */
+  /* Optional: pre-fill email if user is logged in; no login required to view form */
   useEffect(() => {
-    async function checkAuth() {
+    async function init() {
       const supabase = createSupabaseBrowserClient();
-      if (!supabase) {
-        router.replace("/auth/login");
-        return;
+      if (supabase) {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setIsLoggedIn(true);
+          if (user.email) {
+            setContactEmail(user.email);
+            setAnswers((prev) => ({ ...prev, contact_email: user.email || "" }));
+          }
+        }
       }
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/auth/login");
-        return;
-      }
-      setContactEmail(user.email || "");
-      setAnswers((prev) => ({ ...prev, contact_email: user.email || "" }));
       setAuthChecked(true);
     }
-    checkAuth();
-  }, [router]);
+    init();
+  }, []);
 
   /* ── Helpers ── */
   function selectFull(field, value, multi, max) {
@@ -169,9 +169,28 @@ function OnboardingIntakeForm() {
     return false;
   }
 
-  function isLightValid() {
-    return !!(contactEmail.trim()) && !!(contactPhone.trim());
+  function isValidEmail(str) {
+    if (!str?.trim()) return false;
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(str.trim());
   }
+
+  function isValidUSPhone(str) {
+    if (!str?.trim()) return false;
+    let digits = str.replace(/\D/g, "");
+    if (digits.length === 11 && digits.startsWith("1")) digits = digits.slice(1);
+    if (digits.length !== 10) return false;
+    const allSame = /^(\d)\1{9}$/.test(digits);
+    const sequential = digits === "1234567890" || digits === "0123456789" || digits === "9876543210";
+    return !allSame && !sequential;
+  }
+
+  function isLightValid() {
+    return isValidEmail(contactEmail) && isValidUSPhone(contactPhone);
+  }
+
+  const emailError = contactEmail.trim() && !isValidEmail(contactEmail);
+  const phoneError = contactPhone.trim() && !isValidUSPhone(contactPhone);
 
   /* ── Submit ── */
   async function handleSubmit() {
@@ -208,6 +227,10 @@ function OnboardingIntakeForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Submission failed");
+      if (!isLoggedIn) {
+        router.replace("/");
+        return;
+      }
       setDone(true);
     } catch (err) {
       setSaveError(err.message);
@@ -338,22 +361,36 @@ function OnboardingIntakeForm() {
                 <input
                   type="email"
                   required
-                  className={styles.contactInput}
+                  className={`${styles.contactInput} ${emailError ? styles.inputError : ""}`}
                   placeholder="you@example.com"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : undefined}
                 />
+                {emailError && (
+                  <p id="email-error" className={styles.fieldError}>
+                    Please enter a valid email address.
+                  </p>
+                )}
                 <label className={styles.contactLabel}>
                   Phone number <span className={styles.required}>*</span>
                 </label>
                 <input
                   type="tel"
                   required
-                  className={styles.contactInput}
-                  placeholder="+1 234 567 8900"
+                  className={`${styles.contactInput} ${phoneError ? styles.inputError : ""}`}
+                  placeholder="(555) 123-4567 or 555-123-4567"
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
+                  aria-invalid={!!phoneError}
+                  aria-describedby={phoneError ? "phone-error" : undefined}
                 />
+                {phoneError && (
+                  <p id="phone-error" className={styles.fieldError}>
+                    Please enter a valid US phone number (10 digits).
+                  </p>
+                )}
               </div>
             </div>
 

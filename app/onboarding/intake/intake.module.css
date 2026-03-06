@@ -250,6 +250,20 @@
   box-shadow: 0 0 0 2px rgba(201, 148, 26, 0.15);
 }
 
+.contactInput.inputError {
+  border-color: var(--error, #dc2626);
+}
+
+.contactInput.inputError:focus {
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2);
+}
+
+.fieldError {
+  font-size: 0.8rem;
+  color: var(--error, #dc2626);
+  margin: 0.25rem 0 0;
+}
+
 /* ─── Multi-hint ─────────────────────────────────────────── */
 .multiHint {
   font-size: 0.8rem;

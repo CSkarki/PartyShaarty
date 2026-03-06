@@ -275,16 +275,22 @@ export default function LandingTemplate({ theme }) {
           <p className={styles.helpBadge}>We&apos;re here for you</p>
           <h2 className={styles.helpHeadline}>{helpCta?.headline}</h2>
           <p className={styles.helpSub}>{helpCta?.sub}</p>
-          <div className={styles.helpContacts}>
-            <a href={`mailto:${helpCta?.email}`} className={styles.helpContact}>
-              📧 {helpCta?.email}
-            </a>
-            <a href={`tel:${(helpCta?.phone || "").replace(/\D/g, "")}`} className={styles.helpContact}>
-              📞 {helpCta?.phone}
-            </a>
-          </div>
-          <Link href={`/auth/register?intake=${intakeMode || "light"}`} className={styles.helpBtn}>
-            {helpCta?.buttonText || "Get Started →"}
+          {(helpCta?.email?.trim() || helpCta?.phone?.trim()) && (
+            <div className={styles.helpContacts}>
+              {helpCta?.email?.trim() && (
+                <a href={`mailto:${helpCta.email.trim()}`} className={styles.helpContact}>
+                  📧 {helpCta.email.trim()}
+                </a>
+              )}
+              {helpCta?.phone?.trim() && (
+                <a href={`tel:${(helpCta.phone || "").replace(/\D/g, "")}`} className={styles.helpContact}>
+                  📞 {helpCta.phone.trim()}
+                </a>
+              )}
+            </div>
+          )}
+          <Link href="/onboarding/intake?mode=light" className={styles.helpBtn}>
+            {helpCta?.buttonText || "Get Started — We'll Contact You"}
           </Link>
         </section>
       )}

@@ -120,9 +120,9 @@ const WEDDING = {
     enabled:    true,
     headline:   "Want help planning your celebration?",
     sub:        "Let our team design, plan and execute your event — end to end.",
-    email:      "contact@utsav-events.com",
-    phone:      "703-628-7023",
-    buttonText: "Get Started →",
+    email:      "",  // set in Admin → Landing Config (Help CTA section)
+    phone:      "",
+    buttonText: "Get Started — We'll Contact You",
   },
 };
 
@@ -163,9 +163,9 @@ const FESTIVAL = {
     enabled:    true,
     headline:   "Want help planning your event?",
     sub:        "Let our team handle the invites, décor, and day-of coordination.",
-    email:      "contact@utsav-events.com",
-    phone:      "703-628-7023",
-    buttonText: "Get Started →",
+    email:      "",  // set in Admin → Landing Config (Help CTA section)
+    phone:      "",
+    buttonText: "Get Started — We'll Contact You",
   },
 };
 
@@ -206,9 +206,9 @@ const PUJA = {
     enabled:    true,
     headline:   "Want help organising your puja or ceremony?",
     sub:        "Let our team handle the coordination so you can focus on the blessings.",
-    email:      "contact@utsav-events.com",
-    phone:      "703-628-7023",
-    buttonText: "Get Started →",
+    email:      "",  // set in Admin → Landing Config (Help CTA section)
+    phone:      "",
+    buttonText: "Get Started — We'll Contact You",
   },
 };
 
@@ -249,9 +249,9 @@ const ANNIVERSARY = {
     enabled:    true,
     headline:   "Want help planning your anniversary celebration?",
     sub:        "Let our team design and execute a celebration as grand as your love story.",
-    email:      "contact@utsav-events.com",
-    phone:      "703-628-7023",
-    buttonText: "Get Started →",
+    email:      "",  // set in Admin → Landing Config (Help CTA section)
+    phone:      "",
+    buttonText: "Get Started — We'll Contact You",
   },
 };
 
@@ -292,9 +292,9 @@ const BIRTHDAY_KID = {
     enabled:    true,
     headline:   "Want help planning their big day?",
     sub:        "Let our team take care of every detail so you can be fully present.",
-    email:      "contact@utsav-events.com",
-    phone:      "703-628-7023",
-    buttonText: "Get Started →",
+    email:      "",  // set in Admin → Landing Config (Help CTA section)
+    phone:      "",
+    buttonText: "Get Started — We'll Contact You",
   },
 };
 
@@ -335,9 +335,9 @@ const BIRTHDAY_ADULT = {
     enabled:    true,
     headline:   "Want help planning this milestone birthday?",
     sub:        "Let our team design and execute the celebration they deserve.",
-    email:      "contact@utsav-events.com",
-    phone:      "703-628-7023",
-    buttonText: "Get Started →",
+    email:      "",  // set in Admin → Landing Config (Help CTA section)
+    phone:      "",
+    buttonText: "Get Started — We'll Contact You",
   },
 };
 

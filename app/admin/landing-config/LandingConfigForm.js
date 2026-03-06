@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./page.module.css";
 
@@ -109,6 +109,47 @@ export default function LandingConfigForm({ themes, activeTheme }) {
   const [helpEmail,       setHelpEmail]       = useState(activeTheme?.helpCta?.email || "");
   const [helpPhone,       setHelpPhone]       = useState(activeTheme?.helpCta?.phone || "");
   const [helpButtonText,  setHelpButtonText]  = useState(activeTheme?.helpCta?.buttonText || "");
+
+  // When "Theme to edit" changes, load that theme's config so email/phone etc. reflect the selected theme
+  useEffect(() => {
+    if (!editingThemeId) return;
+    const themeId = themes.find((t) => t.id === editingThemeId)?.id;
+    if (!themeId || themeId === activeTheme?.id) {
+      const t = activeTheme;
+      if (!t) return;
+      setBadge(t.hero?.badge ?? ""); setHeadline(t.hero?.headline ?? ""); setSubheadline(t.hero?.subheadline ?? "");
+      setCtaText(t.hero?.ctaText ?? ""); setCtaHref(t.hero?.ctaHref ?? "/auth/register");
+      setPhoto0(t.hero?.photos?.[0]?.src ?? ""); setPhoto1(t.hero?.photos?.[1]?.src ?? ""); setPhoto2(t.hero?.photos?.[2]?.src ?? "");
+      setPAccent(t.palette?.accent ?? "#c9941a"); setPHover(t.palette?.accentHover ?? "#a87a14"); setPDim(t.palette?.accentDim ?? "rgba(201,148,26,0.12)"); setPBg(t.palette?.bg ?? "#faf7f2"); setPDeep(t.palette?.accentDeep ?? "#8b4513");
+      setCtaBannerHeadline(t.ctaBanner?.headline ?? ""); setCtaBannerSub(t.ctaBanner?.sub ?? ""); setCtaBannerCta(t.ctaBanner?.cta ?? ""); setCtaBannerHref(t.ctaBanner?.href ?? "/auth/register");
+      setEventTypeKeys(Array.isArray(t.eventTypeKeys) ? t.eventTypeKeys : []);
+      setIntakeMode(t.intakeMode ?? "light");
+      setHelpEnabled(t.helpCta?.enabled !== false); setHelpHeadline(t.helpCta?.headline ?? ""); setHelpSub(t.helpCta?.sub ?? "");
+      setHelpEmail(t.helpCta?.email ?? ""); setHelpPhone(t.helpCta?.phone ?? ""); setHelpButtonText(t.helpCta?.buttonText ?? "");
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/admin/landing-themes/${themeId}`, { credentials: "include" });
+        if (!res.ok || cancelled) return;
+        const t = await res.json();
+        if (cancelled) return;
+        setBadge(t.hero?.badge ?? ""); setHeadline(t.hero?.headline ?? ""); setSubheadline(t.hero?.subheadline ?? "");
+        setCtaText(t.hero?.ctaText ?? ""); setCtaHref(t.hero?.ctaHref ?? "/auth/register");
+        setPhoto0(t.hero?.photos?.[0]?.src ?? ""); setPhoto1(t.hero?.photos?.[1]?.src ?? ""); setPhoto2(t.hero?.photos?.[2]?.src ?? "");
+        setPAccent(t.palette?.accent ?? "#c9941a"); setPHover(t.palette?.accentHover ?? "#a87a14"); setPDim(t.palette?.accentDim ?? "rgba(201,148,26,0.12)"); setPBg(t.palette?.bg ?? "#faf7f2"); setPDeep(t.palette?.accentDeep ?? "#8b4513");
+        setCtaBannerHeadline(t.ctaBanner?.headline ?? ""); setCtaBannerSub(t.ctaBanner?.sub ?? ""); setCtaBannerCta(t.ctaBanner?.cta ?? ""); setCtaBannerHref(t.ctaBanner?.href ?? "/auth/register");
+        setEventTypeKeys(Array.isArray(t.eventTypeKeys) ? t.eventTypeKeys : []);
+        setIntakeMode(t.intakeMode ?? "light");
+        setHelpEnabled(t.helpCta?.enabled !== false); setHelpHeadline(t.helpCta?.headline ?? ""); setHelpSub(t.helpCta?.sub ?? "");
+        setHelpEmail(t.helpCta?.email ?? ""); setHelpPhone(t.helpCta?.phone ?? ""); setHelpButtonText(t.helpCta?.buttonText ?? "");
+      } catch {
+        if (!cancelled) setSaveMsg({ type: "error", text: "Could not load theme config." });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [editingThemeId, themes, activeTheme]);
 
   function toggleEventType(key) {
     setEventTypeKeys((prev) =>
@@ -497,7 +538,7 @@ export default function LandingConfigForm({ themes, activeTheme }) {
                   </div>
                   <div className={styles.field}>
                     <label className={styles.label}>Contact phone</label>
-                    <input className={styles.input} value={helpPhone} onChange={(e) => setHelpPhone(e.target.value)} placeholder="571-908-9101" />
+                    <input className={styles.input} value={helpPhone} onChange={(e) => setHelpPhone(e.target.value)} placeholder="703-628-7023" />
                   </div>
                 </div>
                 <div className={styles.field}>

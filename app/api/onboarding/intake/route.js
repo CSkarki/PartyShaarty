@@ -1,13 +1,9 @@
-import { createSupabaseServerClient, requireHostProfile, createSupabaseAdminClient } from "../../../../lib/supabase-server";
+import { createSupabaseServerClient, createSupabaseAdminClient } from "../../../../lib/supabase-server";
 
 export async function POST(request) {
   const supabase = createSupabaseServerClient();
-  let profile;
-  try {
-    ({ profile } = await requireHostProfile(supabase));
-  } catch (res) {
-    return res;
-  }
+  const { data: { user } } = await supabase.auth.getUser();
+  const userId = user?.id ?? null;
 
   let body;
   try {
@@ -36,7 +32,7 @@ export async function POST(request) {
 
   const admin = createSupabaseAdminClient();
   const { error } = await admin.from("onboarding_intakes").insert({
-    user_id: profile.user_id,
+    user_id: userId,
     intake_mode: intake_mode || "light",
     event_type: event_type || null,
     event_date: event_date || null,

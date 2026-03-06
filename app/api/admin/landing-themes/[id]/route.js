@@ -1,8 +1,25 @@
 import { createSupabaseServerClient } from "../../../../../lib/supabase-server";
-import { setActiveTheme, upsertThemeConfig } from "../../../../../lib/landing-store";
+import { setActiveTheme, upsertThemeConfig, getThemeById } from "../../../../../lib/landing-store";
 
 function isSuperAdmin(user) {
   return user?.email && user.email === process.env.SUPER_ADMIN_EMAIL;
+}
+
+/** GET: return merged theme config for the form (when switching "Theme to edit"). */
+export async function GET(request, { params }) {
+  const supabase = createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!isSuperAdmin(user)) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+  const { id } = params;
+  try {
+    const theme = await getThemeById(id);
+    if (!theme) return Response.json({ error: "Theme not found" }, { status: 404 });
+    return Response.json(theme);
+  } catch (err) {
+    return Response.json({ error: err.message }, { status: 500 });
+  }
 }
 
 export async function PATCH(request, { params }) {
